@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0a">
+<title>SN Production</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23111'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='40' font-weight='800' fill='%23DC2626'%3ESN%3C/text%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
+  padding-bottom:72px;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+.page{display:none;padding:16px 16px 24px;max-width:480px;margin:0 auto;animation:fadeIn .2s}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#111;
+  border-top:1px solid #222;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:100}
+.bnav a{flex:1;text-align:center;color:#555;font-size:10px;text-decoration:none;padding:4px 0;transition:.15s}
+.bnav a.act{color:#DC2626}
+.bnav a svg{display:block;margin:0 auto 2px;width:24px;height:24px}
+
+/* Components */
+.card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
+.card:active{background:#1a1a1a}
+.hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.val{font-size:15px;margin-bottom:10px}
+.big{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a1a1a}
+.row:last-child{border:none}
+
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.b-created{background:#222;color:#888}
+.b-printing{background:#2d1010;color:#f87171}
+.b-printdone{background:#14332a;color:#4ade80}
+.b-qcpassed{background:#2a1f08;color:#fbbf24}
+.b-qcfailed{background:#2d0f0f;color:#ef4444}
+.b-packed{background:#1e103d;color:#a78bfa}
+.b-shipped{background:#052e16;color:#22c55e}
+
+/* Buttons */
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
+  text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
+.btn:active{transform:scale(.97);opacity:.8}
+.btn-p{background:#DC2626;color:#fff}
+.btn-g{background:#22c55e;color:#000}
+.btn-r{background:#7f1d1d;color:#f87171;border:1px solid #991b1b}
+.btn-o{background:transparent;color:#aaa;border:1px solid #333}
+
+/* Inputs */
+input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #262626;
+  background:#0d0d0d;color:#fff;font-size:15px;margin-bottom:8px;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:#DC2626;outline:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
+/* Timeline */
+.tl{position:relative;padding-left:28px;margin:8px 0}
+.tl::before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#222}
+.tl-i{position:relative;padding-bottom:18px}
+.tl-i:last-child{padding-bottom:0}
+.tl-d{position:absolute;left:-23px;top:3px;width:12px;height:12px;border-radius:50%;background:#151515;border:2px solid #333}
+.tl-d.done{background:#22c55e;border-color:#22c55e}
+.tl-d.now{background:#DC2626;border-color:#DC2626;box-shadow:0 0 10px #DC262655}
+
+/* QR scanner */
+#qr-reader{width:100%;max-width:400px;margin:0 auto;border-radius:12px;overflow:hidden}
+#qr-reader video{border-radius:12px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat{background:#151515;border-radius:12px;padding:14px;border:1px solid #1e1e1e;text-align:center}
+.stat .n{font-size:28px;font-weight:800}
+
+/* Loading */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
+  border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{text-align:center;padding:40px;color:#555}
+
+/* Batch list item */
+.batch-item{display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:inherit}
+.batch-item:active{opacity:.7}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+  padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
+  z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast-ok{background:#22c55e;color:#000}
+.toast-err{background:#ef4444;color:#fff}
+
+/* Confirm overlay */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;display:flex;
+  align-items:center;justify-content:center;padding:24px;animation:fadeIn .15s}
+.confirm-box{background:#1a1a1a;border-radius:16px;padding:24px;max-width:320px;width:100%;border:1px solid #333}
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast toast-ok" id="toast"></div>
+
+<!-- Confirm overlay (hidden) -->
+<div class="confirm-overlay" id="confirm-overlay" style="display:none">
+  <div class="confirm-box">
+    <div id="confirm-msg" style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-o" style="margin:0" onclick="hideConfirm()">ยกเลิก</button>
+      <button class="btn btn-r" style="margin:0" id="confirm-yes">ยืนยันลบ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: HOME ===== -->
+<div class="page active" id="pg-home">
+  <div style="text-align:center;margin:12px 0 20px">
+    <div style="font-size:11px;color:#DC2626;letter-spacing:3px;font-weight:700">SN MOTORSPORTS</div>
+    <div style="font-size:22px;font-weight:800;margin-top:2px;color:#fff">Production Tracker</div>
+    <div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
+  </div>
+  <div class="stats" id="stats">
+    <div class="stat"><div class="n" id="st-total">-</div><div class="hdr">Total</div></div>
+    <div class="stat"><div class="n" id="st-printing" style="color:#f87171">-</div><div class="hdr">Printing</div></div>
+    <div class="stat"><div class="n" id="st-done" style="color:#fbbf24">-</div><div class="hdr">QC/Done</div></div>
+    <div class="stat"><div class="n" id="st-shipped" style="color:#22c55e">-</div><div class="hdr">Shipped</div></div>
+  </div>
+  <button class="btn btn-p" onclick="nav('new')">+ สร้าง Batch ใหม่</button>
+  <button class="btn btn-o" onclick="nav('scan')">สแกน QR Code</button>
+  <div style="margin-top:16px">
+    <div class="hdr" style="margin-bottom:8px">Batch ล่าสุด</div>
+    <div id="recent-list"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ===== PAGE: SCAN ===== -->
+<div class="page" id="pg-scan">
+  <div class="hdr" style="margin-bottom:12px">สแกน QR Code</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div id="qr-reader"></div>
+  </div>
+  <div id="scan-result" style="margin-top:12px"></div>
+  <div style="text-align:center;margin-top:12px;color:#555;font-size:13px">
+    เปิดกล้องแล้วหันไปที่ QR บน Label ผลิต
+  </div>
+</div>
+
+<!-- ===== PAGE: NEW BATCH ===== -->
+<div class="page" id="pg-new">
+  <div class="hdr" style="margin-bottom:12px">สร้าง Batch ใหม่</div>
+  <div class="card">
+    <div class="hdr">สินค้า</div>
+    <select id="f-product">
+      <option value="PCX Velocity Stack">PCX Velocity Stack</option>
+      <option value="Aura Stream">Aura Stream</option>
+      <option value="Aura Beam">Aura Beam</option>
+      <option value="AXIS">AXIS</option>
+    </select>
+    <div class="hdr">จำนวน (ชิ้น)</div>
+    <input type="number" id="f-qty" value="1" min="1">
+    <div class="hdr">รุ่นรถ</div>
+    <input type="text" id="f-carModel" placeholder="เช่น Honda PCX 160">
+    <div class="hdr">ผู้ดำเนินการ</div>
+    <input type="text" id="f-operator" placeholder="ชื่อ">
+    <div class="hdr">หมายเหตุ</div>
+    <textarea id="f-notes" rows="2" placeholder="เช่น nozzle ใหม่, ปรับ temp"></textarea>
+    <button class="btn btn-p" onclick="doCreate()" id="btn-create">สร้าง Batch</button>
+  </div>
+</div>
+
+<!-- ===== PAGE: BATCH DETAIL ===== -->
+<div class="page" id="pg-batch">
+  <div id="batch-content"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
+<!-- ===== PAGE: LIST ===== -->
+<div class="page" id="pg-list">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="hdr">Batch ทั้งหมด</div>
+    <select id="filter-status" onchange="loadList()" style="width:auto;margin:0;padding:8px 32px 8px 10px;font-size:13px">
+      <option value="">ทั้งหมด</option>
+      <option value="Created">Created</option>
+      <option value="Printing">Printing</option>
+      <option value="Print Done">Print Done</option>
+      <option value="QC Passed">QC Passed</option>
+      <option value="Packed">Packed</option>
+      <option value="Shipped">Shipped</option>
+    </select>
+  </div>
+  <div id="full-list"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<div class="bnav">
+  <a href="#" onclick="return nav('home')" id="nav-home" class="act">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    หน้าแรก</a>
+  <a href="#" onclick="return nav('scan')" id="nav-scan">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    สแกน QR</a>
+  <a href="#" onclick="return nav('new')" id="nav-new">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    สร้าง</a>
+  <a href="#" onclick="return nav('list')" id="nav-list">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+    รายการ</a>
+</div>
+
+<!-- QR Scanner Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+<script>
+// ===== API LAYER =====
+// Google Apps Script deployment URL — API calls only (no HTML redirect needed)
+var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+var currentBatch = null;
+
+function callAPI(params) {
+  var qs = Object.keys(params).map(function(k) {
+    return encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
+  }).join('&');
+  var url = API_URL + '?' + qs;
+
+  // Try fetch first, fallback to XHR for Safari
+  return fetchJSON(url)
+    .catch(function() { return xhrJSON(url); });
+}
+
+function fetchJSON(url) {
+  return fetch(url, { redirect: 'follow' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+}
+
+function xhrJSON(url) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch(e) { reject(e); }
+      } else { reject(new Error('XHR ' + xhr.status)); }
+    };
+    xhr.onerror = function() { reject(new Error('XHR network error')); };
+    xhr.send();
+  });
+}
+
+// ===== NAVIGATION =====
+var currentPage = 'home';
+var scanner = null;
+var allBatches = [];
+
+function nav(page, data) {
+  if (currentPage === 'scan' && scanner) {
+    try { scanner.stop(); } catch(e) {}
+  }
+
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.bnav a').forEach(function(a) { a.classList.remove('act'); });
+
+  var pg = document.getElementById('pg-' + page);
+  var nv = document.getElementById('nav-' + page);
+  if (pg) pg.classList.add('active');
+  if (nv) nv.classList.add('act');
+  currentPage = page;
+
+  if (page === 'home') loadHome();
+  if (page === 'scan') initScanner();
+  if (page === 'list') loadList();
+  if (page === 'batch' && data) loadBatch(data);
+
+  window.scrollTo(0, 0);
+  return false;
+}
+
+// ===== HOME =====
+function loadHome() {
+  callAPI({ api: 'getStats' }).then(function(s) {
+    document.getElementById('st-total').textContent = s.total;
+    document.getElementById('st-printing').textContent = s.printing;
+    document.getElementById('st-done').textContent = s.done;
+    document.getElementById('st-shipped').textContent = s.shipped;
+  }).catch(function() {});
+
+  callAPI({ api: 'listBatches' }).then(function(list) {
+    allBatches = list;
+    var recent = allBatches.slice(0, 5);
+    document.getElementById('recent-list').innerHTML = recent.length
+      ? recent.map(batchCard).join('')
+      : '<div class="card" style="text-align:center;color:#555">ยังไม่มี Batch</div>';
+  }).catch(function() {
+    document.getElementById('recent-list').innerHTML =
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่</div>';
+  });
+}
+
+function batchCard(b) {
+  var bc = badgeClass(b.status);
+  return '<div class="card" onclick="nav(\'batch\',\'' + b.batchId + '\')" style="cursor:pointer">' +
+    '<div class="batch-item"><div>' +
+    '<div style="font-weight:700;font-size:15px">' + b.batchId + '</div>' +
+    '<div style="font-size:13px;color:#999">' + b.product + ' x' + b.qty + '</div>' +
+    '<div style="font-size:11px;color:#555">' + (b.carModel || '') + ' &middot; ' + b.created + '</div></div>' +
+    '<span class="badge ' + bc + '">' + b.status + '</span></div></div>';
+}
+
+function badgeClass(s) {
+  var m = {"Created":"b-created","Printing":"b-printing","Print Done":"b-printdone",
+    "QC Passed":"b-qcpassed","QC Failed":"b-qcfailed","Packed":"b-packed","Shipped":"b-shipped"};
+  return m[s] || "b-created";
+}
+
+// ===== QR SCANNER =====
+function initScanner() {
+  document.getElementById('scan-result').innerHTML = '';
+  if (scanner) { try { scanner.stop(); } catch(e) {} }
+
+  scanner = new Html5Qrcode("qr-reader");
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    function(decoded) {
+      var bid = decoded;
+      if (decoded.includes('id=')) {
+        var m = decoded.match(/id=([A-Z0-9-]+)/);
+        if (m) bid = m[1];
+      }
+      if (bid.startsWith('SN-')) {
+        scanner.stop().then(function() {
+          toast('พบ ' + bid, 'ok');
+          nav('batch', bid);
+        });
+      }
+    },
+    function(err) {}
+  ).catch(function(err) {
+    document.getElementById('scan-result').innerHTML =
+      '<div class="card" style="text-align:center;color:#f87171">' +
+      'ไม่สามารถเปิดกล้องได้<br><span style="font-size:13px;color:#666">ตรวจสอบ permission กล้อง</span></div>';
+  });
+}
+
+// ===== CREATE BATCH =====
+function doCreate() {
+  var btn = document.getElementById('btn-create');
+  btn.innerHTML = '<div class="spinner"></div>';
+  btn.disabled = true;
+
+  var carModel = document.getElementById('f-carModel').value;
+
+  callAPI({
+    api: 'create',
+    product: document.getElementById('f-product').value,
+    qty: document.getElementById('f-qty').value,
+    carModel: carModel,
+    operator: document.getElementById('f-operator').value,
+    notes: document.getElementById('f-notes').value
+  }).then(function(res) {
+    btn.textContent = 'สร้าง Batch';
+    btn.disabled = false;
+    if (res.success) {
+      toast('สร้าง ' + res.batchId + ' สำเร็จ!', 'ok');
+      document.getElementById('f-qty').value = 1;
+      document.getElementById('f-operator').value = '';
+      document.getElementById('f-notes').value = '';
+      nav('batch', res.batchId);
+    } else {
+      toast('Error: ' + (res.error || 'Unknown'), 'err');
+    }
+  }).catch(function(err) {
+    btn.textContent = 'สร้าง Batch';
+    btn.disabled = false;
+    toast('เกิดข้อผิดพลาด: ' + err, 'err');
+  });
+}
+
+// ===== BATCH DETAIL =====
+function loadBatch(batchId) {
+  document.getElementById('batch-content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+  callAPI({ api: 'getBatch', id: batchId }).then(function(b) {
+    if (b.error) {
+      document.getElementById('batch-content').innerHTML =
+        '<div class="card" style="text-align:center"><div class="big" style="color:#f87171">ไม่พบ</div>' +
+        '<div style="color:#666;margin-top:4px">' + batchId + '</div></div>';
+      return;
+    }
+    currentBatch = b;
+    renderBatch(b);
+  }).catch(function(err) {
+    document.getElementById('batch-content').innerHTML =
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ<br>' +
+      '<span style="font-size:13px;color:#666">' + err + '</span></div>';
+  });
+}
+
+function renderBatch(b) {
+  var statuses = ["Created","Printing","Print Done","QC Passed","Packed","Shipped"];
+  var ci = statuses.indexOf(b.status);
+  var next = ci >= 0 && ci < statuses.length - 1 ? statuses[ci + 1] : null;
+
+  var steps = [
+    {label:"สร้าง Batch", time:b.created},
+    {label:"เริ่มปริ้น", time:b.startPrint},
+    {label:"ปริ้นเสร็จ", time:b.printDone},
+    {label:"QC ผ่าน", time:b.qcPass},
+    {label:"แพ็คแล้ว", time:b.packed},
+    {label:"ส่งแล้ว", time:b.shipped}
+  ];
+
+  var tl = '<div class="tl">';
+  steps.forEach(function(s, i) {
+    var done = i <= ci;
+    var isCur = i === ci;
+    tl += '<div class="tl-i"><div class="tl-d ' + (isCur ? 'now' : done ? 'done' : '') + '"></div>' +
+      '<div class="hdr">' + s.label + '</div>' +
+      '<div style="font-size:13px;color:' + (done ? '#ccc' : '#444') + '">' + (s.time || '—') + '</div></div>';
+  });
+  tl += '</div>';
+
+  var viewUrl = window.location.href.split('?')[0] + '?id=' + b.batchId;
+  var qrApi = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(viewUrl);
+
+  var actionHtml = '';
+  if (next) {
+    actionHtml = '<div class="card"><div style="font-weight:700;margin-bottom:10px">อัพเดทสถานะ</div>' +
+      '<input type="text" id="u-operator" placeholder="ผู้ดำเนินการ" value="' + (b.operator || '') + '">' +
+      '<textarea id="u-notes" rows="2" placeholder="หมายเหตุ (ไม่บังคับ)"></textarea>' +
+      '<button class="btn ' + (next === "Shipped" ? "btn-g" : "btn-p") + '" onclick="doUpdate(\'' + next + '\')" id="btn-update">➜ ' + next + '</button>' +
+      (b.status === "Print Done" ? '<button class="btn btn-r" onclick="doUpdate(\'QC Failed\')">✗ QC ไม่ผ่าน</button>' : '') +
+      '</div>';
+  }
+
+  document.getElementById('batch-content').innerHTML =
+    '<div style="margin-bottom:12px"><a href="#" onclick="return nav(\'list\')" style="color:#555;text-decoration:none;font-size:13px">← รายการทั้งหมด</a></div>' +
+    '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">' +
+    '<div><div class="hdr">Batch ID</div><div class="big">' + b.batchId + '</div></div>' +
+    '<span class="badge ' + badgeClass(b.status) + '">' + b.status + '</span></div></div>' +
+
+    '<div class="card">' +
+    '<div style="font-weight:700;margin-bottom:8px">ข้อมูล Batch</div>' +
+    '<div class="row"><span class="hdr" style="margin:0">สินค้า</span><span>' + b.product + '</span></div>' +
+    '<div class="row"><span class="hdr" style="margin:0">จำนวน</span><span>' + b.qty + ' ชิ้น</span></div>' +
+    '<div class="row"><span class="hdr" style="margin:0">รุ่นรถ</span><span>' + (b.carModel || '-') + '</span></div>' +
+    '<div class="row"><span class="hdr" style="margin:0">ผู้ดำเนินการ</span><span>' + (b.operator || '-') + '</span></div>' +
+    (b.notes ? '<div class="row"><span class="hdr" style="margin:0">หมายเหตุ</span><span style="font-size:13px;max-width:60%;text-align:right">' + b.notes + '</span></div>' : '') +
+    '</div>' +
+
+    '<div class="card"><div style="font-weight:700;margin-bottom:8px">Timeline</div>' + tl + '</div>' +
+
+    actionHtml +
+
+    '<div class="card" style="text-align:center"><div class="hdr" style="margin-bottom:8px">QR Label</div>' +
+    '<div style="background:#fff;border-radius:10px;padding:16px;display:inline-block">' +
+    '<img src="' + qrApi + '" style="width:160px;height:160px"></div>' +
+    '<div style="margin-top:8px"><button class="btn btn-o" onclick="printQR()">🖨 ปริ้น QR Label</button></div></div>' +
+
+    '<div style="display:flex;gap:8px;margin-top:4px">' +
+    '<button class="btn btn-o" style="flex:1" onclick="showEdit()">แก้ไข</button>' +
+    '<button class="btn btn-r" style="flex:1" onclick="confirmDelete()">ลบ Batch</button>' +
+    '</div>';
+}
+
+function doUpdate(status) {
+  var b = currentBatch;
+  if (!b) return;
+  var btn = document.getElementById('btn-update');
+  if (btn) { btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true; }
+
+  callAPI({
+    api: 'updateStatus', batchId: b.batchId, status: status,
+    operator: document.getElementById('u-operator') ? document.getElementById('u-operator').value : '',
+    notes: document.getElementById('u-notes') ? document.getElementById('u-notes').value : ''
+  }).then(function(res) {
+    if (res.success) {
+      toast(b.batchId + ' → ' + status, 'ok');
+      loadBatch(b.batchId);
+    } else {
+      toast('Error: ' + (res.error || 'Unknown'), 'err');
+      if (btn) { btn.textContent = 'ลองใหม่'; btn.disabled = false; }
+    }
+  }).catch(function(err) {
+    if (btn) { btn.textContent = 'ลองใหม่'; btn.disabled = false; }
+    toast('เกิดข้อผิดพลาด', 'err');
+  });
+}
+
+// ===== EDIT BATCH =====
+function showEdit() {
+  var b = currentBatch;
+  if (!b) return;
+
+  var prodOpts = ["PCX Velocity Stack","Aura Stream","Aura Beam","AXIS"].map(function(p) {
+    return '<option value="' + p + '"' + (b.product === p ? ' selected' : '') + '>' + p + '</option>';
+  }).join('');
+
+  document.getElementById('batch-content').innerHTML =
+    '<div style="margin-bottom:12px"><a href="#" onclick="loadBatch(\'' + b.batchId + '\');return false" style="color:#555;text-decoration:none;font-size:13px">← ยกเลิก</a></div>' +
+    '<div class="card">' +
+    '<div style="font-weight:700;margin-bottom:4px;font-size:17px">แก้ไข ' + b.batchId + '</div>' +
+    '<div style="color:#555;font-size:13px;margin-bottom:14px">แก้ไขข้อมูลแล้วกดบันทึก</div>' +
+    '<div class="hdr">สินค้า</div>' +
+    '<select id="e-product">' + prodOpts + '</select>' +
+    '<div class="hdr">จำนวน (ชิ้น)</div>' +
+    '<input type="number" id="e-qty" value="' + b.qty + '" min="1">' +
+    '<div class="hdr">รุ่นรถ</div>' +
+    '<input type="text" id="e-carModel" value="' + (b.carModel || '') + '" placeholder="เช่น Honda PCX 160">' +
+    '<div class="hdr">ผู้ดำเนินการ</div>' +
+    '<input type="text" id="e-operator" value="' + (b.operator || '') + '">' +
+    '<div class="hdr">หมายเหตุ</div>' +
+    '<textarea id="e-notes" rows="3">' + (b.notes || '') + '</textarea>' +
+    '<button class="btn btn-p" onclick="doEdit()" id="btn-edit">บันทึก</button>' +
+    '<button class="btn btn-o" onclick="loadBatch(\'' + b.batchId + '\')">ยกเลิก</button>' +
+    '</div>';
+}
+
+function doEdit() {
+  var b = currentBatch;
+  if (!b) return;
+  var btn = document.getElementById('btn-edit');
+  btn.innerHTML = '<div class="spinner"></div>';
+  btn.disabled = true;
+
+  var carModel = document.getElementById('e-carModel').value;
+
+  callAPI({
+    api: 'edit',
+    batchId: b.batchId,
+    product: document.getElementById('e-product').value,
+    qty: document.getElementById('e-qty').value,
+    carModel: carModel,
+    operator: document.getElementById('e-operator').value,
+    notes: document.getElementById('e-notes').value
+  }).then(function(res) {
+    if (res.success) {
+      toast('บันทึกสำเร็จ', 'ok');
+      loadBatch(b.batchId);
+    } else {
+      btn.textContent = 'บันทึก';
+      btn.disabled = false;
+      toast('Error: ' + (res.error || 'Unknown'), 'err');
+    }
+  }).catch(function(err) {
+    btn.textContent = 'บันทึก';
+    btn.disabled = false;
+    toast('เกิดข้อผิดพลาด', 'err');
+  });
+}
+
+// ===== DELETE BATCH =====
+function confirmDelete() {
+  var b = currentBatch;
+  if (!b) return;
+  document.getElementById('confirm-msg').textContent = 'ลบ ' + b.batchId + ' ?';
+  document.getElementById('confirm-yes').onclick = function() { hideConfirm(); doDelete(); };
+  document.getElementById('confirm-overlay').style.display = 'flex';
+}
+
+function hideConfirm() {
+  document.getElementById('confirm-overlay').style.display = 'none';
+}
+
+function doDelete() {
+  var b = currentBatch;
+  if (!b) return;
+
+  callAPI({ api: 'delete', batchId: b.batchId }).then(function(res) {
+    if (res.success) {
+      toast('ลบ ' + b.batchId + ' แล้ว', 'ok');
+      currentBatch = null;
+      nav('list');
+    } else {
+      toast('Error: ' + (res.error || 'Unknown'), 'err');
+    }
+  }).catch(function(err) {
+    toast('เกิดข้อผิดพลาด', 'err');
+  });
+}
+
+// ===== QR PRINT =====
+function printQR() {
+  var b = currentBatch;
+  if (!b) return;
+  var viewUrl = window.location.href.split('?')[0] + '?id=' + b.batchId;
+  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(viewUrl);
+
+  var w = window.open('', '_blank');
+  w.document.write('<html><head><style>body{text-align:center;font-family:sans-serif;padding:20px}' +
+    '@page{margin:10mm}</style></head><body>' +
+    '<div style="font-size:10px;letter-spacing:3px;color:#DC2626;font-weight:700">SN MOTORSPORTS</div>' +
+    '<div style="font-size:22px;font-weight:700;margin:4px 0">' + b.batchId + '</div>' +
+    '<div style="font-size:12px;color:#888">' + b.product + ' | ' + (b.carModel || '') + '</div>' +
+    '<div style="margin:16px 0"><img src="' + qrUrl + '" style="width:200px;height:200px"></div>' +
+    '<div style="font-size:11px;color:#888">สแกนเพื่อดูสถานะ + อัพเดท</div>' +
+    '<script>setTimeout(function(){window.print()},500)<\/script></body></html>');
+}
+
+// ===== LIST =====
+function loadList() {
+  document.getElementById('full-list').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+  callAPI({ api: 'listBatches' }).then(function(list) {
+    allBatches = list;
+    renderList();
+  }).catch(function() {
+    document.getElementById('full-list').innerHTML =
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ</div>';
+  });
+}
+
+function renderList() {
+  var filter = document.getElementById('filter-status').value;
+  var filtered = filter ? allBatches.filter(function(b) { return b.status === filter; }) : allBatches;
+
+  document.getElementById('full-list').innerHTML = filtered.length
+    ? filtered.map(batchCard).join('')
+    : '<div class="card" style="text-align:center;color:#555;padding:24px">ไม่พบ Batch' + (filter ? ' (' + filter + ')' : '') + '</div>';
+}
+
+// ===== TOAST =====
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type === 'err' ? 'toast-err' : 'toast-ok') + ' show';
+  setTimeout(function() { t.className = 'toast toast-ok'; }, 2500);
+}
+
+// ===== INIT =====
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  if (id && id.startsWith('SN-')) {
+    nav('batch', id);
+  } else {
+    loadHome();
+  }
+})();
+</script>
+</body>
+</html>
