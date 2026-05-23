@@ -102,8 +102,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="confirm-box">
     <div id="confirm-msg" style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center"></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-o" style="margin:0" onclick="hideConfirm()">à¸¢à¸à¹à¸¥à¸´à¸</button>
-      <button class="btn btn-r" style="margin:0" id="confirm-yes">à¸¢à¸·à¸à¸¢à¸±à¸</button>
+      <button class="btn btn-o" style="margin:0" onclick="hideConfirm()">ยกเลิก</button>
+      <button class="btn btn-r" style="margin:0" id="confirm-yes">ยืนยัน</button>
     </div>
   </div>
 </div>
@@ -121,13 +121,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="stat"><div class="n" id="st-done" style="color:#fbbf24">-</div><div class="hdr">QC/Done</div></div>
     <div class="stat"><div class="n" id="st-shipped" style="color:#22c55e">-</div><div class="hdr">Shipped</div></div>
   </div>
-  <button class="btn btn-p" onclick="nav('new')">+ à¸ªà¸£à¹à¸²à¸ Batch à¹à¸«à¸¡à¹</button>
-  <button class="btn btn-o" onclick="nav('scan')">à¸ªà¹à¸à¸ QR Code</button>
-  <button class="btn btn-o" onclick="printStationQR()" style="border-color:#DC2626;color:#DC2626">à¸à¸´à¸¡à¸à¹ Station QR Label (5 à¸à¸§à¸)</button>
+  <button class="btn btn-p" onclick="nav('new')">+ สร้าง Batch ใหม่</button>
+  <button class="btn btn-o" onclick="nav('scan')">สแกน QR Code</button>
+  <button class="btn btn-o" onclick="printStationQR()" style="border-color:#DC2626;color:#DC2626">พิมพ์ Station QR Label (5 ดวง)</button>
         <a href="report.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">Batch Report</a>
 <a href="inventory.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">Inventory</a>
   <div style="margin-top:16px">
-    <div class="hdr" style="margin-bottom:8px">Batch à¸¥à¹à¸²à¸ªà¸¸à¸</div>
+    <div class="hdr" style="margin-bottom:8px">Batch ล่าสุด</div>
     <div id="recent-list"><div class="loading"><div class="spinner"></div></div></div>
   </div>
 </div>
@@ -139,36 +139,36 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 <!-- ===== PAGE: SCAN ===== -->
 <div class="page" id="pg-scan">
-  <div class="hdr" style="margin-bottom:12px">à¸ªà¹à¸à¸ QR Code</div>
+  <div class="hdr" style="margin-bottom:12px">สแกน QR Code</div>
   <div class="card" style="padding:0;overflow:hidden">
     <div id="qr-reader"></div>
   </div>
   <div id="scan-result" style="margin-top:12px"></div>
   <div style="text-align:center;margin-top:12px;color:#555;font-size:13px">
-    à¹à¸à¸´à¸à¸à¸¥à¹à¸­à¸à¹à¸¥à¹à¸§à¸«à¸±à¸à¹à¸à¸à¸µà¹ QR Label
+    เปิดกล้องแล้วหันไปที่ QR Label
   </div>
 </div>
 
 <!-- ===== PAGE: NEW BATCH ===== -->
 <div class="page" id="pg-new">
-  <div class="hdr" style="margin-bottom:12px">à¸ªà¸£à¹à¸²à¸ Batch à¹à¸«à¸¡à¹</div>
+  <div class="hdr" style="margin-bottom:12px">สร้าง Batch ใหม่</div>
   <div class="card">
-    <div class="hdr">à¸ªà¸´à¸à¸à¹à¸²</div>
+    <div class="hdr">สินค้า</div>
     <select id="f-product">
       <option value="PCX Velocity Stack">PCX Velocity Stack</option>
       <option value="Aura Stream">Aura Stream</option>
       <option value="Aura Beam">Aura Beam</option>
       <option value="AXIS">AXIS</option>
     </select>
-    <div class="hdr">à¸à¸³à¸à¸§à¸ (à¸à¸´à¹à¸)</div>
+    <div class="hdr">จำนวน (ชิ้น)</div>
     <input type="number" id="f-qty" value="1" min="1">
-    <div class="hdr">à¸£à¸¸à¹à¸à¸£à¸</div>
+    <div class="hdr">รุ่นรถ</div>
     <input type="text" id="f-carModel" placeholder="Models">
-    <div class="hdr">à¸à¸¹à¹à¸à¸³à¹à¸à¸´à¸à¸à¸²à¸£</div>
-    <input type="text" id="f-operator" placeholder="à¸à¸·à¹à¸­">
-    <div class="hdr">à¸«à¸¡à¸²à¸¢à¹à¸«à¸à¸¸</div>
-    <textarea id="f-notes" rows="2" placeholder="à¹à¸à¹à¸ nozzle à¹à¸«à¸¡à¹, à¸à¸£à¸±à¸ temp"></textarea>
-    <button class="btn btn-p" onclick="doCreate()" id="btn-create">à¸ªà¸£à¹à¸²à¸ Batch</button>
+    <div class="hdr">ผู้ดำเนินการ</div>
+    <input type="text" id="f-operator" placeholder="ชื่อ">
+    <div class="hdr">หมายเหตุ</div>
+    <textarea id="f-notes" rows="2" placeholder="เช่น nozzle ใหม่, ปรับ temp"></textarea>
+    <button class="btn btn-p" onclick="doCreate()" id="btn-create">สร้าง Batch</button>
   </div>
 </div>
 
@@ -180,9 +180,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <!-- ===== PAGE: LIST ===== -->
 <div class="page" id="pg-list">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div class="hdr">Batch à¸à¸±à¹à¸à¸«à¸¡à¸</div>
+    <div class="hdr">Batch ทั้งหมด</div>
     <select id="filter-status" onchange="renderList()" style="width:auto;margin:0;padding:8px 32px 8px 10px;font-size:13px">
-      <option value="">à¸à¸±à¹à¸à¸«à¸¡à¸</option>
+      <option value="">ทั้งหมด</option>
       <option value="Created">Created</option>
       <option value="Start Producing">Start Producing</option>
       <option value="Print Finish">Print Finish</option>
@@ -198,16 +198,16 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <div class="bnav">
   <a href="#" onclick="return nav('home')" id="nav-home" class="act">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-    à¸«à¸à¹à¸²à¹à¸£à¸</a>
+    หน้าแรก</a>
   <a href="#" onclick="return nav('scan')" id="nav-scan">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    à¸ªà¹à¸à¸ QR</a>
+    สแกน QR</a>
   <a href="#" onclick="return nav('new')" id="nav-new">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    à¸ªà¸£à¹à¸²à¸</a>
+    สร้าง</a>
   <a href="#" onclick="return nav('list')" id="nav-list">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
-    à¸£à¸²à¸¢à¸à¸²à¸£</a>
+    รายการ</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -222,11 +222,11 @@ var allBatches = [];
 
 // Phase definitions
 var PHASES = [
-  {num:1, status:"Start Producing", prev:"Created",           color:"#1a1a1a", label:"à¹à¸£à¸´à¹à¸¡à¸à¸¥à¸´à¸"},
-  {num:2, status:"Print Finish",    prev:"Start Producing",   color:"#2563EB", label:"à¸à¸£à¸´à¹à¸à¹à¸ªà¸£à¹à¸"},
-  {num:3, status:"Outsource",       prev:"Print Finish",      color:"#7C3AED", label:"à¸ªà¹à¸ Outsource"},
-  {num:4, status:"QC Pass",         prev:"Outsource",         color:"#059669", label:"QC à¸à¹à¸²à¸"},
-  {num:5, status:"Shipped",         prev:"QC Pass",           color:"#DC2626", label:"à¸à¸±à¸à¸ªà¹à¸à¹à¸¥à¹à¸§"}
+  {num:1, status:"Start Producing", prev:"Created",           color:"#1a1a1a", label:"เริ่มผลิต"},
+  {num:2, status:"Print Finish",    prev:"Start Producing",   color:"#2563EB", label:"ปริ้นเสร็จ"},
+  {num:3, status:"Outsource",       prev:"Print Finish",      color:"#7C3AED", label:"ส่ง Outsource"},
+  {num:4, status:"QC Pass",         prev:"Outsource",         color:"#059669", label:"QC ผ่าน"},
+  {num:5, status:"Shipped",         prev:"QC Pass",           color:"#DC2626", label:"จัดส่งแล้ว"}
 ];
 
 var STATUSES = ["Created","Start Producing","Print Finish","Outsource","QC Pass","Shipped"];
@@ -300,10 +300,10 @@ function loadHome() {
     var recent = allBatches.slice(0, 5);
     document.getElementById('recent-list').innerHTML = recent.length
       ? recent.map(batchCard).join('')
-      : '<div class="card" style="text-align:center;color:#555">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µ Batch</div>';
+      : '<div class="card" style="text-align:center;color:#555">ยังไม่มี Batch</div>';
   }).catch(function() {
     document.getElementById('recent-list').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">à¹à¸«à¸¥à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¹à¸¡à¹à¸ªà¸³à¹à¸£à¹à¸ à¸à¸£à¸¸à¸à¸²à¸¥à¸­à¸à¹à¸«à¸¡à¹</div>';
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่</div>';
   });
 }
 
@@ -329,15 +329,15 @@ function loadPhase(phaseNum) {
   var phase = PHASES.find(function(p) { return p.num === parseInt(phaseNum); });
   if (!phase) {
     document.getElementById('phase-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">Phase à¹à¸¡à¹à¸à¸¹à¸à¸à¹à¸­à¸</div>';
+      '<div class="card" style="text-align:center;color:#f87171">Phase ไม่ถูกต้อง</div>';
     return;
   }
 
   document.getElementById('phase-content').innerHTML =
     '<div style="text-align:center;margin-bottom:16px">' +
     '<div style="display:inline-block;padding:6px 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:' + phase.color + '">' +
-    'Phase ' + phase.num + ' â ' + phase.status + '</div>' +
-    '<div style="font-size:13px;color:#666;margin-top:6px">à¹à¸¥à¸·à¸­à¸ Batch à¸à¸µà¹à¸à¹à¸­à¸à¸à¸²à¸£à¸­à¸±à¸à¹à¸à¸</div>' +
+    'Phase ' + phase.num + ' — ' + phase.status + '</div>' +
+    '<div style="font-size:13px;color:#666;margin-top:6px">เลือก Batch ที่ต้องการอัพเดท</div>' +
     '</div>' +
     '<div id="phase-list"><div class="loading"><div class="spinner"></div></div></div>';
 
@@ -351,10 +351,10 @@ function loadPhase(phaseNum) {
       el.innerHTML =
         '<div class="card" style="text-align:center;padding:24px">' +
         '<div style="font-size:36px;margin-bottom:8px">&#10003;</div>' +
-        '<div style="color:#888">à¹à¸¡à¹à¸¡à¸µ Batch à¸à¸µà¹à¸£à¸­à¹à¸à¹à¸² Phase à¸à¸µà¹</div>' +
-        '<div style="font-size:13px;color:#555;margin-top:4px">Batch à¸à¹à¸­à¸à¸­à¸¢à¸¹à¹à¸ªà¸à¸²à¸à¸° "' + phase.prev + '" à¸à¹à¸­à¸</div>' +
+        '<div style="color:#888">ไม่มี Batch ที่รอเข้า Phase นี้</div>' +
+        '<div style="font-size:13px;color:#555;margin-top:4px">Batch ต้องอยู่สถานะ "' + phase.prev + '" ก่อน</div>' +
         '</div>' +
-        '<button class="btn btn-o" onclick="nav(\'home\')">à¸à¸¥à¸±à¸à¸«à¸à¹à¸²à¹à¸£à¸</button>';
+        '<button class="btn btn-o" onclick="nav(\'home\')">กลับหน้าแรก</button>';
       return;
     }
 
@@ -371,10 +371,10 @@ function loadPhase(phaseNum) {
         '<div style="font-size:20px;margin-top:4px">&#8594;</div>' +
         '</div></div></div>';
     }).join('') +
-    '<button class="btn btn-o" onclick="nav(\'home\')" style="margin-top:8px">à¸à¸¥à¸±à¸à¸«à¸à¹à¸²à¹à¸£à¸</button>';
+    '<button class="btn btn-o" onclick="nav(\'home\')" style="margin-top:8px">กลับหน้าแรก</button>';
   }).catch(function() {
     var el = document.getElementById('phase-list');
-    if (el) el.innerHTML = '<div class="card" style="text-align:center;color:#f87171">à¹à¸«à¸¥à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¹à¸¡à¹à¸ªà¸³à¹à¸£à¹à¸</div>';
+    if (el) el.innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ</div>';
   });
 }
 
@@ -383,12 +383,12 @@ function confirmPhaseUpdate(batchId, phaseNum) {
   if (!phase) return;
 
   document.getElementById('confirm-msg').innerHTML =
-    '<div style="font-size:14px;color:#888;margin-bottom:8px">à¸­à¸±à¸à¹à¸à¸à¸ªà¸à¸²à¸à¸°</div>' +
+    '<div style="font-size:14px;color:#888;margin-bottom:8px">อัพเดทสถานะ</div>' +
     '<div style="font-size:20px;font-weight:800">' + batchId + '</div>' +
     '<div style="margin:10px 0">' +
     '<span style="padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;color:#fff;background:' + phase.color + '">' +
     phase.status + '</span></div>';
-  document.getElementById('confirm-yes').textContent = 'à¸¢à¸·à¸à¸¢à¸±à¸';
+  document.getElementById('confirm-yes').textContent = 'ยืนยัน';
   document.getElementById('confirm-yes').className = 'btn btn-p';
   document.getElementById('confirm-yes').style.margin = '0';
   document.getElementById('confirm-yes').onclick = function() {
@@ -414,7 +414,7 @@ function doPhaseUpdate(batchId, phase) {
       loadPhase(phase.num);
     }
   }).catch(function() {
-    toast('à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸', 'err');
+    toast('เกิดข้อผิดพลาด', 'err');
     loadPhase(phase.num);
   });
 }
@@ -450,7 +450,7 @@ function initScanner() {
       }
       if (bid.startsWith('SN-')) {
         scanner.stop().then(function() {
-          toast('à¸à¸ ' + bid, 'ok');
+          toast('พบ ' + bid, 'ok');
           nav('batch', bid);
         });
       }
@@ -459,7 +459,7 @@ function initScanner() {
   ).catch(function(err) {
     document.getElementById('scan-result').innerHTML =
       '<div class="card" style="text-align:center;color:#f87171">' +
-      'à¹à¸¡à¹à¸ªà¸²à¸¡à¸²à¸£à¸à¹à¸à¸´à¸à¸à¸¥à¹à¸­à¸à¹à¸à¹<br><span style="font-size:13px;color:#666">à¸à¸£à¸§à¸à¸ªà¸­à¸ permission à¸à¸¥à¹à¸­à¸</span></div>';
+      'ไม่สามารถเปิดกล้องได้<br><span style="font-size:13px;color:#666">ตรวจสอบ permission กล้อง</span></div>';
   });
 }
 
@@ -477,10 +477,10 @@ function doCreate() {
     operator: document.getElementById('f-operator').value,
     notes: document.getElementById('f-notes').value
   }).then(function(res) {
-    btn.textContent = 'à¸ªà¸£à¹à¸²à¸ Batch';
+    btn.textContent = 'สร้าง Batch';
     btn.disabled = false;
     if (res.success) {
-      toast('à¸ªà¸£à¹à¸²à¸ ' + res.batchId + ' à¸ªà¸³à¹à¸£à¹à¸!', 'ok');
+      toast('สร้าง ' + res.batchId + ' สำเร็จ!', 'ok');
       document.getElementById('f-qty').value = 1;
       document.getElementById('f-operator').value = '';
       document.getElementById('f-notes').value = '';
@@ -489,9 +489,9 @@ function doCreate() {
       toast('Error: ' + (res.error || 'Unknown'), 'err');
     }
   }).catch(function(err) {
-    btn.textContent = 'à¸ªà¸£à¹à¸²à¸ Batch';
+    btn.textContent = 'สร้าง Batch';
     btn.disabled = false;
-    toast('à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸: ' + err, 'err');
+    toast('เกิดข้อผิดพลาด: ' + err, 'err');
   });
 }
 
@@ -502,7 +502,7 @@ function loadBatch(batchId) {
   callAPI({ api: 'getBatch', id: batchId }).then(function(b) {
     if (b.error) {
       document.getElementById('batch-content').innerHTML =
-        '<div class="card" style="text-align:center"><div class="big" style="color:#f87171">à¹à¸¡à¹à¸à¸</div>' +
+        '<div class="card" style="text-align:center"><div class="big" style="color:#f87171">ไม่พบ</div>' +
         '<div style="color:#666;margin-top:4px">' + batchId + '</div></div>';
       return;
     }
@@ -510,7 +510,7 @@ function loadBatch(batchId) {
     renderBatch(b);
   }).catch(function(err) {
     document.getElementById('batch-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">à¹à¸«à¸¥à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¹à¸¡à¹à¸ªà¸³à¹à¸£à¹à¸<br>' +
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ<br>' +
       '<span style="font-size:13px;color:#666">' + err + '</span></div>';
   });
 }
@@ -521,12 +521,12 @@ function renderBatch(b) {
   var next = ci < STATUSES.length - 1 ? STATUSES[ci + 1] : null;
 
   var steps = [
-    {label:"à¸ªà¸£à¹à¸²à¸ Batch",     time:b.created},
-    {label:"à¹à¸£à¸´à¹à¸¡à¸à¸¥à¸´à¸",        time:b.startPrint || b.startProduce},
-    {label:"à¸à¸£à¸´à¹à¸à¹à¸ªà¸£à¹à¸",       time:b.printDone || b.printFinish},
+    {label:"สร้าง Batch",     time:b.created},
+    {label:"เริ่มผลิต",        time:b.startPrint || b.startProduce},
+    {label:"ปริ้นเสร็จ",       time:b.printDone || b.printFinish},
     {label:"Outsource",       time:b.qcPass || b.outsource},
-    {label:"QC à¸à¹à¸²à¸",         time:b.packed || b.qcPassTime},
-    {label:"à¸à¸±à¸à¸ªà¹à¸à¹à¸¥à¹à¸§",       time:b.shipped}
+    {label:"QC ผ่าน",         time:b.packed || b.qcPassTime},
+    {label:"จัดส่งแล้ว",       time:b.shipped}
   ];
 
   var tl = '<div class="tl">';
@@ -546,27 +546,27 @@ function renderBatch(b) {
   if (next) {
     var nextPhase = PHASES.find(function(p) { return p.status === next; });
     var btnColor = next === "Shipped" ? "btn-g" : "btn-p";
-    actionHtml = '<div class="card"><div style="font-weight:700;margin-bottom:10px">à¸­à¸±à¸à¹à¸à¸à¸ªà¸à¸²à¸à¸°</div>' +
-      '<input type="text" id="u-operator" placeholder="à¸à¸¹à¹à¸à¸³à¹à¸à¸´à¸à¸à¸²à¸£" value="' + (b.operator || '') + '">' +
-      '<textarea id="u-notes" rows="2" placeholder="à¸«à¸¡à¸²à¸¢à¹à¸«à¸à¸¸ (à¹à¸¡à¹à¸à¸±à¸à¸à¸±à¸)"></textarea>' +
+    actionHtml = '<div class="card"><div style="font-weight:700;margin-bottom:10px">อัพเดทสถานะ</div>' +
+      '<input type="text" id="u-operator" placeholder="ผู้ดำเนินการ" value="' + (b.operator || '') + '">' +
+      '<textarea id="u-notes" rows="2" placeholder="หมายเหตุ (ไม่บังคับ)"></textarea>' +
       '<button class="btn ' + btnColor + '" onclick="doUpdate(\'' + next + '\')" id="btn-update">' +
       (nextPhase ? nextPhase.label : next) + '</button>' +
       '</div>';
   }
 
   document.getElementById('batch-content').innerHTML =
-    '<div style="margin-bottom:12px"><a href="#" onclick="return nav(\'list\')" style="color:#555;text-decoration:none;font-size:13px">&#8592; à¸£à¸²à¸¢à¸à¸²à¸£à¸à¸±à¹à¸à¸«à¸¡à¸</a></div>' +
+    '<div style="margin-bottom:12px"><a href="#" onclick="return nav(\'list\')" style="color:#555;text-decoration:none;font-size:13px">&#8592; รายการทั้งหมด</a></div>' +
     '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">' +
     '<div><div class="hdr">Batch ID</div><div class="big">' + b.batchId + '</div></div>' +
     '<span class="badge ' + badgeClass(b.status) + '">' + b.status + '</span></div></div>' +
 
     '<div class="card">' +
-    '<div style="font-weight:700;margin-bottom:8px">à¸à¹à¸­à¸¡à¸¹à¸¥ Batch</div>' +
-    '<div class="row"><span class="hdr" style="margin:0">à¸ªà¸´à¸à¸à¹à¸²</span><span>' + b.product + '</span></div>' +
-    '<div class="row"><span class="hdr" style="margin:0">à¸à¸³à¸à¸§à¸</span><span>' + b.qty + ' à¸à¸´à¹à¸</span></div>' +
-    '<div class="row"><span class="hdr" style="margin:0">à¸£à¸¸à¹à¸à¸£à¸</span><span>' + (b.carModel || '-') + '</span></div>' +
-    '<div class="row"><span class="hdr" style="margin:0">à¸à¸¹à¹à¸à¸³à¹à¸à¸´à¸à¸à¸²à¸£</span><span>' + (b.operator || '-') + '</span></div>' +
-    (b.notes ? '<div class="row"><span class="hdr" style="margin:0">à¸«à¸¡à¸²à¸¢à¹à¸«à¸à¸¸</span><span style="font-size:13px;max-width:60%;text-align:right">' + b.notes + '</span></div>' : '') +
+    '<div style="font-weight:700;margin-bottom:8px">ข้อมูล Batch</div>' +
+    '<div class="row"><span class="hdr" style="margin:0">สินค้า</span><span>' + b.product + '</span></div>' +
+    '<div class="row"><span class="hdr" style="margin:0">จำนวน</span><span>' + b.qty + ' ชิ้น</span></div>' +
+    '<div class="row"><span class="hdr" style="margin:0">รุ่นรถ</span><span>' + (b.carModel || '-') + '</span></div>' +
+    '<div class="row"><span class="hdr" style="margin:0">ผู้ดำเนินการ</span><span>' + (b.operator || '-') + '</span></div>' +
+    (b.notes ? '<div class="row"><span class="hdr" style="margin:0">หมายเหตุ</span><span style="font-size:13px;max-width:60%;text-align:right">' + b.notes + '</span></div>' : '') +
     '</div>' +
 
     '<div class="card"><div style="font-weight:700;margin-bottom:8px">Timeline</div>' + tl + '</div>' +
@@ -576,11 +576,11 @@ function renderBatch(b) {
     '<div class="card" style="text-align:center"><div class="hdr" style="margin-bottom:8px">QR Label</div>' +
     '<div style="background:#fff;border-radius:10px;padding:16px;display:inline-block">' +
     '<img src="' + qrApi + '" style="width:160px;height:160px"></div>' +
-    '<div style="margin-top:8px"><button class="btn btn-o" onclick="printBatchQR()">à¸à¸£à¸´à¹à¸ Batch QR</button></div></div>' +
+    '<div style="margin-top:8px"><button class="btn btn-o" onclick="printBatchQR()">ปริ้น Batch QR</button></div></div>' +
 
     '<div style="display:flex;gap:8px;margin-top:4px">' +
-    '<button class="btn btn-o" style="flex:1" onclick="showEdit()">à¹à¸à¹à¹à¸</button>' +
-    '<button class="btn btn-r" style="flex:1" onclick="confirmDelete()">à¸¥à¸ Batch</button>' +
+    '<button class="btn btn-o" style="flex:1" onclick="showEdit()">แก้ไข</button>' +
+    '<button class="btn btn-r" style="flex:1" onclick="confirmDelete()">ลบ Batch</button>' +
     '</div>';
 }
 
@@ -600,11 +600,11 @@ function doUpdate(status) {
       loadBatch(b.batchId);
     } else {
       toast('Error: ' + (res.error || 'Unknown'), 'err');
-      if (btn) { btn.textContent = 'à¸¥à¸­à¸à¹à¸«à¸¡à¹'; btn.disabled = false; }
+      if (btn) { btn.textContent = 'ลองใหม่'; btn.disabled = false; }
     }
   }).catch(function(err) {
-    if (btn) { btn.textContent = 'à¸¥à¸­à¸à¹à¸«à¸¡à¹'; btn.disabled = false; }
-    toast('à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸', 'err');
+    if (btn) { btn.textContent = 'ลองใหม่'; btn.disabled = false; }
+    toast('เกิดข้อผิดพลาด', 'err');
   });
 }
 
@@ -618,22 +618,22 @@ function showEdit() {
   }).join('');
 
   document.getElementById('batch-content').innerHTML =
-    '<div style="margin-bottom:12px"><a href="#" onclick="loadBatch(\'' + b.batchId + '\');return false" style="color:#555;text-decoration:none;font-size:13px">&#8592; à¸¢à¸à¹à¸¥à¸´à¸</a></div>' +
+    '<div style="margin-bottom:12px"><a href="#" onclick="loadBatch(\'' + b.batchId + '\');return false" style="color:#555;text-decoration:none;font-size:13px">&#8592; ยกเลิก</a></div>' +
     '<div class="card">' +
-    '<div style="font-weight:700;margin-bottom:4px;font-size:17px">à¹à¸à¹à¹à¸ ' + b.batchId + '</div>' +
-    '<div style="color:#555;font-size:13px;margin-bottom:14px">à¹à¸à¹à¹à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¹à¸¥à¹à¸§à¸à¸à¸à¸±à¸à¸à¸¶à¸</div>' +
-    '<div class="hdr">à¸ªà¸´à¸à¸à¹à¸²</div>' +
+    '<div style="font-weight:700;margin-bottom:4px;font-size:17px">แก้ไข ' + b.batchId + '</div>' +
+    '<div style="color:#555;font-size:13px;margin-bottom:14px">แก้ไขข้อมูลแล้วกดบันทึก</div>' +
+    '<div class="hdr">สินค้า</div>' +
     '<select id="e-product">' + prodOpts + '</select>' +
-    '<div class="hdr">à¸à¸³à¸à¸§à¸ (à¸à¸´à¹à¸)</div>' +
+    '<div class="hdr">จำนวน (ชิ้น)</div>' +
     '<input type="number" id="e-qty" value="' + b.qty + '" min="1">' +
-    '<div class="hdr">à¸£à¸¸à¹à¸à¸£à¸</div>' +
+    '<div class="hdr">รุ่นรถ</div>' +
     '<input type="text" id="e-carModel" value="' + (b.carModel || '') + '" placeholder="Model">' +
-    '<div class="hdr">à¸à¸¹à¹à¸à¸³à¹à¸à¸´à¸à¸à¸²à¸£</div>' +
+    '<div class="hdr">ผู้ดำเนินการ</div>' +
     '<input type="text" id="e-operator" value="' + (b.operator || '') + '">' +
-    '<div class="hdr">à¸«à¸¡à¸²à¸¢à¹à¸«à¸à¸¸</div>' +
+    '<div class="hdr">หมายเหตุ</div>' +
     '<textarea id="e-notes" rows="3">' + (b.notes || '') + '</textarea>' +
-    '<button class="btn btn-p" onclick="doEdit()" id="btn-edit">à¸à¸±à¸à¸à¸¶à¸</button>' +
-    '<button class="btn btn-o" onclick="loadBatch(\'' + b.batchId + '\')">à¸¢à¸à¹à¸¥à¸´à¸</button>' +
+    '<button class="btn btn-p" onclick="doEdit()" id="btn-edit">บันทึก</button>' +
+    '<button class="btn btn-o" onclick="loadBatch(\'' + b.batchId + '\')">ยกเลิก</button>' +
     '</div>';
 }
 
@@ -653,15 +653,15 @@ function doEdit() {
     notes: document.getElementById('e-notes').value
   }).then(function(res) {
     if (res.success) {
-      toast('à¸à¸±à¸à¸à¸¶à¸à¸ªà¸³à¹à¸£à¹à¸', 'ok');
+      toast('บันทึกสำเร็จ', 'ok');
       loadBatch(b.batchId);
     } else {
-      btn.textContent = 'à¸à¸±à¸à¸à¸¶à¸'; btn.disabled = false;
+      btn.textContent = 'บันทึก'; btn.disabled = false;
       toast('Error: ' + (res.error || 'Unknown'), 'err');
     }
   }).catch(function(err) {
-    btn.textContent = 'à¸à¸±à¸à¸à¸¶à¸'; btn.disabled = false;
-    toast('à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸', 'err');
+    btn.textContent = 'บันทึก'; btn.disabled = false;
+    toast('เกิดข้อผิดพลาด', 'err');
   });
 }
 
@@ -669,8 +669,8 @@ function doEdit() {
 function confirmDelete() {
   var b = currentBatch;
   if (!b) return;
-  document.getElementById('confirm-msg').textContent = 'à¸¥à¸ ' + b.batchId + ' ?';
-  document.getElementById('confirm-yes').textContent = 'à¸¢à¸·à¸à¸¢à¸±à¸à¸¥à¸';
+  document.getElementById('confirm-msg').textContent = 'ลบ ' + b.batchId + ' ?';
+  document.getElementById('confirm-yes').textContent = 'ยืนยันลบ';
   document.getElementById('confirm-yes').className = 'btn btn-r';
   document.getElementById('confirm-yes').style.margin = '0';
   document.getElementById('confirm-yes').onclick = function() { hideConfirm(); doDelete(); };
@@ -686,14 +686,14 @@ function doDelete() {
   if (!b) return;
   callAPI({ api: 'delete', batchId: b.batchId }).then(function(res) {
     if (res.success) {
-      toast('à¸¥à¸ ' + b.batchId + ' à¹à¸¥à¹à¸§', 'ok');
+      toast('ลบ ' + b.batchId + ' แล้ว', 'ok');
       currentBatch = null;
       nav('list');
     } else {
       toast('Error: ' + (res.error || 'Unknown'), 'err');
     }
   }).catch(function(err) {
-    toast('à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸', 'err');
+    toast('เกิดข้อผิดพลาด', 'err');
   });
 }
 
@@ -746,7 +746,7 @@ function printStationQR() {
 
   html += '</div>' +
     '<div style="text-align:center;margin-top:16px;font-size:9px;color:#aaa">' +
-    'à¸à¸£à¸´à¹à¸à¹à¸¥à¹à¸§à¸à¸±à¸à¹à¸¢à¸ à¸à¸´à¸à¸à¸²à¸¡à¸à¸¸à¸à¸à¹à¸²à¸à¹ à¹à¸à¸ªà¸²à¸¢à¸à¸²à¸£à¸à¸¥à¸´à¸ | snmotorsport01.github.io</div>' +
+    'ปริ้นแล้วตัดแยก ติดตามจุดต่างๆ ในสายการผลิต | snmotorsport01.github.io</div>' +
     '<script>setTimeout(function(){window.print()},800)<\/script></body></html>';
 
   var w = window.open('', '_blank');
@@ -761,7 +761,7 @@ function loadList() {
     renderList();
   }).catch(function() {
     document.getElementById('full-list').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">à¹à¸«à¸¥à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¹à¸¡à¹à¸ªà¸³à¹à¸£à¹à¸</div>';
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ</div>';
   });
 }
 
@@ -770,7 +770,7 @@ function renderList() {
   var filtered = filter ? allBatches.filter(function(b) { return b.status === filter; }) : allBatches;
   document.getElementById('full-list').innerHTML = filtered.length
     ? filtered.map(batchCard).join('')
-    : '<div class="card" style="text-align:center;color:#555;padding:24px">à¹à¸¡à¹à¸à¸ Batch' + (filter ? ' (' + filter + ')' : '') + '</div>';
+    : '<div class="card" style="text-align:center;color:#555;padding:24px">ไม่พบ Batch' + (filter ? ' (' + filter + ')' : '') + '</div>';
 }
 
 // ===== TOAST =====
