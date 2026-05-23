@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<title>Batch Report — SN Production</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
+padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
+.hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
+text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
+.btn:active{transform:scale(.97);opacity:.8}
+.btn-p{background:#DC2626;color:#fff}
+.btn-g{background:#22c55e;color:#000}
+.btn-o{background:transparent;color:#aaa;border:1px solid #333}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
+border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{text-align:center;padding:40px;color:#555}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th{text-align:left;padding:8px 6px;border-bottom:2px solid #333;color:#888;font-size:11px;text-transform:uppercase}
+td{padding:8px 6px;border-bottom:1px solid #1a1a1a}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.b-created{background:#222;color:#888}
+.b-startprod{background:#2d1010;color:#f87171}
+.b-printfinish{background:#0c1e3d;color:#60a5fa}
+.b-outsource{background:#1e103d;color:#a78bfa}
+.b-qcpass{background:#0a2a1a;color:#4ade80}
+.b-shipped{background:#052e16;color:#22c55e}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.sum-item{background:#0d0d0d;border-radius:10px;padding:12px;text-align:center;border:1px solid #1e1e1e}
+.sum-item .n{font-size:24px;font-weight:800}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
+z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div style="text-align:center;margin:12px 0 20px">
+<img src="logo.svg" alt="SN Motorsports" style="height:14px;filter:brightness(0) invert(1)">
+<div style="font-size:16px;font-weight:700;margin-top:2px;color:#fff">Batch Report</div>
+<div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
+</div>
+
+<div id="report-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">Loading...</div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1qX2ghgY9JW0EesBnRaaA5GUEEMdLCashKdHWTpa7cbM/edit';
+var allBatches = [];
+
+var STATUSES = ["Created","Start Producing","Print Finish","Outsource","QC Pass","Shipped"];
+var STATUS_COLORS = {"Created":"#888","Start Producing":"#f87171","Print Finish":"#60a5fa",
+"Outsource":"#a78bfa","QC Pass":"#4ade80","Shipped":"#22c55e"};
+
+function badgeClass(s) {
+var m = {"Created":"b-created","Start Producing":"b-startprod","Print Finish":"b-printfinish",
+"Outsource":"b-outsource","QC Pass":"b-qcpass","Shipped":"b-shipped"};
+return m[s] || "b-created";
+}
+
+function toast(msg) {
+var t = document.getElementById('toast');
+t.textContent = msg;
+t.className = 'toast show';
+setTimeout(function() { t.className = 'toast'; }, 2500);
+}
+
+function callAPI(params) {
+var qs = Object.keys(params).map(function(k) {
+return encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
+}).join('&');
+return fetch(API_URL + '?' + qs, { redirect: 'follow' }).then(function(r) { return r.json(); });
+}
+
+function loadReport() {
+callAPI({ api: 'listBatches' }).then(function(list) {
+allBatches = list;
+renderReport(list);
+}).catch(function(err) {
+document.getElementById('report-content').innerHTML =
+'<div class="card" style="text-align:center;color:#f87171">Error loading data<br><span style="font-size:13px">' + err + '</span></div>' +
+'<button class="btn btn-o" onclick="loadReport()">Retry</button>';
+});
+}
+
+function renderReport(batches) {
+if (!batches.length) {
+document.getElementById('report-content').innerHTML =
+'<div class="card" style="text-align:center;color:#555;padding:24px">No batches found</div>' +
+'<a href="index.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">Back</a>';
+return;
+}
+
+var statusCount = {};
+STATUSES.forEach(function(s) { statusCount[s] = 0; });
+batches.forEach(function(b) { statusCount[b.status] = (statusCount[b.status] || 0) + 1; });
+
+var productCount = {};
+batches.forEach(function(b) {
+if (!productCount[b.product]) productCount[b.product] = { count: 0, qty: 0 };
+productCount[b.product].count++;
+productCount[b.product].qty += parseInt(b.qty) || 0;
+});
+
+var html = '';
+
+html += '<div style="display:flex;gap:8px;margin-bottom:12px">' +
+'<button class="btn btn-g" style="flex:1;margin:0" onclick="downloadXLSX()">Download Excel</button>' +
+'<button class="btn btn-o" style="flex:1;margin:0;border-color:#4285f4;color:#4285f4" onclick="openGoogleSheets()">Google Sheets</button>' +
+'</div>';
+
+html += '<div class="card">';
+html += '<div style="font-weight:700;margin-bottom:8px">Status Summary</div>';
+html += '<div class="sum-grid">';
+var activeStatuses = STATUSES.filter(function(s) { return statusCount[s] > 0; });
+activeStatuses.forEach(function(s) {
+html += '<div class="sum-item"><div class="n" style="color:' + STATUS_COLORS[s] + '">' + statusCount[s] + '</div><div class="hdr">' + s + '</div></div>';
+});
+html += '</div>';
+html += '<div style="text-align:center;margin-top:4px;font-size:13px;color:#888">Total: <strong style="color:#fff">' + batches.length + '</strong> batches</div>';
+html += '</div>';
+
+html += '<div class="card">';
+html += '<div style="font-weight:700;margin-bottom:8px">Product Summary</div>';
+html += '<table><thead><tr><th>Product</th><th>Batches</th><th>Qty</th></tr></thead><tbody>';
+for (var p in productCount) {
+html += '<tr><td>' + p + '</td><td>' + productCount[p].count + '</td><td>' + productCount[p].qty + '</td></tr>';
+}
+html += '</tbody></table></div>';
+
+html += '<div class="card" style="overflow-x:auto">';
+html += '<div style="font-weight:700;margin-bottom:8px">All Batches (' + batches.length + ')</div>';
+html += '<table><thead><tr><th>Batch</th><th>Product</th><th>Qty</th><th>Model</th><th>Status</th><th>Created</th></tr></thead><tbody>';
+batches.forEach(function(b) {
+html += '<tr><td style="font-weight:600">' + b.batchId + '</td><td>' + b.product + '</td>' +
+'<td>' + b.qty + '</td><td>' + (b.carModel || '-') + '</td>' +
+'<td><span class="badge ' + badgeClass(b.status) + '">' + b.status + '</span></td>' +
+'<td style="font-size:12px;color:#888">' + (b.created || '') + '</td></tr>';
+});
+html += '</tbody></table></div>';
+
+html += '<a href="index.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center;margin-top:4px">Back to Tracker</a>';
+
+document.getElementById('report-content').innerHTML = html;
+}
+
+function downloadXLSX() {
+if (!allBatches.length) { toast('No data'); return; }
+
+var wb = XLSX.utils.book_new();
+
+var sumData = [
+['SN Production \u2014 Batch Report'],
+['Generated: ' + new Date().toLocaleString('th-TH')],
+[''],
+['STATUS SUMMARY'],
+['Status', 'Count']
+];
+var statusCount = {};
+STATUSES.forEach(function(s) { statusCount[s] = 0; });
+allBatches.forEach(function(b) { statusCount[b.status] = (statusCount[b.status] || 0) + 1; });
+STATUSES.forEach(function(s) {
+if (statusCount[s] > 0) sumData.push([s, statusCount[s]]);
+});
+sumData.push(['Total', allBatches.length]);
+sumData.push(['']);
+sumData.push(['PRODUCT SUMMARY']);
+sumData.push(['Product', 'Batches', 'Total Qty']);
+
+var productCount = {};
+allBatches.forEach(function(b) {
+if (!productCount[b.product]) productCount[b.product] = { count: 0, qty: 0 };
+productCount[b.product].count++;
+productCount[b.product].qty += parseInt(b.qty) || 0;
+});
+for (var p in productCount) {
+sumData.push([p, productCount[p].count, productCount[p].qty]);
+}
+
+var ws1 = XLSX.utils.aoa_to_sheet(sumData);
+ws1['!cols'] = [{ wch: 20 }, { wch: 12 }, { wch: 12 }];
+XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+
+var detailData = [
+['Batch ID', 'Product', 'Qty', 'Car Model', 'Status', 'Operator', 'Notes',
+'Created', 'Start Producing', 'Print Finish', 'Outsource', 'QC Pass', 'Shipped']
+];
+allBatches.forEach(function(b) {
+detailData.push([
+b.batchId, b.product, parseInt(b.qty) || 0, b.carModel || '',
+b.status, b.operator || '', b.notes || '',
+b.created || '', b.startPrint || b.startProduce || '',
+b.printDone || b.printFinish || '', b.outsource || '',
+b.qcPass || b.qcPassTime || '', b.shipped || ''
+]);
+});
+
+var ws2 = XLSX.utils.aoa_to_sheet(detailData);
+ws2['!cols'] = [
+{ wch: 16 }, { wch: 22 }, { wch: 6 }, { wch: 14 }, { wch: 16 },
+{ wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 18 },
+{ wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
+];
+XLSX.utils.book_append_sheet(wb, ws2, 'Detail');
+
+var now = new Date();
+var fname = 'SN_BatchReport_' + now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2) + '.xlsx';
+XLSX.writeFile(wb, fname);
+toast('Downloaded ' + fname);
+}
+
+function openGoogleSheets() {
+window.open(SHEET_URL, '_blank');
+toast('Opening Google Sheets...');
+}
+
+loadReport();
+</script>
+</body>
+</html>
