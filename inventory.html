@@ -7,12 +7,10 @@
 <title>Inventory — SN Production</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
-padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:60px}
+body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:60px}
 .hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
 .card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
-.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
-text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
 .btn:active{transform:scale(.97);opacity:.8}
 .btn-p{background:#DC2626;color:#fff}
 .btn-g{background:#22c55e;color:#000}
@@ -21,8 +19,7 @@ text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-
 .btn-d{background:#ef4444;color:#fff}
 .btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin:0}
 .btn-xs{padding:4px 10px;font-size:11px;width:auto;display:inline-block;margin:0;border-radius:8px}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
-border-radius:50%;animation:spin .6s linear infinite}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{text-align:center;padding:40px;color:#555}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
@@ -39,8 +36,7 @@ border-radius:50%;animation:spin .6s linear infinite}
 .sum-item{background:#0d0d0d;border-radius:10px;padding:12px;text-align:center;border:1px solid #1e1e1e}
 .sum-item .n{font-size:24px;font-weight:800}
 
-.stock-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;
-border-bottom:1px solid #1a1a1a}
+.stock-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a1a1a}
 .stock-row:last-child{border-bottom:none}
 .stock-info{flex:1;min-width:0}
 .stock-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -51,8 +47,55 @@ border-bottom:1px solid #1a1a1a}
 .stock-bar-fill{height:100%;border-radius:3px;transition:.3s}
 .stock-btns{display:flex;gap:4px;flex-shrink:0}
 
-.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:100;
-display:none</div>
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#151515;border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;border:1px solid #1e1e1e;border-bottom:none}
+.modal h3{font-size:16px;margin-bottom:14px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;color:#888;margin-bottom:4px;text-transform:uppercase}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;-webkit-appearance:none}
+.form-group textarea{height:60px;resize:none}
+
+.tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid #333;background:transparent;color:#888;transition:.15s;flex-shrink:0}
+.tab.active{background:#DC2626;color:#fff;border-color:#DC2626}
+
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
+.toast.err{background:#ef4444;color:#fff}
+.toast.warn{background:#f59e0b;color:#000}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+.po-status{font-size:11px;text-transform:uppercase;font-weight:600}
+.search-box{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearance:none}
+.search-box::placeholder{color:#555}
+
+.cf-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
+.cf-row:last-child{border-bottom:none}
+.cf-in{color:#4ade80}.cf-out{color:#f87171}
+
+.fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:#DC2626;color:#fff;font-size:24px;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:center;justify-content:center}
+.fab:active{transform:scale(.9)}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Restock Modal (+) -->
+<div class="modal-bg" id="restockModal">
+<div class="modal">
+<h3>เพิ่มสต็อก</h3>
+<div class="form-group"><label>รายการ</label>
+<input type="text" id="restockItem" readonly style="color:#888"></div>
+<div class="form-group"><label>สต็อกปัจจุบัน</label>
+<input type="text" id="restockCurrent" readonly style="color:#888"></div>
+<div class="form-group"><label>จำนวนที่เพิ่ม</label>
+<input type="number" id="restockQty" min="1" placeholder="ระบุจำนวน"></div>
+<div class="form-group"><label>ราคาต่อหน่วย (฿)</label>
+<input type="number" id="restockCost" min="0" step="0.01" placeholder="ไม่บังคับ"></div>
 <div class="form-group"><label>Supplier</label>
 <input type="text" id="restockSupplier" placeholder="ไม่บังคับ"></div>
 <div class="form-group"><label>หมายเหตุ</label>
@@ -115,64 +158,7 @@ display:none</div>
 <input type="text" id="newItemSupplier" placeholder="ไม่บังคับ"></div>
 <button class="btn btn-g" onclick="submitAddItem()" id="addItemBtn">เพิ่มรายการ</button>
 <button class="btn btn-o" onclick="closeModal('addItemModal')">ยกเลิก</button>
-;align-items:flex-end;justify-content:center}
-.modal-bg.show{display:flex}
-.modal{background:#151515;border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:600px;
-max-height:85vh;overflow-y:auto;border:1px solid #1e1e1e;border-bottom:none}
-.modal h3{font-size:16px;margin-bottom:14px}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;color:#888;margin-bottom:4px;text-transform:uppercase}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border-radius:10px;
-border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;-webkit-appearance:none}
-.form-group textarea{height:60px;resize:none}
-
-.tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-scrollbar-width:none;-ms-overflow-style:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
-white-space:nowrap;border:1px solid #333;background:transparent;color:#888;transition:.15s;flex-shrink:0}
-.tab.active{background:#DC2626;color:#fff;border-color:#DC2626}
-
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
-padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
-z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
-.toast.err{background:#ef4444;color:#fff}
-.toast.warn{background:#f59e0b;color:#000}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-
-.po-status{font-size:11px;text-transform:uppercase;font-weight:600}
-.search-box{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #333;
-background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearance:none}
-.search-box::placeholder{color:#555}
-
-.cf-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
-.cf-row:last-child{border-bottom:none}
-.cf-in{color:#4ade80}.cf-out{color:#f87171}
-
-.fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;
-background:#DC2626;color:#fff;font-size:24px;border:none;cursor:pointer;
-box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:center;justify-content:center}
-.fab:active{transform:scale(.9)}
-</style>
-</head>
-<body>
-
-<div class="toast" id="toast"></div>
-
-<!-- ===== MODALS ===== -->
-
-<!-- Restock Modal (+) -->
-<div class="modal-bg" id="restockModal">
-<div class="modal">
-<h3>เพิ่มสต็อก</h3>
-<div class="form-group"><label>รายการ</label>
-<input type="text" id="restockItem" readonly style="color:#888"></div>
-<div class="form-group"><label>สต็อกปัจจุบัน</label>
-<input type="text" id="restockCurrent" readonly style="color:#888"></div>
-<div class="form-group"><label>จำนวนที่เพิ่ม</label>
-<input type="number" id="restockQty" min="1" placeholder="ระบุจำนวน"></div>
-<div class="form-group"><label>ราคาต่อหน่วย (฿)</label>
-<input type="number" id="restockCost" min="0" step="0.01" placeholder="ไม่ปังคัป"></div>
+</div>
 </div>
 
 <!-- Create PO Modal -->
@@ -190,7 +176,7 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 <option value="Low">Low — ไม่เร่ง</option>
 </select></div>
 <div class="form-group"><label>หมายเหตุ</label>
-<textarea id="poNotes" placeholder="ไม่ปังคัป"></textarea></div>
+<textarea id="poNotes" placeholder="ไม่บังคับ"></textarea></div>
 <button class="btn btn-w" onclick="submitCreatePO()" id="createPOBtn">สร้าง PO</button>
 <button class="btn btn-o" onclick="closeModal('createPOModal')">ยกเลิก</button>
 </div>
@@ -199,8 +185,8 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 <!-- Add BOM Item Modal -->
 <div class="modal-bg" id="addBOMModal">
 <div class="modal">
-<h3>เพิ่มรายการ BOM</h3>
-<div class="form-group"><label>ชื่อวัตถุดิป</label>
+<h3>เพิ่มรายการร BOM</h3>
+<div class="form-group"><label>ชื่อวัตถุดิบ</label>
 <input type="text" id="bomItemName" placeholder="เช่น PA12-CF"></div>
 <div class="form-group"><label>จำนวนต่อ 1 ชิ้นงาน</label>
 <input type="number" id="bomItemQty" min="0" step="0.01" placeholder="0"></div>
@@ -219,8 +205,8 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 <h3>บันทึกการจ่ายเงิน</h3>
 <div class="form-group"><label>ประเภท</label>
 <select id="payType">
-<option value="expense">รายจ่าย (ซื้อวัตถุดิป)</option>
-<option value="income">รายรัป (ขายสินค้า)</option>
+<option value="expense">รายจ่าย (ซื้อวัตถุดิบ)</option>
+<option value="income">รายรับ (ขายสินค้า)</option>
 </select></div>
 <div class="form-group"><label>จำนวนเงิน (฿)</label>
 <input type="number" id="payAmount" min="0" step="0.01" placeholder="0.00"></div>
@@ -228,7 +214,7 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 <input type="date" id="payDate"></div>
 <div class="form-group"><label>หมวดหมู่</label>
 <select id="payCategory">
-<option value="วัตถุดิป">วัตถุดิป</option>
+<option value="วัตถุดิบ">วัตถุดิบ</option>
 <option value="อะไหล่">อะไหล่/Hardware</option>
 <option value="บริการ">บริการ (Finishing/Coating)</option>
 <option value="แพ็คเกจ">แพ็คเกจ/บรรจุภัณฑ์</option>
@@ -241,12 +227,12 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 <div class="form-group"><label>Supplier / ลูกค้า</label>
 <input type="text" id="paySupplier" placeholder="ชื่อ"></div>
 <div class="form-group"><label>เลข Invoice</label>
-<input type="text" id="payInvoice" placeholder="ไม่ปังคัป"></div>
+<input type="text" id="payInvoice" placeholder="ไม่บังคับ"></div>
 <div class="form-group"><label>หมายเหตุ</label>
 <textarea id="payNotes" placeholder="รายละเอียด"></textarea></div>
-<div class="form-group"><label>แนบรูป Invoice (ไม่บังคัป)</label>
+<div class="form-group"><label>แนบรูป Invoice (ไม่บังคับ)</label>
 <input type="file" id="payFile" accept="image/*" style="padding:8px;background:#0d0d0d;border:1px dashed #333"></div>
-<button class="btn btn-g" onclick="submitPayment()" id="payBtn">ปันทึก</button>
+<button class="btn btn-g" onclick="submitPayment()" id="payBtn">บันทึก</button>
 <button class="btn btn-o" onclick="closeModal('paymentModal')">ยกเลิก</button>
 </div>
 </div>
@@ -270,9 +256,9 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 
 <!-- Tab Content -->
 <div id="tab-stock">
-<input type="text" class="search-box" placeholder="ค้นหาวัตถุดิป..." oninput="filterStock(this.value)">
+<input type="text" class="search-box" placeholder="ค้นหาวัตถุดิบ..." oninput="filterStock(this.value)">
 <div id="stock-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด...</div></div></div>
-<button class="btn btn-o" onclick="openModal('addItemModal')" style="margin-top:8px">+ เพิ่มรายการวัตถุดิปуหม่</button>
+<button class="btn btn-o" onclick="openModal('addItemModal')" style="margin-top:8px">+ เพิ่มรายการวัตถุดิบใหม่</button>
 </div>
 
 <div id="tab-alerts" style="display:none">
@@ -290,17 +276,17 @@ box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:cen
 </div>
 
 <div id="tab-payment" style="display:none">
-<button class="btn btn-g" onclick="openModal('paymentModal')" style="margin-bottom:10px">+ บันทึกรายรัป/รายจ่าย</button>
+<button class="btn btn-g" onclick="openModal('paymentModal')" style="margin-bottom:10px">+ บันทึกรายรับ/รายจ่าย</button>
 <div id="payment-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด...</div></div></div>
 </div>
 
 <div id="tab-cashflow" style="display:none">
-<div id="cashflow-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังтหลด Cash Flow...</div></div></div>
+<div id="cashflow-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด Cash Flow...</div></div></div>
 </div>
 
 <!-- Bottom nav -->
 <div style="margin-top:8px">
-<a href="index.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">กลัปหน้าหลัก</a>
+<a href="index.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">กลับหน้าหลัก</a>
 </div>
 
 <script>
@@ -368,7 +354,7 @@ function loadInventory() {
   }).catch(function(err) {
     document.getElementById('stock-content').innerHTML =
       '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่ได้<br><span style="font-size:13px">' + err + '</span></div>' +
-      '<button class="btn btn-o" onclick="loadInventory()">ลองуหม่</button>';
+      '<button class="btn btn-o" onclick="loadInventory()">ลองใหม่</button>';
   });
 }
 
@@ -382,7 +368,7 @@ function getStockStatus(stock, min) {
 function renderStock(items) {
   if (!items.length) {
     document.getElementById('stock-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มีรายการวัตถุดิป</div>';
+      '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มีรายการวัตถุดิบ</div>';
     return;
   }
 
@@ -493,7 +479,7 @@ function submitDeduct() {
   if (!qty || qty <= 0) { toast('ระบุจำนวนที่ถูกต้อง', 'err'); return; }
   if (qty > currentItem.stock) { toast('หักเกินสต็อก (มี ' + currentItem.stock + ')', 'err'); return; }
   var btn = document.getElementById('deductBtn');
-  btn.innerHTML = '<div class="spinner" style="border-top-color:#ef4444"></div> กำลังปันทึก...';
+  btn.innerHTML = '<div class="spinner" style="border-top-color:#ef4444"></div> กำลังบันทึก...';
   btn.disabled = true;
   callAPI({
     api: 'deductItem', item: currentItem.item, qty: qty,
@@ -552,19 +538,19 @@ function renderAlerts(items) {
     html += '<div class="stock-row">';
     html += '<div class="stock-info">';
     html += '<div class="stock-name" style="color:' + s.color + '">' + it.item + '</div>';
-    html += '<div class="stock-meta">มี: ' + it.stock + ' / ขั้นตшำ: ' + it.min + ' · ต้องสัшง: ' + deficit + ' ' + (it.unit || '') + '</div>';
+    html += '<div class="stock-meta">มี: ' + it.stock + ' / ขั้นต่ำ: ' + it.min + ' · ต้องสั่ง: ' + deficit + ' ' + (it.unit || '') + '</div>';
     html += '</div>';
     html += '<span class="badge ' + s.cls + '">' + s.label + '</span>';
     html += '</div>';
   });
   html += '</div>';
-  html += '<button class="btn btn-w" onclick="createPOFromAlerts()">สร้าง PO จากรายการทีшต้องเติม</button>';
+  html += '<button class="btn btn-w" onclick="createPOFromAlerts()">สร้าง PO จากรายการที่ต้องเติม</button>';
   document.getElementById('alerts-content').innerHTML = html;
 }
 
 function createPOFromAlerts() {
   var lowItems = allInventory.filter(function(it) { return getStockStatus(it.stock, it.min).label !== 'OK'; });
-  if (!lowItems.length) { toast('ไม่มีรายการทีшต้องเติม', 'warn'); return; }
+  if (!lowItems.length) { toast('ไม่มีรายการที่ต้องเติม', 'warn'); return; }
   var itemsList = lowItems.map(function(it) {
     var need = Math.max(0, (it.max || it.min * 2) - it.stock);
     return it.item + ' x' + need;
@@ -574,7 +560,7 @@ function createPOFromAlerts() {
   callAPI({ api: 'createPODraft', items: itemsList, suppliers: suppliers.join(', ') || 'TBD', urgency: 'High' })
   .then(function(res) {
     if (res.success) { toast('สร้าง PO แล้ว!'); switchTab('po'); }
-    else { toast(res.error || 'สร้างфมшสำเรчจ', 'err'); }
+    else { toast(res.error || 'สร้างไม่สำเร็จ', 'err'); }
   }).catch(function(err) { toast('Error: ' + err, 'err'); });
 }
 
@@ -609,7 +595,7 @@ function renderPOs(pos) {
     } else if (po.status === 'Received') {
       html += '<button class="btn btn-xs b-closed" onclick="updatePOStatus(' + idx + ',\'Closed\')">ปิด PO</button>';
     }
-    html += '<button class="btn btn-xs" style="background:#ef444433;color:#f87171" onclick="deletePO(' + idx + ')">ลป</button>';
+    html += '<button class="btn btn-xs" style="background:#ef444433;color:#f87171" onclick="deletePO(' + idx + ')">ลบ</button>';
     html += '</div></div>';
   });
   document.getElementById('po-content').innerHTML = html;
@@ -639,18 +625,18 @@ function updatePOStatus(idx, newStatus) {
   callAPI({ api: 'updatePOStatus', row: po.row || (idx + 2), status: newStatus })
   .then(function(res) {
     if (res.success) { toast('อัพเดตเป็น ' + newStatus); loadPOs(); }
-    else { toast(res.error || 'อัพเดตไม่สำเรчจ', 'err'); }
+    else { toast(res.error || 'อัพเดตไม่สำเร็จ', 'err'); }
   }).catch(function(err) { toast('Error: ' + err, 'err'); });
 }
 
 function deletePO(idx) {
   var po = allPOs[idx];
   if (!po) return;
-  if (!confirm('ลป PO นี้?')) return;
+  if (!confirm('ลบ PO นี้?')) return;
   callAPI({ api: 'deletePO', row: po.row || (idx + 2) })
   .then(function(res) {
-    if (res.success) { toast('ลป PO แล้ว'); loadPOs(); }
-    else { toast(res.error || 'ลปไม่สำเรчจ', 'err'); }
+    if (res.success) { toast('ลบ PO แล้ว'); loadPOs(); }
+    else { toast(res.error || 'ลบไม่สำเร็จ', 'err'); }
   }).catch(function(err) { toast('Error: ' + err, 'err'); });
 }
 
@@ -668,7 +654,7 @@ function renderBOM(items) {
   var totalCost = 0;
   var html = '<div class="card">';
   html += '<div style="font-weight:700;margin-bottom:4px">SN Mirror — Bill of Materials</div>';
-  html += '<div style="font-size:12px;color:#666;margin-bottom:10px">วัตถุดิปต่อ 1 ชิ้นงาน</div>';
+  html += '<div style="font-size:12px;color:#666;margin-bottom:10px">วัตถุดิบต่อ 1 ชิ้นงาน</div>';
   items.forEach(function(it, idx) {
     var cost = parseFloat(it.cost) || 0;
     totalCost += cost;
@@ -685,7 +671,7 @@ function renderBOM(items) {
 
   // Deduction calculator
   html += '<div class="card">';
-  html += '<div style="font-weight:700;margin-bottom:8px">คำนวณวัตถุดิป</div>';
+  html += '<div style="font-weight:700;margin-bottom:8px">คำนวณวัตถุดิบ</div>';
   html += '<div class="form-group"><label>จำนวนที่ผลิต</label>';
   html += '<input type="number" id="bomCalcQty" min="1" value="1" onchange="calcBOM()" oninput="calcBOM()"></div>';
   html += '<div id="bomCalcResult"></div>';
@@ -716,7 +702,7 @@ function calcBOM() {
 
 function submitAddBOM() {
   var name = document.getElementById('bomItemName').value.trim();
-  if (!name) { toast('ระบุชื่อวัตถุดิป', 'err'); return; }
+  if (!name) { toast('ระบุชื่อวัตถุดิบ', 'err'); return; }
   var btn = document.getElementById('addBOMBtn');
   btn.innerHTML = '<div class="spinner" style="border-top-color:#22c55e"></div>';
   btn.disabled = true;
@@ -726,20 +712,20 @@ function submitAddBOM() {
     unit: document.getElementById('bomItemUnit').value || '',
     cost: document.getElementById('bomItemCost').value || '0'
   }).then(function(res) {
-    if (res.success) { toast('เพิшม ' + name + ' ใน BOM แล้ว'); closeModal('addBOMModal'); loadBOM(); }
-    else { toast(res.error || 'เพิшมไมшสำเรчจ', 'err'); }
+    if (res.success) { toast('เพิ่ม ' + name + ' ใน BOM แล้ว'); closeModal('addBOMModal'); loadBOM(); }
+    else { toast(res.error || 'เพิ่มไม่สำเร็จ', 'err'); }
   }).catch(function(err) { toast('Error: ' + err, 'err'); })
-  .finally(function() { btn.innerHTML = 'เพิшมรายการ'; btn.disabled = false; });
+  .finally(function() { btn.innerHTML = 'เพิ่มรายการ'; btn.disabled = false; });
 }
 
 function deleteBOM(idx) {
   var it = bomData[idx];
   if (!it) return;
-  if (!confirm('ลป ' + it.item + ' จาก BOM?')) return;
+  if (!confirm('ลบ ' + it.item + ' จาก BOM?')) return;
   callAPI({ api: 'deleteBOMItem', row: it.row || (idx + 2) })
   .then(function(res) {
-    if (res.success) { toast('ลป ' + it.item + ' จาก BOM แล้ว'); loadBOM(); }
-    else { toast(res.error || 'ลปไมшสำเรчจ', 'err'); }
+    if (res.success) { toast('ลบ ' + it.item + ' จาก BOM แล้ว'); loadBOM(); }
+    else { toast(res.error || 'ลบไม่สำเร็จ', 'err'); }
   }).catch(function(err) { toast('Error: ' + err, 'err'); });
 }
 
@@ -747,7 +733,7 @@ function deleteBOM(idx) {
 function loadPayments() {
   setToday();
   callAPI({ api: 'listPayments' }).then(function(data) { allPayments = data; renderPayments(data); })
-  .catch(function() { document.getElementById('payment-content').innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไมшได้</div>'; });
+  .catch(function() { document.getElementById('payment-content').innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่ได้</div>'; });
 }
 
 function renderPayments(payments) {
@@ -806,12 +792,12 @@ function submitPayment() {
 function doRecordPayment(data, btn) {
   postAPI(data).then(function(res) {
     if (res.success) { toast('บันทึกแล้ว!'); closeModal('paymentModal'); loadPayments(); document.getElementById('payFile').value = ''; }
-    else { toast(res.error || 'ปันทึกไมшสำเรчจ', 'err'); }
+    else { toast(res.error || 'บันทึกไม่สำเร็จ', 'err'); }
   }).catch(function(err) {
     // Fallback to GET if POST fails
     callAPI(data).then(function(res) {
       if (res.success) { toast('บันทึกแล้ว!'); closeModal('paymentModal'); loadPayments(); }
-      else { toast(res.error || 'ปันทึกไมшสำเรчจ', 'err'); }
+      else { toast(res.error || 'บันทึกไม่สำเร็จ', 'err'); }
     }).catch(function(err2) { toast('Error: ' + err2, 'err'); });
   }).finally(function() { btn.innerHTML = 'บันทึก'; btn.disabled = false; });
 }
@@ -835,7 +821,7 @@ function renderCashFlow(data) {
   var html = '<div class="card">';
   html += '<div style="font-weight:700;margin-bottom:10px">สรุป Cash Flow</div>';
   html += '<div class="sum-grid">';
-  html += '<div class="sum-item"><div class="n" style="color:#4ade80;font-size:18px">฿' + totalIn.toLocaleString('th-TH') + '</div><div class="hdr">รายรัป</div></div>';
+  html += '<div class="sum-item"><div class="n" style="color:#4ade80;font-size:18px">฿' + totalIn.toLocaleString('th-TH') + '</div><div class="hdr">รายรับ</div></div>';
   html += '<div class="sum-item"><div class="n" style="color:#f87171;font-size:18px">฿' + totalOut.toLocaleString('th-TH') + '</div><div class="hdr">รายจ่าย</div></div>';
   html += '<div class="sum-item"><div class="n" style="color:' + (balance >= 0 ? '#4ade80' : '#f87171') + ';font-size:18px">฿' + balance.toLocaleString('th-TH') + '</div><div class="hdr">คงเหลือ</div></div>';
   html += '</div></div>';
