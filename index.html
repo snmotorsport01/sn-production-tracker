@@ -107,7 +107,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
   }
   // Inject auth bar
   var bar=document.createElement('div');bar.className='auth-bar';
-  bar.innerHTML='<div class="user-info"><img src="logo.svg" style="height:18px;vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span></div><button class="logout-btn" onclick="snLogout()">ออกจากระบบ</button>';
+  bar.innerHTML='<div class="user-info"><img src="logo.svg" style="height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span></div><button class="logout-btn" onclick="snLogout()">ออกจากระบบ</button>';
   document.body.insertBefore(bar,document.body.firstChild);
   document.body.style.paddingTop='44px';
   window.snUser=u;window.snToken=token;
