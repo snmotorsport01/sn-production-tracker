@@ -99,7 +99,7 @@ function loadUsers(){
   fetch(API+'?api=authListUsers&token='+token)
   .then(function(r){return r.json();})
   .then(function(d){
-    if(!d.success){document.getElementById('userList').innerHTML='<div class="empty-state">'+( d.error||'Failed to load')+'</div>';return;}
+    if(d.error){document.getElementById('userList').innerHTML='<div class="empty-state">'+d.error+'</div>';return;}
     var users = d.users || [];
     renderStats(users);
     renderUsers(users);
