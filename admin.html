@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>SN ERP — Admin Panel</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding-top:48px}
+.auth-bar{position:fixed;top:0;left:0;right:0;height:40px;background:#111;border-bottom:1px solid #222;display:flex;align-items:center;padding:0 12px;font-size:.8rem;z-index:999;gap:8px}
+.auth-bar .spacer{flex:1}
+.role-badge{padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;text-transform:uppercase}
+.role-admin{background:rgba(231,76,60,.2);color:#e74c3c}
+.role-manager{background:rgba(243,156,18,.2);color:#f39c12}
+.role-operator{background:rgba(46,204,113,.2);color:#2ecc71}
+.logout-btn{background:#333;border:none;color:#aaa;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:.75rem}
+.logout-btn:hover{color:#fff}
+.container{max-width:800px;margin:0 auto;padding:16px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.page-header h1{font-size:1.3rem;font-weight:700;color:#fff}
+.back-link{color:#888;text-decoration:none;font-size:.85rem}
+.back-link:hover{color:#fff}
+.stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.stat-card{background:#1a1a1a;border:1px solid #222;border-radius:10px;padding:12px 16px;flex:1;min-width:100px;text-align:center}
+.stat-card .num{font-size:1.5rem;font-weight:700;color:#fff}
+.stat-card .label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.user-card{background:#1a1a1a;border:1px solid #222;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.user-card .user-info{flex:1;min-width:140px}
+.user-card .user-name{font-weight:600;color:#fff;font-size:.95rem}
+.user-card .user-id{color:#666;font-size:.75rem;margin-top:2px}
+.user-card .user-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.role-select{background:#111;border:1px solid #333;color:#e0e0e0;padding:6px 10px;border-radius:6px;font-size:.8rem;cursor:pointer;outline:none}
+.role-select:focus{border-color:#e74c3c}
+.btn-sm{padding:6px 12px;border:none;border-radius:6px;font-size:.75rem;cursor:pointer;font-weight:500;transition:opacity .2s}
+.btn-sm:hover{opacity:.85}
+.btn-reset{background:#333;color:#ccc}
+.btn-delete{background:rgba(231,76,60,.15);color:#e74c3c}
+.btn-save{background:#e74c3c;color:#fff}
+.loading{text-align:center;padding:40px;color:#666}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#fff;padding:10px 20px;border-radius:8px;font-size:.85rem;display:none;z-index:9999}
+.toast.error{background:#e74c3c}
+.empty-state{text-align:center;padding:40px;color:#666;font-size:.9rem}
+@media(max-width:480px){
+.user-card{flex-direction:column;align-items:flex-start}
+.user-card .user-actions{width:100%;justify-content:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Admin Panel</h1>
+    <a href="index.html" class="back-link">Hub</a>
+  </div>
+  
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="num" id="totalUsers">-</div><div class="label">Users</div></div>
+    <div class="stat-card"><div class="num" id="totalAdmin">-</div><div class="label">Admin</div></div>
+    <div class="stat-card"><div class="num" id="totalManager">-</div><div class="label">Manager</div></div>
+    <div class="stat-card"><div class="num" id="totalOperator">-</div><div class="label">Operator</div></div>
+  </div>
+  
+  <div id="userList"><div class="loading">Loading users...</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+
+// ===== Auth Guard =====
+(function(){
+  var t=sessionStorage.getItem('sn_token');
+  var u=sessionStorage.getItem('sn_user');
+  if(!t||!u){window.location.href='login.html';return;}
+  u=JSON.parse(u);
+  var perms={'admin.html':['admin'],'index.html':['admin','manager','operator'],'production.html':['admin','manager','operator'],'inventory.html':['admin','manager'],'finance.html':['admin'],'qr.html':['admin','manager','operator'],'report.html':['admin','manager']};
+  var page=location.pathname.split('/').pop()||'index.html';
+  if(perms[page]&&perms[page].indexOf(u.role)<0){window.location.href='index.html';return;}
+  var bar=document.createElement('div');bar.className='auth-bar';
+  bar.innerHTML='<img src="logo.svg" style="height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span><span class="spacer"></span><button class="logout-btn" onclick="snLogout()">Logout</button>';
+  document.body.prepend(bar);
+  window._snUser=u; window._snToken=t;
+})();
+function snLogout(){
+  var t=sessionStorage.getItem('sn_token');
+  if(t)fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})});
+  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
+  window.location.href='login.html';
+}
+
+// ===== Load Users =====
+function loadUsers(){
+  var token = window._snToken;
+  fetch(API+'?action=authListUsers&token='+token)
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(!d.success){document.getElementById('userList').innerHTML='<div class="empty-state">'+( d.error||'Failed to load')+'</div>';return;}
+    var users = d.users || [];
+    renderStats(users);
+    renderUsers(users);
+  })
+  .catch(function(err){
+    document.getElementById('userList').innerHTML='<div class="empty-state">Error: '+err.message+'</div>';
+  });
+}
+
+function renderStats(users){
+  document.getElementById('totalUsers').textContent = users.length;
+  document.getElementById('totalAdmin').textContent = users.filter(function(u){return u.role==='admin';}).length;
+  document.getElementById('totalManager').textContent = users.filter(function(u){return u.role==='manager';}).length;
+  document.getElementById('totalOperator').textContent = users.filter(function(u){return u.role==='operator';}).length;
+}
+
+function renderUsers(users){
+  var html = '';
+  users.forEach(function(u){
+    var isSelf = u.username === window._snUser.username;
+    html += '<div class="user-card" id="user-'+u.username+'">'
+      + '<div class="user-info">'
+      + '<div class="user-name">'+u.name+(isSelf?' (you)':'')+'</div>'
+      + '<div class="user-id">@'+u.username+' | created: '+(u.created||'N/A')+'</div>'
+      + '</div>'
+      + '<div class="user-actions">'
+      + '<select class="role-select" id="role-'+u.username+'" '+(isSelf?'disabled':'')+' data-original="'+u.role+'">'
+      + '<option value="admin"'+(u.role==='admin'?' selected':'')+'>Admin</option>'
+      + '<option value="manager"'+(u.role==='manager'?' selected':'')+'>Manager</option>'
+      + '<option value="operator"'+(u.role==='operator'?' selected':'')+'>Operator</option>'
+      + '</select>'
+      + (isSelf?'':'<button class="btn-sm btn-save" onclick="changeRole(\''+u.username+'\')">Save</button>')
+      + (isSelf?'':'<button class="btn-sm btn-reset" onclick="resetPin(\''+u.username+'\')">Reset PIN</button>')
+      + (isSelf?'':'<button class="btn-sm btn-delete" onclick="deleteUser(\''+u.username+'\')">Delete</button>')
+      + '</div></div>';
+  });
+  document.getElementById('userList').innerHTML = html || '<div class="empty-state">No users found</div>';
+}
+
+// ===== Actions =====
+function changeRole(username){
+  var sel = document.getElementById('role-'+username);
+  var newRole = sel.value;
+  var orig = sel.getAttribute('data-original');
+  if(newRole === orig){showToast('Role is already '+newRole);return;}
+  if(!confirm('Change '+username+' role to '+newRole+'?'))return;
+  
+  apiPost({action:'auth_update_user',token:window._snToken,target_username:username,updates:{role:newRole}},function(d){
+    if(d.success){showToast(username+' role changed to '+newRole);sel.setAttribute('data-original',newRole);loadUsers();}
+    else showToast(d.error||'Failed','error');
+  });
+}
+
+function resetPin(username){
+  var newPin = prompt('New 4-digit PIN for '+username+':');
+  if(!newPin||newPin.length!==4||!/^\d{4}$/.test(newPin)){showToast('PIN must be 4 digits','error');return;}
+  
+  apiPost({action:'auth_change_pin',token:window._snToken,target_username:username,new_pin:newPin},function(d){
+    if(d.success) showToast('PIN reset for '+username);
+    else showToast(d.error||'Failed','error');
+  });
+}
+
+function deleteUser(username){
+  if(!confirm('Delete user '+username+'? This cannot be undone.'))return;
+  if(!confirm('Are you SURE? Type the username to confirm.'))return;
+  
+  apiPost({action:'auth_update_user',token:window._snToken,target_username:username,updates:{status:'deleted'}},function(d){
+    if(d.success){showToast(username+' deleted');loadUsers();}
+    else showToast(d.error||'Failed','error');
+  });
+}
+
+function apiPost(data, cb){
+  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(data)})
+  .then(function(r){return r.json();})
+  .then(cb)
+  .catch(function(e){showToast('Network error: '+e.message,'error');});
+}
+
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type==='error'?' error':'');
+  t.style.display='block';
+  setTimeout(function(){t.style.display='none';},3000);
+}
+
+// Load on start
+loadUsers();
+</script>
+</body>
+</html>
