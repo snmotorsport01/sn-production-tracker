@@ -22,6 +22,12 @@ text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-
 .btn-w{background:#f59e0b;color:#000}
 .btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin:0}
 .btn-xs{padding:4px 10px;font-size:12px;width:auto;display:inline-block;margin:0;border-radius:8px}
+.btn-del{background:transparent;color:#f87171;border:1px solid #f8717144;padding:4px 10px;font-size:12px;
+width:auto;display:inline-block;margin:0;border-radius:8px;cursor:pointer}
+.btn-del:active{background:#f8717122}
+.btn-edit{background:transparent;color:#60a5fa;border:1px solid #60a5fa44;padding:4px 10px;font-size:12px;
+width:auto;display:inline-block;margin:0;border-radius:8px;cursor:pointer}
+.btn-edit:active{background:#60a5fa22}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
 border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -45,12 +51,12 @@ white-space:nowrap;color:#666;background:#151515;border:1px solid #1e1e1e;transi
 .tab.active{background:#DC2626;color:#fff;border-color:#DC2626}
 
 /* Batch card */
-.batch-card{background:#151515;border-radius:14px;padding:14px 16px;margin-bottom:8px;border:1px solid #1e1e1e;cursor:pointer;transition:.12s}
-.batch-card:active{transform:scale(.98);opacity:.85}
+.batch-card{background:#151515;border-radius:14px;padding:14px 16px;margin-bottom:8px;border:1px solid #1e1e1e;transition:.12s}
 .batch-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .batch-id{font-weight:700;font-size:15px;color:#fff}
 .batch-product{font-size:13px;color:#ccc;margin-bottom:2px}
 .batch-meta{font-size:12px;color:#666}
+.batch-actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
 
 /* Table */
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
@@ -81,7 +87,7 @@ z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;backgroun
 justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 .modal-bg.open{opacity:1;pointer-events:auto}
 .modal{background:#151515;border-radius:18px 18px 0 0;width:100%;max-width:600px;padding:20px 16px 32px;
-transform:translateY(100%);transition:.3s}
+transform:translateY(100%);transition:.3s;max-height:90vh;overflow-y:auto}
 .modal-bg.open .modal{transform:translateY(0)}
 .modal h3{font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;text-align:center}
 .field{margin-bottom:12px}
@@ -90,6 +96,23 @@ transform:translateY(100%);transition:.3s}
 background:#0d0d0d;color:#fff;font-size:15px;outline:none;-webkit-appearance:none}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:#DC2626}
 .field textarea{resize:vertical;min-height:60px}
+
+/* Custom select with other */
+.select-other{display:flex;gap:8px}
+.select-other select{flex:1}
+.select-other input{flex:1;display:none}
+.select-other.show-other select{flex:0 0 110px}
+.select-other.show-other input{display:block}
+
+/* Confirm dialog */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:flex;align-items:center;
+justify-content:center;opacity:0;pointer-events:none;transition:.25s}
+.confirm-bg.open{opacity:1;pointer-events:auto}
+.confirm-box{background:#1a1a1a;border-radius:16px;padding:24px 20px;max-width:340px;width:90%;text-align:center;border:1px solid #333}
+.confirm-box h4{color:#fff;font-size:16px;margin-bottom:8px}
+.confirm-box p{color:#888;font-size:14px;margin-bottom:20px}
+.confirm-btns{display:flex;gap:8px}
+.confirm-btns button{flex:1}
 
 /* Bottom nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;border-top:1px solid #1e1e1e;
@@ -119,13 +142,66 @@ border-radius:10px;background:#151515;border:1px solid #1e1e1e;transition:.12s}
 <div class="modal-bg" id="createModal" onclick="if(event.target===this)closeCreateBatch()">
   <div class="modal">
     <h3>สร้าง Batch ใหม่</h3>
-    <div class="field"><label>สินค้า / ชิ้นงาน *</label><input id="f-product" placeholder="เช่น Turbo manifold, Downpipe..."></div>
+    <div class="field">
+      <label>สินค้า / ชิ้นงาน *</label>
+      <div class="select-other" id="product-group">
+        <select id="f-product-sel" onchange="onProductChange()">
+          <option value="">-- เลือกสินค้า --</option>
+          <option value="Aura Stream">Aura Stream</option>
+          <option value="Aura Beam">Aura Beam</option>
+          <option value="AXIS">AXIS</option>
+          <option value="_other">อื่นๆ (พิมพ์เอง)</option>
+        </select>
+        <input id="f-product-other" placeholder="พิมพ์ชื่อสินค้า...">
+      </div>
+    </div>
     <div class="field"><label>จำนวน *</label><input id="f-qty" type="number" min="1" value="1" inputmode="numeric"></div>
     <div class="field"><label>รุ่นรถ</label><input id="f-carModel" placeholder="เช่น Toyota Supra MK5, Honda Civic FD..."></div>
+    <div class="field"><label>ชื่อลูกค้า</label><input id="f-customer" placeholder="ชื่อลูกค้า..."></div>
     <div class="field"><label>ผู้รับผิดชอบ</label><input id="f-operator" placeholder="ชื่อช่าง / ทีม"></div>
     <div class="field"><label>หมายเหตุ</label><textarea id="f-notes" rows="2" placeholder="รายละเอียดเพิ่มเติม..."></textarea></div>
     <button class="btn btn-g" id="btn-create" onclick="submitBatch()" style="margin-top:4px">✅ สร้าง Batch</button>
     <button class="btn btn-o" onclick="closeCreateBatch()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- Edit Batch Modal -->
+<div class="modal-bg" id="editModal" onclick="if(event.target===this)closeEditBatch()">
+  <div class="modal">
+    <h3>แก้ไข Batch</h3>
+    <input type="hidden" id="e-batchId">
+    <div class="field">
+      <label>สินค้า / ชิ้นงาน *</label>
+      <div class="select-other" id="edit-product-group">
+        <select id="e-product-sel" onchange="onEditProductChange()">
+          <option value="">-- เลือกสินค้า --</option>
+          <option value="Aura Stream">Aura Stream</option>
+          <option value="Aura Beam">Aura Beam</option>
+          <option value="AXIS">AXIS</option>
+          <option value="_other">อื่นๆ (พิมพ์เอง)</option>
+        </select>
+        <input id="e-product-other" placeholder="พิมพ์ชื่อสินค้า...">
+      </div>
+    </div>
+    <div class="field"><label>จำนวน *</label><input id="e-qty" type="number" min="1" value="1" inputmode="numeric"></div>
+    <div class="field"><label>รุ่นรถ</label><input id="e-carModel" placeholder="เช่น Toyota Supra MK5, Honda Civic FD..."></div>
+    <div class="field"><label>ชื่อลูกค้า</label><input id="e-customer" placeholder="ชื่อลูกค้า..."></div>
+    <div class="field"><label>ผู้รับผิดชอบ</label><input id="e-operator" placeholder="ชื่อช่าง / ทีม"></div>
+    <div class="field"><label>หมายเหตุ</label><textarea id="e-notes" rows="2" placeholder="รายละเอียดเพิ่มเติม..."></textarea></div>
+    <button class="btn btn-w" id="btn-edit" onclick="submitEditBatch()" style="margin-top:4px">💾 บันทึกการแก้ไข</button>
+    <button class="btn btn-o" onclick="closeEditBatch()">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="confirm-bg" id="deleteConfirm" onclick="if(event.target===this)closeDeleteConfirm()">
+  <div class="confirm-box">
+    <h4>ลบ Batch นี้?</h4>
+    <p id="delete-info">Batch ID จะถูกลบถาวร</p>
+    <div class="confirm-btns">
+      <button class="btn btn-o" style="margin:0" onclick="closeDeleteConfirm()">ยกเลิก</button>
+      <button class="btn btn-p" style="margin:0" id="btn-delete-confirm" onclick="confirmDelete()">🗑️ ลบ</button>
+    </div>
   </div>
 </div>
 
@@ -166,6 +242,7 @@ var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vd
 var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1qX2ghgY9JW0EesBnRaaA5GUEEMdLCashKdHWTpa7cbM/edit';
 var allBatches = [];
 var currentFilter = 'all';
+var pendingDeleteId = '';
 
 var STATUSES = ['Created','Start Producing','Print Finish','Outsource','QC Pass','Shipped'];
 var STATUS_COLORS = {'Created':'#888','Start Producing':'#f87171','Print Finish':'#60a5fa',
@@ -186,11 +263,68 @@ function callAPI(params) {
   return fetch(API + '?' + qs, { redirect: 'follow' }).then(function(r) { return r.json(); });
 }
 
+function postAPI(body) {
+  return fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(body),
+    redirect: 'follow'
+  }).then(function(r) { return r.json(); });
+}
+
 function toast(msg, type) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast ' + (type || '') + ' show';
   setTimeout(function() { t.className = 'toast'; }, 2500);
+}
+
+// ── Product dropdown with "Other" ──
+function onProductChange() {
+  var sel = document.getElementById('f-product-sel');
+  var grp = document.getElementById('product-group');
+  if (sel.value === '_other') {
+    grp.classList.add('show-other');
+    document.getElementById('f-product-other').focus();
+  } else {
+    grp.classList.remove('show-other');
+    document.getElementById('f-product-other').value = '';
+  }
+}
+
+function onEditProductChange() {
+  var sel = document.getElementById('e-product-sel');
+  var grp = document.getElementById('edit-product-group');
+  if (sel.value === '_other') {
+    grp.classList.add('show-other');
+    document.getElementById('e-product-other').focus();
+  } else {
+    grp.classList.remove('show-other');
+    document.getElementById('e-product-other').value = '';
+  }
+}
+
+function getProductValue(prefix) {
+  var sel = document.getElementById(prefix + '-product-sel');
+  if (sel.value === '_other') {
+    return document.getElementById(prefix + '-product-other').value.trim();
+  }
+  return sel.value;
+}
+
+function setProductField(prefix, val) {
+  var sel = document.getElementById(prefix + '-product-sel');
+  var grp = document.getElementById(prefix === 'f' ? 'product-group' : 'edit-product-group');
+  var opts = Array.from(sel.options).map(function(o) { return o.value; });
+  if (opts.indexOf(val) >= 0 && val !== '_other') {
+    sel.value = val;
+    grp.classList.remove('show-other');
+    document.getElementById(prefix + '-product-other').value = '';
+  } else {
+    sel.value = '_other';
+    grp.classList.add('show-other');
+    document.getElementById(prefix + '-product-other').value = val;
+  }
 }
 
 // ── Tab switching ──
@@ -306,6 +440,7 @@ function renderOverview() {
     html += '<div><span style="font-weight:700;color:#fff">' + b.batchId + '</span> <span style="color:#666;font-size:12px">' + (b.product || '') + '</span></div>';
     html += '<span class="badge ' + badgeClass(b.status) + '">' + (STATUS_TH[b.status] || b.status) + '</span>';
     html += '</div>';
+    if (b.customer) html += '<div style="font-size:12px;color:#f59e0b;margin-top:2px">👤 ' + b.customer + '</div>';
     html += '<div class="status-bar">';
     for (var i = 0; i < STATUSES.length; i++) {
       html += '<div class="status-step' + (i < si ? ' done' : i === si ? ' current' : '') + '"></div>';
@@ -339,7 +474,7 @@ function setFilter(f) {
   renderBatches();
 }
 
-// ── Batches list tab ──
+// ── Batches list tab (with edit/delete) ──
 function renderBatches() {
   var filtered = currentFilter === 'all' ? allBatches : allBatches.filter(function(b) { return b.status === currentFilter; });
 
@@ -359,6 +494,7 @@ function renderBatches() {
     html += '</div>';
     html += '<div class="batch-product">' + (b.product || '-') + ' <span style="color:#666">×' + (b.qty || 0) + '</span></div>';
     html += '<div class="batch-meta">';
+    if (b.customer) html += '👤 ' + b.customer + ' · ';
     if (b.carModel) html += b.carModel + ' · ';
     if (b.operator) html += b.operator + ' · ';
     html += (b.created || '');
@@ -367,6 +503,11 @@ function renderBatches() {
     for (var i = 0; i < STATUSES.length; i++) {
       html += '<div class="status-step' + (i < si ? ' done' : i === si ? ' current' : '') + '"></div>';
     }
+    html += '</div>';
+    // Action buttons
+    html += '<div class="batch-actions">';
+    html += '<button class="btn-edit" onclick="openEditBatch(\'' + b.batchId + '\')">✏️ แก้ไข</button>';
+    html += '<button class="btn-del" onclick="openDeleteConfirm(\'' + b.batchId + '\')">🗑️ ลบ</button>';
     html += '</div>';
     html += '</div>';
   });
@@ -426,11 +567,12 @@ function renderReport() {
   // Detail table
   html += '<div class="card" style="overflow-x:auto">';
   html += '<div style="font-weight:700;margin-bottom:8px">รายละเอียด (' + allBatches.length + ' batch)</div>';
-  html += '<table><thead><tr><th>Batch</th><th>สินค้า</th><th>จำนวน</th><th>สถานะ</th><th>วันที่</th></tr></thead><tbody>';
+  html += '<table><thead><tr><th>Batch</th><th>สินค้า</th><th>จำนวน</th><th>ลูกค้า</th><th>สถานะ</th><th>วันที่</th></tr></thead><tbody>';
   allBatches.forEach(function(b) {
     html += '<tr><td style="font-weight:600">' + b.batchId + '</td>';
     html += '<td>' + (b.product || '-') + '</td>';
     html += '<td>' + (b.qty || 0) + '</td>';
+    html += '<td>' + (b.customer || '-') + '</td>';
     html += '<td><span class="badge ' + badgeClass(b.status) + '">' + (STATUS_TH[b.status] || b.status) + '</span></td>';
     html += '<td style="font-size:12px;color:#888">' + (b.created || '') + '</td></tr>';
   });
@@ -480,12 +622,12 @@ function downloadXLSX() {
 
   // Sheet 2: Detail
   var detailData = [
-    ['Batch ID', 'Product', 'Qty', 'Car Model', 'Status', 'Operator', 'Notes',
+    ['Batch ID', 'Product', 'Qty', 'Customer', 'Car Model', 'Status', 'Operator', 'Notes',
     'Created', 'Start Producing', 'Print Finish', 'Outsource', 'QC Pass', 'Shipped']
   ];
   allBatches.forEach(function(b) {
     detailData.push([
-      b.batchId, b.product, parseInt(b.qty) || 0, b.carModel || '',
+      b.batchId, b.product, parseInt(b.qty) || 0, b.customer || '', b.carModel || '',
       b.status, b.operator || '', b.notes || '',
       b.created || '', b.startPrint || b.startProduce || '',
       b.printDone || b.printFinish || '', b.outsource || '',
@@ -495,7 +637,7 @@ function downloadXLSX() {
 
   var ws2 = XLSX.utils.aoa_to_sheet(detailData);
   ws2['!cols'] = [
-    { wch: 16 }, { wch: 22 }, { wch: 6 }, { wch: 14 }, { wch: 16 },
+    { wch: 16 }, { wch: 22 }, { wch: 6 }, { wch: 16 }, { wch: 14 }, { wch: 16 },
     { wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 18 },
     { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
   ];
@@ -514,6 +656,15 @@ function openGoogleSheets() {
 
 // ── Create Batch ──
 function openCreateBatch() {
+  // Reset form
+  document.getElementById('f-product-sel').value = '';
+  document.getElementById('product-group').classList.remove('show-other');
+  document.getElementById('f-product-other').value = '';
+  document.getElementById('f-qty').value = '1';
+  document.getElementById('f-carModel').value = '';
+  document.getElementById('f-customer').value = '';
+  document.getElementById('f-operator').value = '';
+  document.getElementById('f-notes').value = '';
   document.getElementById('createModal').classList.add('open');
 }
 function closeCreateBatch() {
@@ -521,56 +672,138 @@ function closeCreateBatch() {
 }
 
 function submitBatch() {
-  var product = document.getElementById('f-product').value.trim();
+  var product = getProductValue('f');
   var qty = parseInt(document.getElementById('f-qty').value) || 0;
   var carModel = document.getElementById('f-carModel').value.trim();
+  var customer = document.getElementById('f-customer').value.trim();
   var operator = document.getElementById('f-operator').value.trim();
   var notes = document.getElementById('f-notes').value.trim();
 
-  if (!product) { toast('กรุณาใส่ชื่อสินค้า', 'err'); return; }
+  if (!product) { toast('กรุณาเลือกสินค้า', 'err'); return; }
   if (qty < 1) { toast('จำนวนต้องมากกว่า 0', 'err'); return; }
 
   var btn = document.getElementById('btn-create');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> กำลังสร้าง...';
 
-  var body = {
+  postAPI({
     action: 'add_batch',
     product: product,
     qty: qty,
     carModel: carModel,
+    customer: customer,
     operator: operator,
     notes: notes
-  };
-
-  fetch(API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(body),
-    redirect: 'follow'
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
+  }).then(function(data) {
     btn.disabled = false;
     btn.innerHTML = '✅ สร้าง Batch';
     if (data.success) {
       toast('สร้าง Batch สำเร็จ: ' + (data.batchId || ''));
       closeCreateBatch();
-      // Clear form
-      document.getElementById('f-product').value = '';
-      document.getElementById('f-qty').value = '1';
-      document.getElementById('f-carModel').value = '';
-      document.getElementById('f-operator').value = '';
-      document.getElementById('f-notes').value = '';
-      // Reload data
       loadData();
     } else {
       toast(data.error || 'สร้างไม่สำเร็จ', 'err');
     }
-  })
-  .catch(function(err) {
+  }).catch(function(err) {
     btn.disabled = false;
     btn.innerHTML = '✅ สร้าง Batch';
+    toast('Error: ' + err, 'err');
+  });
+}
+
+// ── Edit Batch ──
+function openEditBatch(batchId) {
+  var b = allBatches.find(function(x) { return x.batchId === batchId; });
+  if (!b) { toast('ไม่พบ Batch', 'err'); return; }
+
+  document.getElementById('e-batchId').value = b.batchId;
+  setProductField('e', b.product || '');
+  document.getElementById('e-qty').value = b.qty || 1;
+  document.getElementById('e-carModel').value = b.carModel || '';
+  document.getElementById('e-customer').value = b.customer || '';
+  document.getElementById('e-operator').value = b.operator || '';
+  document.getElementById('e-notes').value = b.notes || '';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditBatch() {
+  document.getElementById('editModal').classList.remove('open');
+}
+
+function submitEditBatch() {
+  var batchId = document.getElementById('e-batchId').value;
+  var product = getProductValue('e');
+  var qty = parseInt(document.getElementById('e-qty').value) || 0;
+  var carModel = document.getElementById('e-carModel').value.trim();
+  var customer = document.getElementById('e-customer').value.trim();
+  var operator = document.getElementById('e-operator').value.trim();
+  var notes = document.getElementById('e-notes').value.trim();
+
+  if (!product) { toast('กรุณาเลือกสินค้า', 'err'); return; }
+  if (qty < 1) { toast('จำนวนต้องมากกว่า 0', 'err'); return; }
+
+  var btn = document.getElementById('btn-edit');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> กำลังบันทึก...';
+
+  postAPI({
+    action: 'edit',
+    batchId: batchId,
+    product: product,
+    qty: qty,
+    carModel: carModel,
+    customer: customer,
+    operator: operator,
+    notes: notes
+  }).then(function(data) {
+    btn.disabled = false;
+    btn.innerHTML = '💾 บันทึกการแก้ไข';
+    if (data.success) {
+      toast('แก้ไข ' + batchId + ' สำเร็จ');
+      closeEditBatch();
+      loadData();
+    } else {
+      toast(data.error || 'แก้ไขไม่สำเร็จ', 'err');
+    }
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.innerHTML = '💾 บันทึกการแก้ไข';
+    toast('Error: ' + err, 'err');
+  });
+}
+
+// ── Delete Batch ──
+function openDeleteConfirm(batchId) {
+  pendingDeleteId = batchId;
+  document.getElementById('delete-info').textContent = batchId + ' จะถูกลบถาวร';
+  document.getElementById('deleteConfirm').classList.add('open');
+}
+function closeDeleteConfirm() {
+  document.getElementById('deleteConfirm').classList.remove('open');
+  pendingDeleteId = '';
+}
+
+function confirmDelete() {
+  if (!pendingDeleteId) return;
+  var btn = document.getElementById('btn-delete-confirm');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  postAPI({
+    action: 'delete',
+    batchId: pendingDeleteId
+  }).then(function(data) {
+    btn.disabled = false;
+    btn.innerHTML = '🗑️ ลบ';
+    if (data.success) {
+      toast('ลบ ' + pendingDeleteId + ' สำเร็จ');
+      closeDeleteConfirm();
+      loadData();
+    } else {
+      toast(data.error || 'ลบไม่สำเร็จ', 'err');
+    }
+  }).catch(function(err) {
+    btn.disabled = false;
+    btn.innerHTML = '🗑️ ลบ';
     toast('Error: ' + err, 'err');
   });
 }
