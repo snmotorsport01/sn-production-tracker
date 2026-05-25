@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Production — SN ERP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
+padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
+.hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
+text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
+.btn:active{transform:scale(.97);opacity:.8}
+.btn-p{background:#DC2626;color:#fff}
+.btn-g{background:#22c55e;color:#000}
+.btn-o{background:transparent;color:#aaa;border:1px solid #333}
+.btn-w{background:#f59e0b;color:#000}
+.btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin:0}
+.btn-xs{padding:4px 10px;font-size:12px;width:auto;display:inline-block;margin:0;border-radius:8px}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
+border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{text-align:center;padding:40px;color:#555}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.b-created{background:#222;color:#888}
+.b-startprod{background:#2d1010;color:#f87171}
+.b-printfinish{background:#0c1e3d;color:#60a5fa}
+.b-outsource{background:#1e103d;color:#a78bfa}
+.b-qcpass{background:#0a2a1a;color:#4ade80}
+.b-shipped{background:#052e16;color:#22c55e}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.sum-item{background:#0d0d0d;border-radius:10px;padding:12px;text-align:center;border:1px solid #1e1e1e}
+.sum-item .n{font-size:24px;font-weight:800}
+
+/* Tabs */
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
+white-space:nowrap;color:#666;background:#151515;border:1px solid #1e1e1e;transition:.12s;flex-shrink:0}
+.tab:active{transform:scale(.95)}
+.tab.active{background:#DC2626;color:#fff;border-color:#DC2626}
+
+/* Batch card */
+.batch-card{background:#151515;border-radius:14px;padding:14px 16px;margin-bottom:8px;border:1px solid #1e1e1e;cursor:pointer;transition:.12s}
+.batch-card:active{transform:scale(.98);opacity:.85}
+.batch-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.batch-id{font-weight:700;font-size:15px;color:#fff}
+.batch-product{font-size:13px;color:#ccc;margin-bottom:2px}
+.batch-meta{font-size:12px;color:#666}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th{text-align:left;padding:8px 6px;border-bottom:2px solid #333;color:#888;font-size:11px;text-transform:uppercase}
+td{padding:8px 6px;border-bottom:1px solid #1a1a1a}
+
+/* Status progress bar */
+.status-bar{display:flex;gap:2px;margin-top:8px}
+.status-step{flex:1;height:4px;border-radius:2px;background:#1a1a1a}
+.status-step.done{background:#DC2626}
+.status-step.current{background:#f59e0b}
+
+/* Filter */
+.filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filter-btn{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+background:#151515;color:#666;border:1px solid #1e1e1e;transition:.12s}
+.filter-btn:active{transform:scale(.95)}
+.filter-btn.active{background:#DC262633;color:#DC2626;border-color:#DC2626}
+
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
+z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
+.toast.err{background:#f87171;color:#fff}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;border-top:1px solid #1e1e1e;
+padding:12px 16px;display:flex;gap:8px;justify-content:center;z-index:100}
+.bottom-nav a{text-decoration:none;color:#888;font-size:12px;font-weight:600;padding:8px 16px;
+border-radius:10px;background:#151515;border:1px solid #1e1e1e;transition:.12s}
+.bottom-nav a:active{transform:scale(.95);opacity:.8}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div style="text-align:center;margin:12px 0 4px">
+  <div style="font-size:11px;color:#DC2626;font-weight:700;letter-spacing:3px">SN ERP</div>
+  <div style="font-size:18px;font-weight:800;margin-top:2px;color:#fff">Production Dashboard</div>
+  <div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
+</div>
+
+<!-- Quick Actions -->
+<div style="display:flex;gap:8px;margin:16px 0 12px">
+  <a href="index.html" class="btn btn-p" style="flex:1;margin:0;text-decoration:none;font-size:13px;padding:10px">📷 สแกน QR / สร้าง Batch</a>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('overview')">ภาพรวม</div>
+  <div class="tab" onclick="switchTab('batches')">รายการ Batch</div>
+  <div class="tab" onclick="switchTab('report')">รายงาน</div>
+</div>
+
+<!-- Tab: Overview -->
+<div id="tab-overview">
+  <div id="overview-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">Loading...</div></div></div>
+</div>
+
+<!-- Tab: Batches -->
+<div id="tab-batches" style="display:none">
+  <div class="filter-row" id="filter-row"></div>
+  <div id="batches-content"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
+<!-- Tab: Report -->
+<div id="tab-report" style="display:none">
+  <div id="report-content"><div class="loading"><div class="spinner"></div></div></div>
+</div>
+
+<div style="height:70px"></div>
+
+<div class="bottom-nav">
+  <a href="hub.html">🏠 Hub</a>
+  <a href="index.html">📷 สแกน QR</a>
+  <a href="inventory.html">📦 สต็อก</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1qX2ghgY9JW0EesBnRaaA5GUEEMdLCashKdHWTpa7cbM/edit';
+var allBatches = [];
+var currentFilter = 'all';
+
+var STATUSES = ['Created','Start Producing','Print Finish','Outsource','QC Pass','Shipped'];
+var STATUS_COLORS = {'Created':'#888','Start Producing':'#f87171','Print Finish':'#60a5fa',
+'Outsource':'#a78bfa','QC Pass':'#4ade80','Shipped':'#22c55e'};
+var STATUS_TH = {'Created':'สร้างแล้ว','Start Producing':'กำลังผลิต','Print Finish':'พิมพ์เสร็จ',
+'Outsource':'ส่งนอก','QC Pass':'QC ผ่าน','Shipped':'จัดส่งแล้ว'};
+
+function badgeClass(s) {
+  var m = {'Created':'b-created','Start Producing':'b-startprod','Print Finish':'b-printfinish',
+  'Outsource':'b-outsource','QC Pass':'b-qcpass','Shipped':'b-shipped'};
+  return m[s] || 'b-created';
+}
+
+function callAPI(params) {
+  var qs = Object.keys(params).map(function(k) {
+    return encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
+  }).join('&');
+  return fetch(API + '?' + qs, { redirect: 'follow' }).then(function(r) { return r.json(); });
+}
+
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || '') + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 2500);
+}
+
+// ── Tab switching ──
+var allTabs = ['overview','batches','report'];
+function switchTab(tab) {
+  allTabs.forEach(function(t) {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(function(el, i) {
+    el.className = 'tab' + (allTabs[i] === tab ? ' active' : '');
+  });
+  if (tab === 'batches') renderBatches();
+  if (tab === 'report') renderReport();
+}
+
+// ── Status index helper ──
+function statusIndex(s) {
+  var idx = STATUSES.indexOf(s);
+  return idx >= 0 ? idx : 0;
+}
+
+// ── Load all batches ──
+function loadData() {
+  callAPI({ api: 'listBatches' }).then(function(data) {
+    if (data && data.batches) {
+      allBatches = data.batches;
+    } else if (Array.isArray(data)) {
+      allBatches = data;
+    } else {
+      allBatches = [];
+    }
+    renderOverview();
+    buildFilters();
+  }).catch(function(err) {
+    document.getElementById('overview-content').innerHTML =
+      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่ได้<br><span style="font-size:13px">' + err + '</span></div>' +
+      '<button class="btn btn-o" onclick="loadData()">ลองใหม่</button>';
+  });
+}
+
+// ── Overview tab ──
+function renderOverview() {
+  if (!allBatches.length) {
+    document.getElementById('overview-content').innerHTML =
+      '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มี Batch</div>';
+    return;
+  }
+
+  var statusCount = {};
+  STATUSES.forEach(function(s) { statusCount[s] = 0; });
+  allBatches.forEach(function(b) { statusCount[b.status] = (statusCount[b.status] || 0) + 1; });
+
+  var active = 0, done = 0;
+  allBatches.forEach(function(b) {
+    if (b.status === 'QC Pass' || b.status === 'QC ผ่าน' || b.status === 'Shipped' || b.status === 'เสร็จสิ้น') done++;
+    else active++;
+  });
+
+  var html = '';
+
+  // Summary cards
+  html += '<div class="card">';
+  html += '<div style="font-weight:700;margin-bottom:8px">สถานะการผลิต</div>';
+  html += '<div class="sum-grid">';
+  html += '<div class="sum-item"><div class="n" style="color:#f87171">' + active + '</div><div class="hdr">กำลังผลิต</div></div>';
+  html += '<div class="sum-item"><div class="n" style="color:#4ade80">' + done + '</div><div class="hdr">เสร็จแล้ว</div></div>';
+  html += '<div class="sum-item"><div class="n" style="color:#f59e0b">' + allBatches.length + '</div><div class="hdr">ทั้งหมด</div></div>';
+  html += '</div></div>';
+
+  // Status breakdown
+  html += '<div class="card">';
+  html += '<div style="font-weight:700;margin-bottom:10px">แยกตามสถานะ</div>';
+  STATUSES.forEach(function(s) {
+    if (statusCount[s] > 0) {
+      var pct = Math.round((statusCount[s] / allBatches.length) * 100);
+      html += '<div style="display:flex;align-items:center;margin-bottom:8px">';
+      html += '<span class="badge ' + badgeClass(s) + '" style="min-width:100px;text-align:center">' + (STATUS_TH[s] || s) + '</span>';
+      html += '<div style="flex:1;height:8px;background:#1a1a1a;border-radius:4px;margin:0 10px">';
+      html += '<div style="width:' + pct + '%;height:100%;background:' + STATUS_COLORS[s] + ';border-radius:4px"></div>';
+      html += '</div>';
+      html += '<span style="font-weight:700;color:' + STATUS_COLORS[s] + ';min-width:30px;text-align:right">' + statusCount[s] + '</span>';
+      html += '</div>';
+    }
+  });
+  html += '</div>';
+
+  // Product summary
+  var productCount = {};
+  allBatches.forEach(function(b) {
+    if (!productCount[b.product]) productCount[b.product] = { count: 0, qty: 0 };
+    productCount[b.product].count++;
+    productCount[b.product].qty += parseInt(b.qty) || 0;
+  });
+
+  html += '<div class="card">';
+  html += '<div style="font-weight:700;margin-bottom:8px">สรุปตามสินค้า</div>';
+  for (var p in productCount) {
+    html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:13px">';
+    html += '<div style="color:#ccc">' + p + '</div>';
+    html += '<div><span style="color:#fff;font-weight:600">' + productCount[p].count + '</span> <span style="color:#666">batch</span> · <span style="color:#f59e0b;font-weight:600">' + productCount[p].qty + '</span> <span style="color:#666">ชิ้น</span></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Recent batches (last 5)
+  var recent = allBatches.slice(-5).reverse();
+  html += '<div class="card">';
+  html += '<div style="font-weight:700;margin-bottom:8px">Batch ล่าสุด</div>';
+  recent.forEach(function(b) {
+    var si = statusIndex(b.status);
+    html += '<div style="padding:8px 0;border-bottom:1px solid #1a1a1a">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    html += '<div><span style="font-weight:700;color:#fff">' + b.batchId + '</span> <span style="color:#666;font-size:12px">' + (b.product || '') + '</span></div>';
+    html += '<span class="badge ' + badgeClass(b.status) + '">' + (STATUS_TH[b.status] || b.status) + '</span>';
+    html += '</div>';
+    html += '<div class="status-bar">';
+    for (var i = 0; i < STATUSES.length; i++) {
+      html += '<div class="status-step' + (i < si ? ' done' : i === si ? ' current' : '') + '"></div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  document.getElementById('overview-content').innerHTML = html;
+}
+
+// ── Filter buttons ──
+function buildFilters() {
+  var html = '<div class="filter-btn active" onclick="setFilter(\'all\')">ทั้งหมด (' + allBatches.length + ')</div>';
+  var statusCount = {};
+  allBatches.forEach(function(b) { statusCount[b.status] = (statusCount[b.status] || 0) + 1; });
+  STATUSES.forEach(function(s) {
+    if (statusCount[s] > 0) {
+      html += '<div class="filter-btn" onclick="setFilter(\'' + s + '\')">' + (STATUS_TH[s] || s) + ' (' + statusCount[s] + ')</div>';
+    }
+  });
+  document.getElementById('filter-row').innerHTML = html;
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(el) {
+    el.className = 'filter-btn' + (el.textContent.indexOf(f === 'all' ? 'ทั้งหมด' : (STATUS_TH[f] || f)) >= 0 ? ' active' : '');
+  });
+  renderBatches();
+}
+
+// ── Batches list tab ──
+function renderBatches() {
+  var filtered = currentFilter === 'all' ? allBatches : allBatches.filter(function(b) { return b.status === currentFilter; });
+
+  if (!filtered.length) {
+    document.getElementById('batches-content').innerHTML =
+      '<div class="card" style="text-align:center;color:#555;padding:24px">ไม่มีรายการ</div>';
+    return;
+  }
+
+  var html = '';
+  filtered.slice().reverse().forEach(function(b) {
+    var si = statusIndex(b.status);
+    html += '<div class="batch-card">';
+    html += '<div class="batch-header">';
+    html += '<div class="batch-id">' + b.batchId + '</div>';
+    html += '<span class="badge ' + badgeClass(b.status) + '">' + (STATUS_TH[b.status] || b.status) + '</span>';
+    html += '</div>';
+    html += '<div class="batch-product">' + (b.product || '-') + ' <span style="color:#666">×' + (b.qty || 0) + '</span></div>';
+    html += '<div class="batch-meta">';
+    if (b.carModel) html += b.carModel + ' · ';
+    if (b.operator) html += b.operator + ' · ';
+    html += (b.created || '');
+    html += '</div>';
+    html += '<div class="status-bar">';
+    for (var i = 0; i < STATUSES.length; i++) {
+      html += '<div class="status-step' + (i < si ? ' done' : i === si ? ' current' : '') + '"></div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+
+  document.getElementById('batches-content').innerHTML = html;
+}
+
+// ── Report tab ──
+function renderReport() {
+  if (!allBatches.length) {
+    document.getElementById('report-content').innerHTML =
+      '<div class="card" style="text-align:center;color:#555;padding:24px">ไม่มีข้อมูล</div>';
+    return;
+  }
+
+  var statusCount = {};
+  STATUSES.forEach(function(s) { statusCount[s] = 0; });
+  allBatches.forEach(function(b) { statusCount[b.status] = (statusCount[b.status] || 0) + 1; });
+
+  var productCount = {};
+  allBatches.forEach(function(b) {
+    if (!productCount[b.product]) productCount[b.product] = { count: 0, qty: 0 };
+    productCount[b.product].count++;
+    productCount[b.product].qty += parseInt(b.qty) || 0;
+  });
+
+  var html = '';
+
+  // Export buttons
+  html += '<div style="display:flex;gap:8px;margin-bottom:12px">';
+  html += '<button class="btn btn-g" style="flex:1;margin:0" onclick="downloadXLSX()">📥 Download Excel</button>';
+  html += '<button class="btn btn-o" style="flex:1;margin:0;border-color:#4285f4;color:#4285f4" onclick="openGoogleSheets()">📊 Google Sheets</button>';
+  html += '</div>';
+
+  // Status summary
+  html += '<div class="card">';
+  html += '<div style="font-weight:700;margin-bottom:8px">สรุปสถานะ</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  STATUSES.forEach(function(s) {
+    if (statusCount[s] > 0) {
+      html += '<div class="sum-item"><div class="n" style="color:' + STATUS_COLORS[s] + '">' + statusCount[s] + '</div><div class="hdr">' + (STATUS_TH[s] || s) + '</div></div>';
+    }
+  });
+  html += '</div>';
+  html += '<div style="text-align:center;margin-top:8px;font-size:13px;color:#888">Total: <strong style="color:#fff">' + allBatches.length + '</strong> batches</div>';
+  html += '</div>';
+
+  // Product summary table
+  html += '<div class="card">';
+  html += '<div style="font-weight:700;margin-bottom:8px">สรุปตามสินค้า</div>';
+  html += '<table><thead><tr><th>สินค้า</th><th>Batches</th><th>จำนวน</th></tr></thead><tbody>';
+  for (var p in productCount) {
+    html += '<tr><td>' + p + '</td><td>' + productCount[p].count + '</td><td>' + productCount[p].qty + '</td></tr>';
+  }
+  html += '</tbody></table></div>';
+
+  // Detail table
+  html += '<div class="card" style="overflow-x:auto">';
+  html += '<div style="font-weight:700;margin-bottom:8px">รายละเอียด (' + allBatches.length + ' batch)</div>';
+  html += '<table><thead><tr><th>Batch</th><th>สินค้า</th><th>จำนวน</th><th>สถานะ</th><th>วันที่</th></tr></thead><tbody>';
+  allBatches.forEach(function(b) {
+    html += '<tr><td style="font-weight:600">' + b.batchId + '</td>';
+    html += '<td>' + (b.product || '-') + '</td>';
+    html += '<td>' + (b.qty || 0) + '</td>';
+    html += '<td><span class="badge ' + badgeClass(b.status) + '">' + (STATUS_TH[b.status] || b.status) + '</span></td>';
+    html += '<td style="font-size:12px;color:#888">' + (b.created || '') + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+
+  document.getElementById('report-content').innerHTML = html;
+}
+
+// ── Excel Download ──
+function downloadXLSX() {
+  if (!allBatches.length) { toast('ไม่มีข้อมูล', 'err'); return; }
+
+  var wb = XLSX.utils.book_new();
+
+  // Sheet 1: Summary
+  var sumData = [
+    ['SN ERP — Production Report'],
+    ['Generated: ' + new Date().toLocaleString('th-TH')],
+    [''],
+    ['STATUS SUMMARY'],
+    ['Status', 'Count']
+  ];
+  var statusCount = {};
+  STATUSES.forEach(function(s) { statusCount[s] = 0; });
+  allBatches.forEach(function(b) { statusCount[b.status] = (statusCount[b.status] || 0) + 1; });
+  STATUSES.forEach(function(s) {
+    if (statusCount[s] > 0) sumData.push([s, statusCount[s]]);
+  });
+  sumData.push(['Total', allBatches.length]);
+  sumData.push(['']);
+  sumData.push(['PRODUCT SUMMARY']);
+  sumData.push(['Product', 'Batches', 'Total Qty']);
+
+  var productCount = {};
+  allBatches.forEach(function(b) {
+    if (!productCount[b.product]) productCount[b.product] = { count: 0, qty: 0 };
+    productCount[b.product].count++;
+    productCount[b.product].qty += parseInt(b.qty) || 0;
+  });
+  for (var p in productCount) {
+    sumData.push([p, productCount[p].count, productCount[p].qty]);
+  }
+
+  var ws1 = XLSX.utils.aoa_to_sheet(sumData);
+  ws1['!cols'] = [{ wch: 20 }, { wch: 12 }, { wch: 12 }];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+
+  // Sheet 2: Detail
+  var detailData = [
+    ['Batch ID', 'Product', 'Qty', 'Car Model', 'Status', 'Operator', 'Notes',
+    'Created', 'Start Producing', 'Print Finish', 'Outsource', 'QC Pass', 'Shipped']
+  ];
+  allBatches.forEach(function(b) {
+    detailData.push([
+      b.batchId, b.product, parseInt(b.qty) || 0, b.carModel || '',
+      b.status, b.operator || '', b.notes || '',
+      b.created || '', b.startPrint || b.startProduce || '',
+      b.printDone || b.printFinish || '', b.outsource || '',
+      b.qcPass || b.qcPassTime || '', b.shipped || ''
+    ]);
+  });
+
+  var ws2 = XLSX.utils.aoa_to_sheet(detailData);
+  ws2['!cols'] = [
+    { wch: 16 }, { wch: 22 }, { wch: 6 }, { wch: 14 }, { wch: 16 },
+    { wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 18 },
+    { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Detail');
+
+  var now = new Date();
+  var fname = 'SN_ProductionReport_' + now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2) + '.xlsx';
+  XLSX.writeFile(wb, fname);
+  toast('Downloaded ' + fname);
+}
+
+function openGoogleSheets() {
+  window.open(SHEET_URL, '_blank');
+  toast('เปิด Google Sheets...');
+}
+
+// ── URL param support ──
+var urlTab = new URLSearchParams(window.location.search).get('tab');
+if (urlTab && allTabs.indexOf(urlTab) >= 0) {
+  switchTab(urlTab);
+}
+
+// ── Init ──
+loadData();
+</script>
+</body>
+</html>
