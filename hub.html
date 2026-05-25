@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SN ERP — Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
+.logo{text-align:center;margin:24px 0 8px}
+.logo-text{font-size:28px;font-weight:800;letter-spacing:2px;color:#fff}
+.logo-sub{font-size:12px;color:#666;letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+.divider{width:40px;height:3px;background:#DC2626;border-radius:2px;margin:12px auto 32px}
+
+.hub-grid{display:flex;flex-direction:column;gap:12px}
+
+.hub-card{background:#151515;border-radius:16px;padding:24px 20px;border:1px solid #1e1e1e;cursor:pointer;transition:all .15s;text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden}
+.hub-card:active{transform:scale(.97);opacity:.85}
+.hub-card::after{content:'';position:absolute;top:0;right:0;width:120px;height:100%;opacity:.06;border-radius:50%;filter:blur(30px)}
+
+.hub-card.prod{border-left:3px solid #DC2626}
+.hub-card.prod::after{background:#DC2626}
+.hub-card.inv{border-left:3px solid #f59e0b}
+.hub-card.inv::after{background:#f59e0b}
+.hub-card.fin{border-left:3px solid #22c55e}
+.hub-card.fin::after{background:#22c55e}
+
+.hub-icon{font-size:28px;margin-bottom:8px}
+.hub-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.hub-desc{font-size:13px;color:#888;line-height:1.4}
+.hub-stats{display:flex;gap:16px;margin-top:14px}
+.hub-stat{text-align:center}
+.hub-stat .n{font-size:20px;font-weight:800}
+.hub-stat .l{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+.hub-stat .n.red{color:#DC2626}
+.hub-stat .n.amber{color:#f59e0b}
+.hub-stat .n.green{color:#22c55e}
+
+.quick-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}
+.qlink{background:#151515;border-radius:12px;padding:14px;text-align:center;border:1px solid #1e1e1e;cursor:pointer;transition:.12s;text-decoration:none;color:#888;font-size:12px;font-weight:600}
+.qlink:active{transform:scale(.95);opacity:.8}
+.qlink .qi{font-size:20px;margin-bottom:4px;display:block}
+
+.footer{text-align:center;margin-top:40px;padding:20px 0;color:#333;font-size:11px;letter-spacing:1px}
+
+.loading{text-align:center;padding:20px;color:#555}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="logo">
+  <div class="logo-text">SN ERP</div>
+  <div class="logo-sub">Production &amp; Operations</div>
+</div>
+<div class="divider"></div>
+
+<div class="hub-grid">
+
+  <!-- Production Dashboard -->
+  <a href="production.html" class="hub-card prod">
+    <div class="hub-icon">🏭</div>
+    <div class="hub-title">Production Dashboard</div>
+    <div class="hub-desc">ติดตาม Batch, สแกน QR, อัพเดทสถานะการผลิต</div>
+    <div class="hub-stats" id="prod-stats">
+      <div class="hub-stat"><div class="n red" id="ps-active">—</div><div class="l">กำลังผลิต</div></div>
+      <div class="hub-stat"><div class="n green" id="ps-done">—</div><div class="l">เสร็จแล้ว</div></div>
+      <div class="hub-stat"><div class="n amber" id="ps-total">—</div><div class="l">ทั้งหมด</div></div>
+    </div>
+  </a>
+
+  <!-- Inventory -->
+  <a href="inventory.html" class="hub-card inv">
+    <div class="hub-icon">📦</div>
+    <div class="hub-title">Inventory Management</div>
+    <div class="hub-desc">สต็อกวัตถุดิบ, แจ้งเตือน, PO, BOM</div>
+    <div class="hub-stats" id="inv-stats">
+      <div class="hub-stat"><div class="n green" id="is-ok">—</div><div class="l">OK</div></div>
+      <div class="hub-stat"><div class="n amber" id="is-low">—</div><div class="l">ต่ำ</div></div>
+      <div class="hub-stat"><div class="n red" id="is-crit">—</div><div class="l">วิกฤต</div></div>
+    </div>
+  </a>
+
+  <!-- Finance -->
+  <a href="finance.html" class="hub-card fin">
+    <div class="hub-icon">💰</div>
+    <div class="hub-title">Financial</div>
+    <div class="hub-desc">บันทึกรายรับรายจ่าย, Cash Flow, ภาพรวมการเงิน</div>
+    <div class="hub-stats" id="fin-stats">
+      <div class="hub-stat"><div class="n green" id="fs-in">—</div><div class="l">รายรับ</div></div>
+      <div class="hub-stat"><div class="n red" id="fs-out">—</div><div class="l">รายจ่าย</div></div>
+      <div class="hub-stat"><div class="n amber" id="fs-net">—</div><div class="l">คงเหลือ</div></div>
+    </div>
+  </a>
+
+</div>
+
+<!-- Quick Links -->
+<div class="quick-links">
+  <a href="production.html?tab=report" class="qlink"><span class="qi">📊</span>Batch Report</a>
+  <a href="index.html" class="qlink"><span class="qi">📷</span>สแกน QR</a>
+  <a href="inventory.html?tab=po" class="qlink"><span class="qi">📋</span>สร้าง PO</a>
+  <a href="finance.html?tab=cashflow" class="qlink"><span class="qi">💸</span>Cash Flow</a>
+</div>
+
+<div class="footer">SN Motorsports — ERP v2.0</div>
+
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+
+function callAPI(params) {
+  var url = API + '?' + Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k])}).join('&');
+  return fetch(url).then(function(r){return r.json()});
+}
+
+function fmt(n) {
+  if (n === undefined || n === null || isNaN(n)) return '—';
+  return Number(n).toLocaleString('th-TH');
+}
+
+// Load inventory stats
+callAPI({api:'listInventory'}).then(function(data) {
+  if (!data || !data.items) return;
+  var ok=0, low=0, crit=0;
+  data.items.forEach(function(item) {
+    var qty = Number(item.qty) || 0;
+    var min = Number(item.min) || 0;
+    if (qty <= 0) crit++;
+    else if (qty < min) crit++;
+    else if (qty < min * 1.5) low++;
+    else ok++;
+  });
+  document.getElementById('is-ok').textContent = ok;
+  document.getElementById('is-low').textContent = low;
+  document.getElementById('is-crit').textContent = crit;
+}).catch(function(){});
+
+// Load cashflow stats
+callAPI({api:'listCashflow'}).then(function(data) {
+  if (!data) return;
+  document.getElementById('fs-in').textContent = '฿' + fmt(data.totalIncome || 0);
+  document.getElementById('fs-out').textContent = '฿' + fmt(data.totalExpense || 0);
+  var net = (data.totalIncome || 0) - (data.totalExpense || 0);
+  var el = document.getElementById('fs-net');
+  el.textContent = '฿' + fmt(net);
+  el.className = 'n ' + (net >= 0 ? 'green' : 'red');
+}).catch(function(){});
+
+// Load production stats
+callAPI({api:'listBatches'}).then(function(data) {
+  if (!data || !data.batches) return;
+  var active=0, done=0;
+  data.batches.forEach(function(b) {
+    if (b.status === 'QC ผ่าน' || b.status === 'เสร็จสิ้น') done++;
+    else active++;
+  });
+  document.getElementById('ps-active').textContent = active;
+  document.getElementById('ps-done').textContent = done;
+  document.getElementById('ps-total').textContent = data.batches.length;
+}).catch(function(){});
+</script>
+</body>
+</html>
