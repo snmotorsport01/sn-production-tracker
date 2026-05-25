@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0a0a0a">
-<title>Inventory — SN Production</title>
+<title>Inventory — SN ERP</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:60px}
@@ -70,8 +70,6 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .search-box{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearance:none}
 .search-box::placeholder{color:#555}
 
-.cf-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
-.cf-row:last-child{border-bottom:none}
 .cf-in{color:#4ade80}.cf-out{color:#f87171}
 
 .fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:#DC2626;color:#fff;font-size:24px;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(220,38,38,.4);z-index:50;display:none;align-items:center;justify-content:center}
@@ -230,43 +228,6 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 </div>
 </div>
 
-<!-- Record Payment Modal -->
-<div class="modal-bg" id="paymentModal">
-<div class="modal">
-<h3>บันทึกการจ่ายเงิน</h3>
-<div class="form-group"><label>ประเภท</label>
-<select id="payType">
-<option value="expense">รายจ่าย (ซื้อวัตถุดิบ)</option>
-<option value="income">รายรับ (ขายสินค้า)</option>
-</select></div>
-<div class="form-group"><label>จำนวนเงิน (฿)</label>
-<input type="number" id="payAmount" min="0" step="0.01" placeholder="0.00"></div>
-<div class="form-group"><label>วันที่</label>
-<input type="date" id="payDate"></div>
-<div class="form-group"><label>หมวดหมู่</label>
-<select id="payCategory">
-<option value="วัตถุดิบ">วัตถุดิบ</option>
-<option value="อะไหล่">อะไหล่/Hardware</option>
-<option value="บริการ">บริการ (Finishing/Coating)</option>
-<option value="แพ็คเกจ">แพ็คเกจ/บรรจุภัณฑ์</option>
-<option value="ค่าส่ง">ค่าส่ง/Shipping</option>
-<option value="ค่าแรง">ค่าแรง</option>
-<option value="อื่นๆ">อื่นๆ</option>
-<option value="ขายสินค้า">ขายสินค้า</option>
-<option value="Pre-order">Pre-order</option>
-</select></div>
-<div class="form-group"><label>Supplier / ลูกค้า</label>
-<input type="text" id="paySupplier" placeholder="ชื่อ"></div>
-<div class="form-group"><label>เลข Invoice</label>
-<input type="text" id="payInvoice" placeholder="ไม่บังคับ"></div>
-<div class="form-group"><label>หมายเหตุ</label>
-<textarea id="payNotes" placeholder="รายละเอียด"></textarea></div>
-<div class="form-group"><label>แนบรูป Invoice (ไม่บังคับ)</label>
-<input type="file" id="payFile" accept="image/*" style="padding:8px;background:#0d0d0d;border:1px dashed #333"></div>
-<button class="btn btn-g" onclick="submitPayment()" id="payBtn">บันทึก</button>
-<button class="btn btn-o" onclick="closeModal('paymentModal')">ยกเลิก</button>
-</div>
-</div>
 
 <!-- Header -->
 <div style="text-align:center;margin:12px 0 20px">
@@ -281,8 +242,6 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 <div class="tab" onclick="switchTab('alerts')">แจ้งเตือน <span id="alertBadge" style="display:none;background:#ef4444;color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;margin-left:4px"></span></div>
 <div class="tab" onclick="switchTab('po')">PO</div>
 <div class="tab" onclick="switchTab('bom')">BOM</div>
-<div class="tab" onclick="switchTab('payment')">จ่ายเงิน</div>
-<div class="tab" onclick="switchTab('cashflow')">Cash Flow</div>
 </div>
 
 <!-- Tab Content -->
@@ -306,28 +265,9 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 <button class="btn btn-o" onclick="openModal('addBOMModal')" style="margin-top:8px">+ เพิ่มรายการ BOM</button>
 </div>
 
-<div id="tab-payment" style="display:none">
-<button class="btn btn-g" onclick="openModal('paymentModal')" style="margin-bottom:10px">+ บันทึกรายรับ/รายจ่าย</button>
-<div id="payment-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด...</div></div></div>
-</div>
-
-<div id="tab-cashflow" style="display:none">
-<div class="card" style="margin-bottom:8px;padding:10px">
-<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-<input type="date" id="cfFrom" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px">
-<span style="color:#666">ถึง</span>
-<input type="date" id="cfTo" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px">
-<select id="cfType" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px"><option value="">ทั้งหมด</option><option value="income">รายรับ</option><option value="expense">รายจ่าย</option></select>
-<select id="cfGroup" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px"><option value="month">รายเดือน</option><option value="week">รายสัปดาห์</option><option value="day">รายวัน</option></select>
-<button class="btn btn-g" onclick="loadCashFlow()" style="padding:4px 12px;font-size:13px">โหลด</button>
-</div>
-</div>
-<div id="cashflow-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด Cash Flow...</div></div></div>
-</div>
-
 <!-- Bottom nav -->
 <div style="margin-top:8px">
-<a href="index.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">กลับหน้าหลัก</a>
+<a href="hub.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">กลับ Hub</a>
 </div>
 
 <script>
@@ -335,7 +275,6 @@ var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZ
 var allInventory = [];
 var allPOs = [];
 var bomData = [];
-var allPayments = [];
 var currentItem = null;
 
 function callAPI(params) {
@@ -364,14 +303,8 @@ function toast(msg, type) {
 function openModal(id) { document.getElementById(id).className = 'modal-bg show'; }
 function closeModal(id) { document.getElementById(id).className = 'modal-bg'; currentItem = null; }
 
-function setToday() {
-  var d = new Date();
-  var s = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  document.getElementById('payDate').value = s;
-}
-
 // ── Tab switching ──
-var allTabs = ['stock','alerts','po','bom','payment','cashflow'];
+var allTabs = ['stock','alerts','po','bom'];
 function switchTab(tab) {
   allTabs.forEach(function(t) {
     document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
@@ -382,8 +315,6 @@ function switchTab(tab) {
   if (tab === 'alerts') loadAlerts();
   if (tab === 'po') loadPOs();
   if (tab === 'bom') loadBOM();
-  if (tab === 'payment') loadPayments();
-  if (tab === 'cashflow') loadCashFlow();
 }
 
 // ── Stock List ──
@@ -829,147 +760,6 @@ function deleteBOM(idx) {
   }).catch(function(err) { toast('Error: ' + err, 'err'); });
 }
 
-// ── Payment Tab ──
-function loadPayments() {
-  setToday();
-  callAPI({ api: 'listPayments' }).then(function(data) { allPayments = data; renderPayments(data); })
-  .catch(function() { document.getElementById('payment-content').innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่ได้</div>'; });
-}
-
-function renderPayments(payments) {
-  if (!payments.length) {
-    document.getElementById('payment-content').innerHTML = '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มีรายการ</div>';
-    return;
-  }
-  var html = '';
-  payments.slice().reverse().forEach(function(p) {
-    var isIncome = p.type === 'income';
-    html += '<div class="card" style="border-left:3px solid ' + (isIncome ? '#4ade80' : '#f87171') + '">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-    html += '<div style="font-weight:600;font-size:13px">' + (p.date || '-') + '</div>';
-    html += '<div style="font-weight:700;color:' + (isIncome ? '#4ade80' : '#f87171') + '">' + (isIncome ? '+' : '-') + '฿' + Number(p.amount || 0).toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
-    html += '</div>';
-    html += '<div style="font-size:13px;color:#ccc">' + (p.category || '-') + '</div>';
-    html += '<div style="font-size:12px;color:#666">' + (p.supplier || '') + (p.invoice ? ' · INV: ' + p.invoice : '') + '</div>';
-    if (p.notes) html += '<div style="font-size:12px;color:#555;margin-top:2px">' + p.notes + '</div>';
-    html += '</div>';
-  });
-  document.getElementById('payment-content').innerHTML = html;
-}
-
-function submitPayment() {
-  var amount = parseFloat(document.getElementById('payAmount').value);
-  if (!amount || amount <= 0) { toast('ระบุจำนวนเงิน', 'err'); return; }
-  var btn = document.getElementById('payBtn');
-  btn.innerHTML = '<div class="spinner" style="border-top-color:#22c55e"></div>';
-  btn.disabled = true;
-
-  var data = {
-    api: 'recordPayment',
-    type: document.getElementById('payType').value,
-    amount: amount,
-    date: document.getElementById('payDate').value || '',
-    category: document.getElementById('payCategory').value,
-    supplier: document.getElementById('paySupplier').value || '',
-    invoice: document.getElementById('payInvoice').value || '',
-    notes: document.getElementById('payNotes').value || ''
-  };
-
-  // Handle file upload if present
-  var fileInput = document.getElementById('payFile');
-  if (fileInput.files.length > 0) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      data.invoiceImage = e.target.result; // base64
-      doRecordPayment(data, btn);
-    };
-    reader.readAsDataURL(fileInput.files[0]);
-  } else {
-    doRecordPayment(data, btn);
-  }
-}
-
-function doRecordPayment(data, btn) {
-  postAPI(data).then(function(res) {
-    if (res.success) { toast('บันทึกแล้ว!'); closeModal('paymentModal'); loadPayments(); document.getElementById('payFile').value = ''; }
-    else { toast(res.error || 'บันทึกไม่สำเร็จ', 'err'); }
-  }).catch(function(err) {
-    // Fallback to GET if POST fails
-    callAPI(data).then(function(res) {
-      if (res.success) { toast('บันทึกแล้ว!'); closeModal('paymentModal'); loadPayments(); }
-      else { toast(res.error || 'บันทึกไม่สำเร็จ', 'err'); }
-    }).catch(function(err2) { toast('Error: ' + err2, 'err'); });
-  }).finally(function() { btn.innerHTML = 'บันทึก'; btn.disabled = false; });
-}
-
-// ── Cash Flow Tab ──
-function loadCashFlow() {
-  var params = { api: 'listCashflow' };
-  var from = document.getElementById('cfFrom').value;
-  var to = document.getElementById('cfTo').value;
-  var type = document.getElementById('cfType').value;
-  var group = document.getElementById('cfGroup').value;
-  if (from) params.from = from;
-  if (to) params.to = to;
-  if (type) params.type = type;
-  if (group) params.groupBy = group;
-  document.getElementById('cashflow-content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  callAPI(params).then(function(data) { renderCashFlow(data); })
-  .catch(function() { document.getElementById('cashflow-content').innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลด Cash Flow ไม่ได้</div>'; });
-}
-
-function renderCashFlow(data) {
-  if (!data || (data.totalIncome === undefined && data.totalExpense === undefined)) {
-    document.getElementById('cashflow-content').innerHTML = '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มีข้อมูล Cash Flow</div>';
-    return;
-  }
-
-  var totalIn = data.totalIncome || 0;
-  var totalOut = data.totalExpense || 0;
-  var net = data.net || data.balance || (totalIn - totalOut);
-
-  var html = '<div class="card">';
-  var txCount = (data.transactions || data.recent || []).length;
-  html += '<div style="font-weight:700;margin-bottom:10px">สรุป Cash Flow <span style="color:#666;font-size:12px">(' + (data.count || txCount) + ' รายการ)</span></div>';
-  html += '<div class="sum-grid">';
-  html += '<div class="sum-item"><div class="n" style="color:#4ade80;font-size:18px">฿' + totalIn.toLocaleString('th-TH') + '</div><div class="hdr">รายรับ</div></div>';
-  html += '<div class="sum-item"><div class="n" style="color:#f87171;font-size:18px">฿' + totalOut.toLocaleString('th-TH') + '</div><div class="hdr">รายจ่าย</div></div>';
-  html += '<div class="sum-item"><div class="n" style="color:' + (net >= 0 ? '#4ade80' : '#f87171') + ';font-size:18px">฿' + net.toLocaleString('th-TH') + '</div><div class="hdr">คงเหลือ</div></div>';
-  html += '</div></div>';
-
-  // Grouped breakdown
-  var grouped = data.grouped || data.monthly || [];
-  if (grouped.length) {
-    var groupLabel = document.getElementById('cfGroup').value === 'day' ? 'รายวัน' : document.getElementById('cfGroup').value === 'week' ? 'รายสัปดาห์' : 'รายเดือน';
-    html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">' + groupLabel + '</div>';
-    grouped.forEach(function(m) {
-      var pNet = (m.income || 0) - (m.expense || 0);
-      html += '<div class="cf-row">';
-      html += '<div>' + (m.period || m.month || '-') + '</div>';
-      html += '<div><span class="cf-in">+' + (m.income || 0).toLocaleString('th-TH') + '</span> / <span class="cf-out">-' + (m.expense || 0).toLocaleString('th-TH') + '</span>';
-      html += ' = <span style="color:' + (pNet >= 0 ? '#4ade80' : '#f87171') + ';font-weight:600">' + pNet.toLocaleString('th-TH') + '</span></div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // Transactions list
-  var transactions = data.transactions || data.recent || [];
-  if (transactions.length) {
-    html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">รายการ (ล่าสุด 50)</div>';
-    transactions.forEach(function(t) {
-      var isIn = t.type === 'income';
-      var srcBadge = t.source === 'po' ? ' <span style="background:#f59e0b22;color:#f59e0b;padding:1px 5px;border-radius:4px;font-size:10px">PO</span>' : t.source === 'sales' ? ' <span style="background:#22c55e22;color:#22c55e;padding:1px 5px;border-radius:4px;font-size:10px">Sales</span>' : '';
-      html += '<div class="cf-row">';
-      html += '<div><span style="color:#fff">' + (t.date || '-') + '</span> <span style="color:#666">' + (t.category || '') + '</span>' + srcBadge + '</div>';
-      html += '<div style="color:' + (isIn ? '#4ade80' : '#f87171') + ';font-weight:600">' + (isIn ? '+' : '-') + '฿' + Number(t.amount || 0).toLocaleString('th-TH') + '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  document.getElementById('cashflow-content').innerHTML = html;
-}
 
 // ── Init ──
 loadInventory();
