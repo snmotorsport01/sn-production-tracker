@@ -114,9 +114,9 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 })();
 function snLogout(){
  var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
- var t=sessionStorage.getItem('sn_token');
+ var t=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');if(!sessionStorage.getItem('sn_token')&&localStorage.getItem('sn_token')){sessionStorage.setItem('sn_token',localStorage.getItem('sn_token'));sessionStorage.setItem('sn_user',localStorage.getItem('sn_user'));}
  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
- sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
+ sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');
  window.location.href='login.html';
 }
 </script>
@@ -268,7 +268,7 @@ callAPI({api:'listBatches'}).then(function(data) {
 
 // === Admin Panel Button ===
 (function(){
-  var u=JSON.parse(sessionStorage.getItem('sn_user')||'{}');
+  var u=JSON.parse(sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user')||'{}');
   if(u.role==='admin'){
     var link=document.createElement('a');
     link.href='admin.html';
