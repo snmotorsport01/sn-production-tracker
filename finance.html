@@ -1,377 +1,662 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="apple-touch-icon" href="icon-192.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SN ERP — Finance</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Financial — SN ERP</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:60px}
-.hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
-.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
-.btn:active{transform:scale(.97);opacity:.8}
-.btn-p{background:#DC2626;color:#fff}
-.btn-g{background:#22c55e;color:#000}
-.btn-o{background:transparent;color:#aaa;border:1px solid #333}
-.btn-d{background:#ef4444;color:#fff}
-.btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin:0}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#22c55e;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading{text-align:center;padding:40px;color:#555}
-
-.sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
-.sum-item{background:#0d0d0d;border-radius:10px;padding:12px;text-align:center;border:1px solid #1e1e1e}
-.sum-item .n{font-size:24px;font-weight:800}
-
-.tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid #333;background:transparent;color:#888;transition:.15s;flex-shrink:0}
-.tab.active{background:#22c55e;color:#000;border-color:#22c55e}
-
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
-.toast.err{background:#ef4444;color:#fff}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-
-.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:flex-end;justify-content:center}
-.modal-bg.show{display:flex}
-.modal{background:#151515;border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;border:1px solid #1e1e1e;border-bottom:none}
-.modal h3{font-size:16px;margin-bottom:14px}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;color:#888;margin-bottom:4px;text-transform:uppercase}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;-webkit-appearance:none}
-.form-group textarea{height:60px;resize:none}
-
-.cf-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
-.cf-row:last-child{border-bottom:none}
-.cf-in{color:#4ade80}.cf-out{color:#f87171}
-
-.auth-bar{position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a1a1a;border-bottom:1px solid #333;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;font-size:.8rem}
-.auth-bar .user-info{color:#aaa}
-.auth-bar .user-info strong{color:#e74c3c}
-.auth-bar .role-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;margin-left:8px;text-transform:uppercase;font-weight:600}
-.auth-bar .role-admin{background:rgba(231,76,60,.2);color:#e74c3c}
-.auth-bar .role-manager{background:rgba(243,156,18,.2);color:#f39c12}
-.auth-bar .role-operator{background:rgba(46,204,113,.2);color:#2ecc71}
-.auth-bar .logout-btn{background:transparent;border:1px solid #555;color:#aaa;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.75rem}
-.auth-bar .logout-btn:hover{border-color:#e74c3c;color:#e74c3c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px;max-width:800px;margin:0 auto}
+h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
+.subtitle{color:#888;font-size:.85rem;margin-bottom:20px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 16px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#aaa;cursor:pointer;font-size:.85rem;transition:.2s}
+.tab.active{background:#e53935;color:#fff;border-color:#e53935}
+.card{background:#141414;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:16px}
+.card h2{font-size:1.1rem;color:#fff;margin-bottom:12px}
+.upload-zone{border:2px dashed #333;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:16px}
+.upload-zone:hover,.upload-zone.dragover{border-color:#e53935;background:#1a1010}
+.upload-zone p{color:#888;font-size:.9rem}
+.upload-zone .icon{font-size:2rem;margin-bottom:8px}
+#fileInput{display:none}
+.preview-card{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:12px;margin-bottom:12px}
+.preview-row{display:flex;justify-content:space-between;padding:4px 0;font-size:.85rem}
+.preview-row .label{color:#888}
+.preview-row .value{color:#fff;font-weight:500}
+.items-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.8rem}
+.items-table th{text-align:left;color:#888;padding:6px 8px;border-bottom:1px solid #333}
+.items-table td{padding:6px 8px;border-bottom:1px solid #1a1a1a}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:.9rem;cursor:pointer;font-weight:600;transition:.2s}
+.btn-primary{background:#e53935;color:#fff}
+.btn-primary:hover{background:#c62828}
+.btn-secondary{background:#333;color:#fff}
+.btn-secondary:hover{background:#444}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.select-box{background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px 12px;font-size:.85rem;width:100%}
+.cashflow-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.cf-card{background:#1a1a1a;border:1px solid #222;border-radius:10px;padding:14px}
+.cf-card .month{color:#888;font-size:.8rem;margin-bottom:6px}
+.cf-card .amount{font-size:1.3rem;font-weight:700;color:#fff}
+.cf-card .detail{font-size:.78rem;color:#888;margin-top:6px}
+.green{color:#4caf50!important}
+.red{color:#e53935!important}
+.yellow{color:#ffc107!important}
+.summary-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.summary-box{flex:1;min-width:140px;background:#1a1a1a;border-radius:10px;padding:14px;text-align:center}
+.summary-box .num{font-size:1.5rem;font-weight:700}
+.summary-box .lbl{font-size:.75rem;color:#888;margin-top:4px}
+.inv-list{margin-top:12px}
+.inv-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#1a1a1a;border:1px solid #222;border-radius:8px;margin-bottom:8px;font-size:.85rem}
+.inv-item .inv-left{flex:1}
+.inv-item .inv-id{color:#fff;font-weight:600}
+.inv-item .inv-meta{color:#888;font-size:.78rem;margin-top:2px}
+.inv-item .inv-amount{font-weight:700;font-size:1rem;white-space:nowrap;margin-left:12px}
+.del-btn{background:none;border:none;color:#666;cursor:pointer;font-size:1.1rem;padding:4px 8px;transition:.2s}
+.del-btn:hover{color:#e53935}
+.empty{text-align:center;color:#666;padding:40px;font-size:.9rem}
+.loading{text-align:center;color:#888;padding:20px}
+.nav-back{color:#888;text-decoration:none;font-size:.85rem;display:inline-block;margin-bottom:12px}
+.nav-back:hover{color:#fff}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:.85rem;z-index:999;opacity:0;transition:.3s}
+.toast.show{opacity:1}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.filter-row select,.filter-row input{background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:6px 10px;font-size:.82rem}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge-income{background:#1b5e20;color:#4caf50}
+.badge-expense{background:#b71c1c33;color:#e53935}
 </style>
 </head>
-<body><script>
-(function(){
- var token=sessionStorage.getItem('sn_token');
- var userStr=sessionStorage.getItem('sn_user');
- if(!token||!userStr){window.location.href='login.html';return}
- try{var u=JSON.parse(userStr)}catch(e){window.location.href='login.html';return}
- // Permission check per page
- var page=window.location.pathname.split('/').pop()||'index.html';
- var perms={
- 'index.html':['admin','manager','operator'],
- 'production.html':['admin','manager','operator'],
- 'inventory.html':['admin','manager'],
- 'finance.html':['admin'],
- 'qr.html':['admin','manager','operator'],
- 'report.html':['admin','manager'],'admin.html':['admin']
- };
- var allowed=perms[page]||['admin'];
- if(allowed.indexOf(u.role)===-1){
- alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องการ: '+allowed.join('/')+')');
- window.location.href='index.html';return
- }
- // Inject auth bar
- var bar=document.createElement('div');bar.className='auth-bar';
- bar.innerHTML='<div class="user-info"><img src="logo.svg" style="height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span></div><button class="logout-btn" onclick="snLogout()">ออกจากระบบ</button>';
- document.body.insertBefore(bar,document.body.firstChild);
- document.body.style.paddingTop='44px';
- window.snUser=u;window.snToken=token;
-})();
-function snLogout(){
- var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
- var t=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');if(!sessionStorage.getItem('sn_token')&&localStorage.getItem('sn_token')){sessionStorage.setItem('sn_token',localStorage.getItem('sn_token'));sessionStorage.setItem('sn_user',localStorage.getItem('sn_user'));}
- fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
- sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');
- window.location.href='login.html';
-}
-</script>
+<body>
 
-<div id="toast" class="toast"></div>
-
-<!-- Header -->
-<div style="text-align:center;margin:12px 0 20px">
-<div style="font-size:16px;font-weight:700;color:#fff">Financial</div>
-<div style="font-size:12px;color:#666;margin-top:2px">SN Motorsports — รายรับรายจ่าย</div>
-<div style="width:40px;height:3px;background:#22c55e;margin:8px auto 0;border-radius:2px"></div>
+<a href="index.html" class="nav-back">&larr; กลับหน้าหลัก</a>
+<h1>Finance — รายรับรายจ่าย</h1>
+<p class="subtitle">Import Invoice PDF &bull; Cashflow Summary</p>
+<div id="rateBar" style="background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:.8rem">
+  <span style="color:#888">USD/THB: <strong id="rateValue" style="color:#ffc107">loading...</strong></span>
+  <span id="rateTime" style="color:#555"></span>
 </div>
 
 <!-- Tabs -->
 <div class="tabs">
-<div class="tab active" onclick="switchTab('payment')">บันทึกรายรับ/รายจ่าย</div>
-<div class="tab" onclick="switchTab('cashflow')">Cash Flow</div>
+  <div class="tab active" onclick="switchTab('cashflow')">Cashflow</div>
+  <div class="tab" onclick="switchTab('invoices')">รายการ Invoice</div>
+  <div class="tab" onclick="switchTab('import')">Import Invoice</div>
 </div>
 
-<!-- Payment Tab -->
-<div id="tab-payment">
-<button class="btn btn-g" onclick="openModal('paymentModal')" style="margin-bottom:10px">+ บันทึกรายรับ/รายจ่าย</button>
-<div id="payment-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด...</div></div></div>
+<!-- ===================== TAB: Cashflow ===================== -->
+<div id="tab-cashflow">
+  <div class="filter-row">
+    <select id="cfYear" onchange="loadCashflow()">
+      <option value="">ทุกปี</option>
+    </select>
+  </div>
+
+  <div class="summary-row" id="cfSummary">
+    <div class="summary-box"><div class="num green" id="cfIncome">$0</div><div class="lbl">รายรับรวม</div></div>
+    <div class="summary-box"><div class="num red" id="cfExpense">$0</div><div class="lbl">รายจ่ายรวม</div></div>
+    <div class="summary-box"><div class="num" id="cfProfit">$0</div><div class="lbl">กำไร/ขาดทุน</div></div>
+    <div class="summary-box"><div class="num yellow" id="cfUnpaid">$0</div><div class="lbl">ค้างชำระ</div></div>
+  </div>
+
+  <h2 style="font-size:1rem;margin-bottom:12px;color:#fff">รายเดือน</h2>
+  <div class="cashflow-grid" id="cfGrid">
+    <div class="loading">กำลังโหลด...</div>
+  </div>
 </div>
 
-<!-- Cash Flow Tab -->
-<div id="tab-cashflow" style="display:none">
-<div class="card" style="margin-bottom:8px;padding:10px">
-<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-<input type="date" id="cfFrom" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px">
-<span style="color:#666">ถึง</span>
-<input type="date" id="cfTo" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px">
-<select id="cfType" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px"><option value="">ทั้งหมด</option><option value="income">รายรับ</option><option value="expense">รายจ่าย</option></select>
-<select id="cfGroup" style="background:#1a1a1a;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:6px;font-size:13px"><option value="month">รายเดือน</option><option value="week">รายสัปดาห์</option><option value="day">รายวัน</option></select>
-<button class="btn btn-g" onclick="loadCashFlow()" style="padding:4px 12px;font-size:13px">โหลด</button>
-</div>
-</div>
-<div id="cashflow-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">กำลังโหลด Cash Flow...</div></div></div>
-</div>
-
-<!-- Bottom nav -->
-<div style="margin-top:8px">
-<a href="index.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">กลับ Hub</a>
+<!-- ===================== TAB: Invoices ===================== -->
+<div id="tab-invoices" style="display:none">
+  <div class="filter-row">
+    <select id="invTypeFilter" onchange="loadInvoices()">
+      <option value="">ทั้งหมด</option>
+      <option value="income">รายรับ</option>
+      <option value="expense">รายจ่าย</option>
+    </select>
+    <input type="month" id="invMonthFilter" onchange="loadInvoices()">
+  </div>
+  <div id="invList">
+    <div class="loading">กำลังโหลด...</div>
+  </div>
 </div>
 
-<!-- Record Payment Modal -->
-<div class="modal-bg" id="paymentModal">
-<div class="modal">
-<h3>บันทึกการจ่ายเงิน</h3>
-<div class="form-group"><label>ประเภท</label>
-<select id="payType">
-<option value="expense">รายจ่าย (ซื้อวัตถุดิบ)</option>
-<option value="income">รายรับ (ขายสินค้า)</option>
-</select></div>
-<div class="form-group"><label>จำนวนเงิน (฿)</label>
-<input type="number" id="payAmount" min="0" step="0.01" placeholder="0.00"></div>
-<div class="form-group"><label>วันที่</label>
-<input type="date" id="payDate"></div>
-<div class="form-group"><label>หมวดหมู่</label>
-<select id="payCategory">
-<option value="วัตถุดิบ">วัตถุดิบ</option>
-<option value="อะไหล่">อะไหล่/Hardware</option>
-<option value="บริการ">บริการ (Finishing/Coating)</option>
-<option value="แพ็คเกจ">แพ็คเกจ/บรรจุภัณฑ์</option>
-<option value="ค่าส่ง">ค่าส่ง/Shipping</option>
-<option value="ค่าแรง">ค่าแรง</option>
-<option value="อื่นๆ">อื่นๆ</option>
-<option value="ขายสินค้า">ขายสินค้า</option>
-<option value="Pre-order">Pre-order</option>
-</select></div>
-<div class="form-group"><label>Supplier / ลูกค้า</label>
-<input type="text" id="paySupplier" placeholder="ชื่อ"></div>
-<div class="form-group"><label>เลข Invoice</label>
-<input type="text" id="payInvoice" placeholder="ไม่บังคับ"></div>
-<div class="form-group"><label>หมายเหตุ</label>
-<textarea id="payNotes" placeholder="รายละเอียด"></textarea></div>
-<div class="form-group"><label>แนบรูป Invoice (ไม่บังคับ)</label>
-<input type="file" id="payFile" accept="image/*" style="padding:8px;background:#0d0d0d;border:1px dashed #333"></div>
-<button class="btn btn-g" onclick="submitPayment()" id="payBtn">บันทึก</button>
-<button class="btn btn-o" onclick="closeModal('paymentModal')">ยกเลิก</button>
+<!-- ===================== TAB: Import ===================== -->
+<div id="tab-import" style="display:none">
+  <div class="card">
+    <h2>Import Invoice PDF</h2>
+    <p style="color:#888;font-size:.82rem;margin-bottom:16px">อัปโหลดไฟล์ PDF จาก Invoice Fly — ระบบจะอ่านข้อมูลอัตโนมัติ</p>
+
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">PDF</div>
+      <p>คลิกหรือลากไฟล์ PDF มาวางที่นี่</p>
+    </div>
+    <input type="file" id="fileInput" accept=".pdf" onchange="handleFile(this.files[0])">
+
+    <!-- Preview -->
+    <div id="previewArea" style="display:none">
+      <div class="preview-card">
+        <div class="preview-row"><span class="label">Invoice #</span><span class="value" id="pvId">-</span></div>
+        <div class="preview-row"><span class="label">วันที่</span><span class="value" id="pvDate">-</span></div>
+        <div class="preview-row"><span class="label">ลูกค้า</span><span class="value" id="pvCustomer">-</span></div>
+        <table class="items-table" id="pvItems">
+          <thead><tr><th>รายการ</th><th>จำนวน</th><th>ราคา/ชิ้น</th><th>รวม</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="preview-row" style="border-top:1px solid #333;margin-top:6px;padding-top:8px"><span class="label">Subtotal</span><span class="value" id="pvSubtotal">-</span></div>
+        <div class="preview-row"><span class="label">Total</span><span class="value" id="pvTotal" style="color:#4caf50;font-size:1rem">-</span></div>
+        <div class="preview-row"><span class="label">Paid</span><span class="value" id="pvPaid">-</span></div>
+        <div class="preview-row"><span class="label">Balance Due</span><span class="value" id="pvBalance">-</span></div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <label style="font-size:.82rem;color:#888">ประเภท:</label>
+        <select id="pvType" class="select-box" style="width:auto;flex:1">
+          <option value="income">รายรับ (Income)</option>
+          <option value="expense">รายจ่าย (Expense)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <label style="font-size:.82rem;color:#888">หมวด:</label>
+        <select id="pvCategory" class="select-box" style="width:auto;flex:1">
+          <option value="product_sale">ขายสินค้า</option>
+          <option value="service">บริการ</option>
+          <option value="material">วัตถุดิบ</option>
+          <option value="shipping">ค่าส่ง</option>
+          <option value="other">อื่นๆ</option>
+        </select>
+      </div>
+      <textarea id="pvNotes" placeholder="หมายเหตุ (ไม่บังคับ)" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.82rem;resize:vertical;min-height:50px;margin-bottom:8px"></textarea>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnSave" onclick="saveInvoice()">บันทึก</button>
+        <button class="btn btn-secondary" onclick="clearPreview()">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
 </div>
-</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
-var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
-var allPayments = [];
+// ============================================================
+// Config
+// ============================================================
+var API = "https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec";
 
-function callAPI(params) {
- var qs = Object.keys(params).map(function(k) {
- return encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
- }).join('&');
- return fetch(API_URL + '?' + qs, { redirect: 'follow' }).then(function(r) { return r.json(); });
+// Auth guard
+(function(){
+  var t = sessionStorage.getItem("sn_token") || localStorage.getItem("sn_token");
+  if (!sessionStorage.getItem("sn_token") && localStorage.getItem("sn_token")) {
+    sessionStorage.setItem("sn_token", localStorage.getItem("sn_token"));
+    sessionStorage.setItem("sn_user", localStorage.getItem("sn_user"));
+  }
+  if (!t) { window.location.href = "login.html"; return; }
+  try {
+    var u = JSON.parse(sessionStorage.getItem("sn_user") || "{}");
+    if (u.role === "operator") { alert("ไม่มีสิทธิ์เข้าถึงหน้านี้"); window.location.href = "index.html"; return; }
+  } catch(e){}
+})();
+
+var currentTab = "cashflow";
+var parsedInvoice = null;
+var usdThbRate = 0;
+var rateLoaded = false;
+
+// ============================================================
+// Exchange Rate — USD to THB (free API, updates daily)
+// ============================================================
+async function loadExchangeRate() {
+  try {
+    var res = await fetch("https://open.er-api.com/v6/latest/USD");
+    var data = await res.json();
+    if (data.result === "success" && data.rates && data.rates.THB) {
+      usdThbRate = data.rates.THB;
+      rateLoaded = true;
+      document.getElementById("rateValue").textContent = usdThbRate.toFixed(2);
+      document.getElementById("rateTime").textContent = "updated: " + data.time_last_update_utc.substring(0, 16);
+    }
+  } catch (e) {
+    // Fallback rate
+    usdThbRate = 33.5;
+    rateLoaded = true;
+    document.getElementById("rateValue").textContent = usdThbRate.toFixed(2) + " (offline)";
+  }
 }
 
-function postAPI(data) {
- return fetch(API_URL, {
- method: 'POST', headers: { 'Content-Type': 'text/plain' },
- body: JSON.stringify(data), redirect: 'follow'
- }).then(function(r) { return r.json(); });
+function toTHB(usd) {
+  if (!rateLoaded || !usdThbRate) return "";
+  return (usd * usdThbRate).toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-function toast(msg, type) {
- var t = document.getElementById('toast');
- t.textContent = msg;
- t.className = 'toast ' + (type || '') + ' show';
- setTimeout(function() { t.className = 'toast'; }, 2500);
+function fmtDual(usd) {
+  var s = "$" + usd.toFixed(2);
+  if (rateLoaded) s += " (" + toTHB(usd) + " THB)";
+  return s;
 }
 
-function openModal(id) { document.getElementById(id).className = 'modal-bg show'; }
-function closeModal(id) { document.getElementById(id).className = 'modal-bg'; }
+// ============================================================
+// PDF.js setup
+// ============================================================
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-function setToday() {
- var d = new Date();
- var s = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
- document.getElementById('payDate').value = s;
-}
-
-// ── Tab switching ──
-var allTabs = ['payment','cashflow'];
+// ============================================================
+// Tab switching
+// ============================================================
 function switchTab(tab) {
- allTabs.forEach(function(t) {
- document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
- });
- document.querySelectorAll('.tab').forEach(function(el, i) {
- el.className = 'tab' + (allTabs[i] === tab ? ' active' : '');
- });
- if (tab === 'payment') loadPayments();
- if (tab === 'cashflow') loadCashFlow();
+  currentTab = tab;
+  document.querySelectorAll(".tabs .tab").forEach(function(el, i) {
+    el.classList.toggle("active", ["cashflow","invoices","import"][i] === tab);
+  });
+  document.getElementById("tab-cashflow").style.display = tab === "cashflow" ? "" : "none";
+  document.getElementById("tab-invoices").style.display = tab === "invoices" ? "" : "none";
+  document.getElementById("tab-import").style.display = tab === "import" ? "" : "none";
+
+  if (tab === "cashflow") loadCashflow();
+  if (tab === "invoices") loadInvoices();
 }
 
-// ── Check URL param ──
-var urlTab = new URLSearchParams(window.location.search).get('tab');
-if (urlTab && allTabs.indexOf(urlTab) >-1) {
- switchTab(urlTab);
+// ============================================================
+// Drag and drop
+// ============================================================
+var dropZone = document.getElementById("dropZone");
+dropZone.addEventListener("dragover", function(e) { e.preventDefault(); dropZone.classList.add("dragover"); });
+dropZone.addEventListener("dragleave", function() { dropZone.classList.remove("dragover"); });
+dropZone.addEventListener("drop", function(e) {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+
+// ============================================================
+// PDF Parsing — Invoice Fly format
+// ============================================================
+function handleFile(file) {
+  if (!file || file.type !== "application/pdf") {
+    toast("กรุณาเลือกไฟล์ PDF");
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    parsePDF(new Uint8Array(e.target.result));
+  };
+  reader.readAsArrayBuffer(file);
 }
 
-// ── Payment Tab ──
-function loadPayments() {
- setToday();
- callAPI({ api: 'listPayments' }).then(function(data) { allPayments = data; renderPayments(data); })
- .catch(function() { document.getElementById('payment-content').innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่ได้</div>'; });
+async function parsePDF(data) {
+  try {
+    var pdf = await pdfjsLib.getDocument({ data: data }).promise;
+    var page = await pdf.getPage(1);
+    var content = await page.getTextContent();
+
+    // Extract all text items with positions
+    var items = content.items.map(function(item) {
+      return {
+        text: item.str.trim(),
+        x: Math.round(item.transform[4]),
+        y: Math.round(item.transform[5]),
+        w: item.width
+      };
+    }).filter(function(item) { return item.text.length > 0; });
+
+    // Sort by Y descending (top of page first) then X
+    items.sort(function(a, b) { return b.y - a.y || a.x - b.x; });
+
+    var invoice = {
+      invoiceId: "",
+      date: "",
+      customer: "",
+      items: [],
+      subtotal: 0,
+      total: 0,
+      paid: 0,
+      balanceDue: 0
+    };
+
+    // Flatten all text for regex matching
+    var allText = items.map(function(i) { return i.text; }).join(" ");
+
+    // Extract Invoice Number
+    var numMatch = allText.match(/NUMBER:\s*(\S+)/i);
+    if (numMatch) invoice.invoiceId = numMatch[1];
+
+    // Extract Date
+    var dateMatch = allText.match(/DATE:\s*([A-Za-z]+\s+\d{1,2},?\s*\d{4})/i);
+    if (dateMatch) invoice.date = dateMatch[1].replace(",", ", ");
+
+    // Extract Customer (BILL TO:)
+    var billMatch = allText.match(/BILL\s*TO:\s*([^\s]+(?:\s+[^\s]+)*?)(?:\s+NUMBER:)/i);
+    if (billMatch) invoice.customer = billMatch[1].trim();
+
+    // Extract amounts
+    var subtotalMatch = allText.match(/SUBTOTAL:\s*\$?([\d,]+\.?\d*)/i);
+    if (subtotalMatch) invoice.subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+
+    var totalMatch = allText.match(/TOTAL:\s*\$?([\d,]+\.?\d*)/i);
+    if (totalMatch) invoice.total = parseFloat(totalMatch[1].replace(/,/g, ""));
+
+    var paidMatch = allText.match(/PAID:\s*\$?([\d,]+\.?\d*)/i);
+    if (paidMatch) invoice.paid = parseFloat(paidMatch[1].replace(/,/g, ""));
+
+    var balanceMatch = allText.match(/BALANCE\s*DUE\s*\$?([\d,]+\.?\d*)/i);
+    if (balanceMatch) invoice.balanceDue = parseFloat(balanceMatch[1].replace(/,/g, ""));
+
+    // Extract line items — find text between the header row and SUBTOTAL
+    var headerY = null;
+    var subtotalY = null;
+
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].text === "Description") headerY = items[i].y;
+      if (items[i].text === "SUBTOTAL:") subtotalY = items[i].y;
+    }
+
+    if (headerY !== null && subtotalY !== null) {
+      // Get all items between header and subtotal
+      var rowItems = items.filter(function(it) {
+        return it.y < headerY && it.y > subtotalY;
+      });
+
+      // Group by Y (with tolerance = same row)
+      var rows = [];
+      var currentRow = [];
+      var lastY = null;
+
+      rowItems.sort(function(a, b) { return b.y - a.y || a.x - b.x; });
+
+      for (var j = 0; j < rowItems.length; j++) {
+        if (lastY === null || Math.abs(rowItems[j].y - lastY) < 8) {
+          currentRow.push(rowItems[j]);
+        } else {
+          if (currentRow.length) rows.push(currentRow);
+          currentRow = [rowItems[j]];
+        }
+        lastY = rowItems[j].y;
+      }
+      if (currentRow.length) rows.push(currentRow);
+
+      // Parse each row
+      for (var r = 0; r < rows.length; r++) {
+        var rowTexts = rows[r].sort(function(a, b) { return a.x - b.x; });
+        var texts = rowTexts.map(function(t) { return t.text; });
+
+        var amounts = [];
+        var descParts = [];
+        for (var t = 0; t < texts.length; t++) {
+          var cleaned = texts[t].replace(/[$,]/g, "");
+          if (/^\d+(\.\d+)?$/.test(cleaned) && parseFloat(cleaned) > 0) {
+            amounts.push(parseFloat(cleaned));
+          } else {
+            descParts.push(texts[t]);
+          }
+        }
+
+        if (amounts.length >= 3) {
+          invoice.items.push({
+            description: descParts.join(" "),
+            quantity: amounts[0],
+            unitPrice: amounts[1],
+            amount: amounts[2]
+          });
+        } else if (amounts.length === 0 && descParts.length > 0 && invoice.items.length > 0) {
+          // Sub-description line
+          invoice.items[invoice.items.length - 1].description += " " + descParts.join(" ");
+        }
+      }
+    }
+
+    parsedInvoice = invoice;
+    showPreview(invoice);
+
+  } catch (err) {
+    console.error("PDF parse error:", err);
+    toast("ไม่สามารถอ่าน PDF: " + err.message);
+  }
 }
 
-function renderPayments(payments) {
- if (!payments.length) {
- document.getElementById('payment-content').innerHTML = '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มีรายการ</div>';
- return;
- }
- var html = '';
- payments.slice().reverse().forEach(function(p) {
- var isIncome = p.type === 'income';
- html += '<div class="card" style="border-left:3px solid ' + (isIncome ? '#4ade80' : '#f87171') + '">';
- html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
- html += '<div style="font-weight:600;font-size:13px">' + (p.date || '-') + '</div>';
- html += '<div style="font-weight:700;color:' + (isIncome ? '#4ade80' : '#f87171') + '">' + (isIncome ? '+' : '-') + '฿' + Number(p.amount || 0).toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
- html += '</div>';
- html += '<div style="font-size:13px;color:#ccc">' + (p.category || '-') + '</div>';
- html += '<div style="font-size:12px;color:#666">' + (p.supplier || '') + (p.invoice ? ' · INV: ' + p.invoice : '') + '</div>';
- if (p.notes) html += '<div style="font-size:12px;color:#555;margin-top:2px">' + p.notes + '</div>';
- html += '</div>';
- });
- document.getElementById('payment-content').innerHTML = html;
+// ============================================================
+// Preview
+// ============================================================
+function showPreview(inv) {
+  document.getElementById("previewArea").style.display = "";
+  document.getElementById("pvId").textContent = inv.invoiceId || "-";
+  document.getElementById("pvDate").textContent = inv.date || "-";
+  document.getElementById("pvCustomer").textContent = inv.customer || "-";
+  document.getElementById("pvSubtotal").innerHTML = fmtDual(inv.subtotal || 0);
+  document.getElementById("pvTotal").innerHTML = fmtDual(inv.total || 0);
+  document.getElementById("pvPaid").innerHTML = fmtDual(inv.paid || 0);
+  document.getElementById("pvBalance").innerHTML = fmtDual(inv.balanceDue || 0);
+
+  var tbody = document.querySelector("#pvItems tbody");
+  tbody.innerHTML = "";
+  (inv.items || []).forEach(function(item) {
+    var tr = document.createElement("tr");
+    var thbAmt = rateLoaded ? " <span style='color:#888;font-size:.7rem'>(" + toTHB(item.amount) + ")</span>" : "";
+    tr.innerHTML = "<td>" + esc(item.description) + "</td><td style='text-align:center'>" + item.quantity + "</td><td style='text-align:right'>$" + item.unitPrice.toFixed(2) + "</td><td style='text-align:right'>$" + item.amount.toFixed(2) + thbAmt + "</td>";
+    tbody.appendChild(tr);
+  });
+
+  if (!inv.items.length) {
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td colspan='4' style='color:#888;text-align:center'>ไม่พบรายการสินค้า</td>";
+    tbody.appendChild(tr);
+  }
 }
 
-function submitPayment() {
- var amount = parseFloat(document.getElementById('payAmount').value);
- if (!amount || amount <= 0) { toast('ระบุจำนวนเงิน', 'err'); return; }
- var btn = document.getElementById('payBtn');
- btn.innerHTML = '<div class="spinner"></div>';
- btn.disabled = true;
-
- var data = {
- api: 'recordPayment',
- type: document.getElementById('payType').value,
- amount: amount,
- date: document.getElementById('payDate').value || '',
- category: document.getElementById('payCategory').value,
- supplier: document.getElementById('paySupplier').value || '',
- invoice: document.getElementById('payInvoice').value || '',
- notes: document.getElementById('payNotes').value || ''
- };
-
- var fileInput = document.getElementById('payFile');
- if (fileInput.files.length >0) {
- var reader = new FileReader();
- reader.onload = function(e) {
- data.invoiceImage = e.target.result;
- doRecordPayment(data, btn);
- };
- reader.readAsDataURL(fileInput.files[0]);
- } else {
- doRecordPayment(data, btn);
- }
+function clearPreview() {
+  document.getElementById("previewArea").style.display = "none";
+  document.getElementById("fileInput").value = "";
+  parsedInvoice = null;
 }
 
-function doRecordPayment(data, btn) {
- postAPI(data).then(function(res) {
- if (res.success) { toast('บันทึกแล้ว!'); closeModal('paymentModal'); loadPayments(); document.getElementById('payFile').value = ''; }
- else { toast(res.error || 'บันทึกไม่สำเร็จ', 'err'); }
- }).catch(function(err) {
- callAPI(data).then(function(res) {
- if (res.success) { toast('บันทึกแล้ว!'); closeModal('paymentModal'); loadPayments(); }
- else { toast(res.error || 'บันทึกไม่สำเร็จ', 'err'); }
- }).catch(function(err2) { toast('Error: ' + err2, 'err'); });
- }).finally(function() { btn.innerHTML = 'บันทึก'; btn.disabled = false; });
+// ============================================================
+// Save invoice to API
+// ============================================================
+async function saveInvoice() {
+  if (!parsedInvoice) { toast("กรุณาอัปโหลด PDF ก่อน"); return; }
+
+  var btn = document.getElementById("btnSave");
+  btn.disabled = true;
+  btn.textContent = "กำลังบันทึก...";
+
+  var payload = {
+    action: "add_invoice",
+    token: sessionStorage.getItem("sn_token"),
+    invoiceId: parsedInvoice.invoiceId,
+    date: parsedInvoice.date,
+    customer: parsedInvoice.customer,
+    items: parsedInvoice.items,
+    subtotal: parsedInvoice.subtotal,
+    total: parsedInvoice.total,
+    paid: parsedInvoice.paid,
+    balanceDue: parsedInvoice.balanceDue,
+    type: document.getElementById("pvType").value,
+    category: document.getElementById("pvCategory").value,
+    notes: document.getElementById("pvNotes").value
+  };
+
+  try {
+    var res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    });
+    var data = await res.json();
+    if (data.success) {
+      toast("บันทึก " + parsedInvoice.invoiceId + " สำเร็จ!");
+      clearPreview();
+    } else {
+      toast(data.error || "เกิดข้อผิดพลาด");
+    }
+  } catch (err) {
+    toast(err.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = "บันทึก";
 }
 
-// ── Cash Flow Tab ──
-function loadCashFlow() {
- var params = { api: 'listCashflow' };
- var from = document.getElementById('cfFrom').value;
- var to = document.getElementById('cfTo').value;
- var type = document.getElementById('cfType').value;
- var group = document.getElementById('cfGroup').value;
- if (from) params.from = from;
- if (to) params.to = to;
- if (type) params.type = type;
- if (group) params.groupBy = group;
- document.getElementById('cashflow-content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
- callAPI(params).then(function(data) { renderCashFlow(data); })
- .catch(function() { document.getElementById('cashflow-content').innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลด Cash Flow ไม่ได้</div>'; });
+// ============================================================
+// Load invoices list
+// ============================================================
+async function loadInvoices() {
+  var container = document.getElementById("invList");
+  container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+
+  var params = "api=listInvoices&token=" + sessionStorage.getItem("sn_token");
+  var typeF = document.getElementById("invTypeFilter").value;
+  var monthF = document.getElementById("invMonthFilter").value;
+  if (typeF) params += "&type=" + typeF;
+  if (monthF) params += "&month=" + monthF;
+
+  try {
+    var res = await fetch(API + "?" + params);
+    var data = await res.json();
+    if (!data.success) { container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
+
+    var invoices = data.invoices || [];
+    if (!invoices.length) { container.innerHTML = '<div class="empty">ยังไม่มีรายการ Invoice</div>'; return; }
+
+    container.innerHTML = "";
+    invoices.forEach(function(inv) {
+      var typeClass = inv.type === "expense" ? "badge-expense" : "badge-income";
+      var typeLabel = inv.type === "expense" ? "รายจ่าย" : "รายรับ";
+      var amountClass = inv.type === "expense" ? "red" : "green";
+
+      var div = document.createElement("div");
+      div.className = "inv-item";
+      div.innerHTML = '<div class="inv-left">' +
+        '<div class="inv-id">' + esc(inv.invoiceId) + ' <span class="badge ' + typeClass + '">' + typeLabel + '</span></div>' +
+        '<div class="inv-meta">' + esc(inv.date) + ' &bull; ' + esc(inv.customer) + '</div>' +
+        '</div>' +
+        '<div class="inv-amount ' + amountClass + '">$' + (inv.total || 0).toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888">' + toTHB(inv.total || 0) + ' THB</div>' : '') + '</div>' +
+        '<button class="del-btn" onclick="deleteInvoice(\'' + esc(inv.invoiceId) + '\')" title="ลบ">X</button>';
+      container.appendChild(div);
+    });
+  } catch (err) {
+    container.innerHTML = '<div class="empty">' + err.message + '</div>';
+  }
 }
 
-function renderCashFlow(data) {
- if (!data || (data.totalIncome === undefined && data.totalExpense === undefined)) {
- document.getElementById('cashflow-content').innerHTML = '<div class="card" style="text-align:center;color:#555;padding:24px">ยังไม่มีข้อมูล Cash Flow</div>';
- return;
- }
-
- var totalIn = data.totalIncome || 0;
- var totalOut = data.totalExpense || 0;
- var net = data.net || data.balance || (totalIn - totalOut);
-
- var html = '<div class="card">';
- var txCount = (data.transactions || data.recent || []).length;
- html += '<div style="font-weight:700;margin-bottom:10px">สรุป Cash Flow <span style="color:#666;font-size:12px">(' + (data.count || txCount) + ' รายการ)</span></div>';
- html += '<div class="sum-grid">';
- html += '<div class="sum-item"><div class="n" style="color:#4ade80;font-size:18px">฿' + totalIn.toLocaleString('th-TH') + '</div><div class="hdr">รายรับ</div></div>';
- html += '<div class="sum-item"><div class="n" style="color:#f87171;font-size:18px">฿' + totalOut.toLocaleString('th-TH') + '</div><div class="hdr">รายจ่าย</div></div>';
- html += '<div class="sum-item"><div class="n" style="color:' + (net >= 0 ? '#4ade80' : '#f87171') + ';font-size:18px">฿' + net.toLocaleString('th-TH') + '</div><div class="hdr">คงเหลือ</div></div>';
- html += '</div></div>';
-
- var grouped = data.grouped || data.monthly || [];
- if (grouped.length) {
- var groupLabel = document.getElementById('cfGroup').value === 'day' ? 'รายวัน' : document.getElementById('cfGroup').value === 'week' ? 'รายสัปดาห์' : 'รายเดือน';
- html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">' + groupLabel + '</div>';
- grouped.forEach(function(m) {
- var pNet = (m.income || 0) - (m.expense || 0);
- html += '<div class="cf-row">';
- html += '<div>' + (m.period || m.month || '-') + '</div>';
- html += '<div><span class="cf-in">+' + (m.income || 0).toLocaleString('th-TH') + '</span>/ <span class="cf-out">-' + (m.expense || 0).toLocaleString('th-TH') + '</span>';
- html += ' = <span style="color:' + (pNet >= 0 ? '#4ade80' : '#f87171') + ';font-weight:600">' + pNet.toLocaleString('th-TH') + '</span></div>';
- html += '</div>';
- });
- html += '</div>';
- }
-
- var transactions = data.transactions || data.recent || [];
- if (transactions.length) {
- html += '<div class="card"><div style="font-weight:700;margin-bottom:8px">รายการ (ล่าสุด 50)</div>';
- transactions.forEach(function(t) {
- var isIn = t.type === 'income';
- var srcBadge = t.source === 'po' ? ' <span style="background:#f59e0b22;color:#f59e0b;padding:1px 5px;border-radius:4px;font-size:10px">PO</span>' : t.source === 'sales' ? ' <span style="background:#22c55e22;color:#22c55e;padding:1px 5px;border-radius:4px;font-size:10px">Sales</span>' : '';
- html += '<div class="cf-row">';
- html += '<div><span style="color:#fff">' + (t.date || '-') + '</span><span style="color:#666">' + (t.category || '') + '</span>' + srcBadge + '</div>';
- html += '<div style="color:' + (isIn ? '#4ade80' : '#f87171') + ';font-weight:600">' + (isIn ? '+' : '-') + '฿' + Number(t.amount || 0).toLocaleString('th-TH') + '</div>';
- html += '</div>';
- });
- html += '</div>';
- }
-
- document.getElementById('cashflow-content').innerHTML = html;
+// ============================================================
+// Delete invoice
+// ============================================================
+async function deleteInvoice(id) {
+  if (!confirm("ลบ Invoice " + id + " ?")) return;
+  try {
+    var res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "delete_invoice", token: sessionStorage.getItem("sn_token"), invoiceId: id })
+    });
+    var data = await res.json();
+    if (data.success) {
+      toast("ลบ " + id + " แล้ว");
+      loadInvoices();
+    } else {
+      toast(data.error || "Error");
+    }
+  } catch (err) {
+    toast(err.message);
+  }
 }
 
-// ── Init ──
-loadPayments();
+// ============================================================
+// Load Cashflow Summary
+// ============================================================
+async function loadCashflow() {
+  var grid = document.getElementById("cfGrid");
+  grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+
+  var params = "api=cashflowSummary&token=" + sessionStorage.getItem("sn_token");
+  var yearF = document.getElementById("cfYear").value;
+  if (yearF) params += "&year=" + yearF;
+
+  try {
+    var res = await fetch(API + "?" + params);
+    var data = await res.json();
+    if (!data.success) { grid.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
+
+    var months = data.months || [];
+    if (!months.length) {
+      grid.innerHTML = '<div class="empty">ยังไม่มีข้อมูล — Import Invoice เพื่อเริ่มต้น</div>';
+      document.getElementById("cfIncome").textContent = "$0";
+      document.getElementById("cfExpense").textContent = "$0";
+      document.getElementById("cfProfit").textContent = "$0";
+      document.getElementById("cfUnpaid").textContent = "$0";
+      return;
+    }
+
+    // Calculate totals
+    var totalIncome = 0, totalExpense = 0, totalUnpaid = 0;
+    months.forEach(function(m) {
+      totalIncome += m.income;
+      totalExpense += m.expense;
+      totalUnpaid += m.unpaidTotal;
+    });
+    var totalProfit = totalIncome - totalExpense;
+
+    document.getElementById("cfIncome").innerHTML = "$" + totalIncome.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalIncome) + ' THB</div>' : '');
+    document.getElementById("cfExpense").innerHTML = "$" + totalExpense.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalExpense) + ' THB</div>' : '');
+    document.getElementById("cfProfit").innerHTML = "$" + totalProfit.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalProfit) + ' THB</div>' : '');
+    document.getElementById("cfProfit").className = "num " + (totalProfit >= 0 ? "green" : "red");
+    document.getElementById("cfUnpaid").innerHTML = "$" + totalUnpaid.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalUnpaid) + ' THB</div>' : '');
+
+    // Populate year filter
+    var yearSelect = document.getElementById("cfYear");
+    var years = {};
+    months.forEach(function(m) { years[m.month.substring(0, 4)] = true; });
+    var currentVal = yearSelect.value;
+    yearSelect.innerHTML = '<option value="">ทุกปี</option>';
+    Object.keys(years).sort().reverse().forEach(function(y) {
+      yearSelect.innerHTML += '<option value="' + y + '"' + (y === currentVal ? ' selected' : '') + '>' + y + '</option>';
+    });
+
+    // Render month cards
+    var thaiMonths = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+    grid.innerHTML = "";
+    months.forEach(function(m) {
+      var parts = m.month.split("-");
+      var monthName = thaiMonths[parseInt(parts[1])] + " " + parts[0];
+      var profitColor = m.profit >= 0 ? "green" : "red";
+      var profitSign = m.profit >= 0 ? "+" : "";
+
+      var card = document.createElement("div");
+      card.className = "cf-card";
+      var thbProfit = rateLoaded ? ' <span style="font-size:.75rem;color:#888">(' + toTHB(m.profit) + ' THB)</span>' : '';
+      card.innerHTML = '<div class="month">' + monthName + '</div>' +
+        '<div class="amount ' + profitColor + '">' + profitSign + '$' + m.profit.toFixed(2) + thbProfit + '</div>' +
+        '<div class="detail">รายรับ <span class="green">$' + m.income.toFixed(2) + '</span>' + (rateLoaded ? ' <span style="color:#555">(' + toTHB(m.income) + ')</span>' : '') + '</div>' +
+        '<div class="detail">รายจ่าย <span class="red">$' + m.expense.toFixed(2) + '</span>' + (rateLoaded ? ' <span style="color:#555">(' + toTHB(m.expense) + ')</span>' : '') + '</div>' +
+        '<div class="detail">' + m.invoiceCount + ' invoices &bull; ค้างชำระ $' + m.unpaidTotal.toFixed(2) + '</div>';
+      grid.appendChild(card);
+    });
+
+  } catch (err) {
+    grid.innerHTML = '<div class="empty">' + err.message + '</div>';
+  }
+}
+
+// ============================================================
+// Utilities
+// ============================================================
+function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+function toast(msg) {
+  var el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(function() { el.classList.remove("show"); }, 3000);
+}
+
+// ============================================================
+// Init — load exchange rate first, then cashflow
+// ============================================================
+(async function() {
+  await loadExchangeRate();
+  loadCashflow();
+})();
 </script>
 </body>
 </html>
