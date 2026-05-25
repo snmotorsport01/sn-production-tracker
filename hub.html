@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>SN ERP — Hub</title>
+<title>SN ERP â Hub</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
@@ -50,6 +50,25 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .loading{text-align:center;padding:20px;color:#555}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* N8N Status Panel */
+.n8n-panel{margin:20px auto;max-width:600px;background:#151515;border:1px solid #2a2a2a;border-radius:16px;padding:20px;}
+.n8n-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.n8n-icon{font-size:20px;}
+.n8n-title{font-size:15px;font-weight:600;color:#e5e5e5;flex:1;}
+.n8n-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.n8n-badge.healthy{background:#0d3320;color:#4ade80;}
+.n8n-badge.warning{background:#3d2e08;color:#fbbf24;}
+.n8n-badge.error,.n8n-badge.no_data{background:#1a1a2e;color:#818cf8;}
+.n8n-badge.loading{background:#1a1a2e;color:#888;}
+.n8n-body{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.n8n-stat{text-align:center;padding:12px 8px;background:#0d0d0d;border-radius:10px;}
+.n8n-stat-val{font-size:18px;font-weight:700;color:#e5e5e5;}
+.n8n-stat-lbl{font-size:11px;color:#666;margin-top:4px;}
+.n8n-actions{display:flex;align-items:center;justify-content:space-between;}
+.n8n-btn{background:#1a1a2e;color:#818cf8;border:1px solid #2a2a4a;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;}
+.n8n-btn:hover{background:#252545;}
+.n8n-ver{font-size:11px;color:#555;}
 </style>
 </head>
 <body>
@@ -64,37 +83,37 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 
   <!-- Production Dashboard -->
   <a href="production.html" class="hub-card prod">
-    <div class="hub-icon">🏭</div>
+    <div class="hub-icon">ð­</div>
     <div class="hub-title">Production Dashboard</div>
-    <div class="hub-desc">ติดตาม Batch, สแกน QR, อัพเดทสถานะการผลิต</div>
+    <div class="hub-desc">à¸à¸´à¸à¸à¸²à¸¡ Batch, à¸ªà¹à¸à¸ QR, à¸­à¸±à¸à¹à¸à¸à¸ªà¸à¸²à¸à¸°à¸à¸²à¸£à¸à¸¥à¸´à¸</div>
     <div class="hub-stats" id="prod-stats">
-      <div class="hub-stat"><div class="n red" id="ps-active">—</div><div class="l">กำลังผลิต</div></div>
-      <div class="hub-stat"><div class="n green" id="ps-done">—</div><div class="l">เสร็จแล้ว</div></div>
-      <div class="hub-stat"><div class="n amber" id="ps-total">—</div><div class="l">ทั้งหมด</div></div>
+      <div class="hub-stat"><div class="n red" id="ps-active">â</div><div class="l">à¸à¸³à¸¥à¸±à¸à¸à¸¥à¸´à¸</div></div>
+      <div class="hub-stat"><div class="n green" id="ps-done">â</div><div class="l">à¹à¸ªà¸£à¹à¸à¹à¸¥à¹à¸§</div></div>
+      <div class="hub-stat"><div class="n amber" id="ps-total">â</div><div class="l">à¸à¸±à¹à¸à¸«à¸¡à¸</div></div>
     </div>
   </a>
 
   <!-- Inventory -->
   <a href="inventory.html" class="hub-card inv">
-    <div class="hub-icon">📦</div>
+    <div class="hub-icon">ð¦</div>
     <div class="hub-title">Inventory Management</div>
-    <div class="hub-desc">สต็อกวัตถุดิบ, แจ้งเตือน, PO, BOM</div>
+    <div class="hub-desc">à¸ªà¸à¹à¸­à¸à¸§à¸±à¸à¸à¸¸à¸à¸´à¸, à¹à¸à¹à¸à¹à¸à¸·à¸­à¸, PO, BOM</div>
     <div class="hub-stats" id="inv-stats">
-      <div class="hub-stat"><div class="n green" id="is-ok">—</div><div class="l">OK</div></div>
-      <div class="hub-stat"><div class="n amber" id="is-low">—</div><div class="l">ต่ำ</div></div>
-      <div class="hub-stat"><div class="n red" id="is-crit">—</div><div class="l">วิกฤต</div></div>
+      <div class="hub-stat"><div class="n green" id="is-ok">â</div><div class="l">OK</div></div>
+      <div class="hub-stat"><div class="n amber" id="is-low">â</div><div class="l">à¸à¹à¸³</div></div>
+      <div class="hub-stat"><div class="n red" id="is-crit">â</div><div class="l">à¸§à¸´à¸à¸¤à¸</div></div>
     </div>
   </a>
 
   <!-- Finance -->
   <a href="finance.html" class="hub-card fin">
-    <div class="hub-icon">💰</div>
+    <div class="hub-icon">ð°</div>
     <div class="hub-title">Financial</div>
-    <div class="hub-desc">บันทึกรายรับรายจ่าย, Cash Flow, ภาพรวมการเงิน</div>
+    <div class="hub-desc">à¸à¸±à¸à¸à¸¶à¸à¸£à¸²à¸¢à¸£à¸±à¸à¸£à¸²à¸¢à¸à¹à¸²à¸¢, Cash Flow, à¸ à¸²à¸à¸£à¸§à¸¡à¸à¸²à¸£à¹à¸à¸´à¸</div>
     <div class="hub-stats" id="fin-stats">
-      <div class="hub-stat"><div class="n green" id="fs-in">—</div><div class="l">รายรับ</div></div>
-      <div class="hub-stat"><div class="n red" id="fs-out">—</div><div class="l">รายจ่าย</div></div>
-      <div class="hub-stat"><div class="n amber" id="fs-net">—</div><div class="l">คงเหลือ</div></div>
+      <div class="hub-stat"><div class="n green" id="fs-in">â</div><div class="l">à¸£à¸²à¸¢à¸£à¸±à¸</div></div>
+      <div class="hub-stat"><div class="n red" id="fs-out">â</div><div class="l">à¸£à¸²à¸¢à¸à¹à¸²à¸¢</div></div>
+      <div class="hub-stat"><div class="n amber" id="fs-net">â</div><div class="l">à¸à¸à¹à¸«à¸¥à¸·à¸­</div></div>
     </div>
   </a>
 
@@ -102,13 +121,24 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 
 <!-- Quick Links -->
 <div class="quick-links">
-  <a href="production.html?tab=report" class="qlink"><span class="qi">📊</span>Batch Report</a>
-  <a href="index.html" class="qlink"><span class="qi">📷</span>สแกน QR</a>
-  <a href="inventory.html?tab=po" class="qlink"><span class="qi">📋</span>สร้าง PO</a>
-  <a href="finance.html?tab=cashflow" class="qlink"><span class="qi">💸</span>Cash Flow</a>
+  <a href="production.html?tab=report" class="qlink"><span class="qi">ð</span>Batch Report</a>
+  <a href="index.html" class="qlink"><span class="qi">ð·</span>à¸ªà¹à¸à¸ QR</a>
+  <a href="inventory.html?tab=po" class="qlink"><span class="qi">ð</span>à¸ªà¸£à¹à¸²à¸ PO</a>
+  <a href="finance.html?tab=cashflow" class="qlink"><span class="qi">ð¸</span>Cash Flow</a>
 </div>
 
-<div class="footer">SN Motorsports — ERP v2.0</div>
+
+<div class="n8n-panel">
+<div class="n8n-header"><span class="n8n-icon">🔗</span><span class="n8n-title">N8N Integration Status</span><span class="n8n-badge loading" id="n8nBadge">...</span></div>
+<div class="n8n-body">
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nLastSync">—</div><div class="n8n-stat-lbl">Last Sync</div></div>
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nTotal">—</div><div class="n8n-stat-lbl">Total Syncs</div></div>
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nErrors">—</div><div class="n8n-stat-lbl">Errors (24h)</div></div>
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nModules">—</div><div class="n8n-stat-lbl">Modules</div></div>
+</div>
+<div class="n8n-actions"><button class="n8n-btn" onclick="loadN8N()">🔄 Refresh</button><span class="n8n-ver" id="n8nVer"></span></div>
+</div>
+<div class="footer">SN Motorsports â ERP v2.0</div>
 
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
@@ -119,7 +149,7 @@ function callAPI(params) {
 }
 
 function fmt(n) {
-  if (n === undefined || n === null || isNaN(n)) return '—';
+  if (n === undefined || n === null || isNaN(n)) return 'â';
   return Number(n).toLocaleString('th-TH');
 }
 
@@ -143,11 +173,11 @@ callAPI({api:'listInventory'}).then(function(data) {
 // Load cashflow stats
 callAPI({api:'listCashflow'}).then(function(data) {
   if (!data) return;
-  document.getElementById('fs-in').textContent = '฿' + fmt(data.totalIncome || 0);
-  document.getElementById('fs-out').textContent = '฿' + fmt(data.totalExpense || 0);
+  document.getElementById('fs-in').textContent = 'à¸¿' + fmt(data.totalIncome || 0);
+  document.getElementById('fs-out').textContent = 'à¸¿' + fmt(data.totalExpense || 0);
   var net = (data.totalIncome || 0) - (data.totalExpense || 0);
   var el = document.getElementById('fs-net');
-  el.textContent = '฿' + fmt(net);
+  el.textContent = 'à¸¿' + fmt(net);
   el.className = 'n ' + (net >= 0 ? 'green' : 'red');
 }).catch(function(){});
 
@@ -156,13 +186,37 @@ callAPI({api:'listBatches'}).then(function(data) {
   if (!data || !data.batches) return;
   var active=0, done=0;
   data.batches.forEach(function(b) {
-    if (b.status === 'QC ผ่าน' || b.status === 'เสร็จสิ้น') done++;
+    if (b.status === 'QC à¸à¹à¸²à¸' || b.status === 'à¹à¸ªà¸£à¹à¸à¸ªà¸´à¹à¸') done++;
     else active++;
   });
   document.getElementById('ps-active').textContent = active;
   document.getElementById('ps-done').textContent = done;
   document.getElementById('ps-total').textContent = data.batches.length;
 }).catch(function(){});
+
+  // === N8N Status ===
+  function loadN8N(){
+    var b=document.getElementById('n8nBadge');
+    b.textContent='Loading...';b.className='n8n-badge loading';
+    Promise.all([
+      fetch(API+'?api=n8nHealth').then(function(r){return r.json();}),
+      fetch(API+'?api=n8nSyncStatus').then(function(r){return r.json();})
+    ]).then(function(arr){
+      var h=arr[0],s=arr[1];
+      var st=s.status||'healthy';
+      var labels={healthy:'● Connected',warning:'⚠ Warning',no_data:'○ Standby'};
+      b.textContent=labels[st]||st;
+      b.className='n8n-badge '+st;
+      document.getElementById('n8nLastSync').textContent=s.lastSync?new Date(s.lastSync).toLocaleString('th-TH',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}):'ยังไม่มี';
+      document.getElementById('n8nTotal').textContent=s.totalSyncs||0;
+      document.getElementById('n8nErrors').textContent=s.recentErrors||0;
+      document.getElementById('n8nModules').textContent=h.modules?h.modules.length:0;
+      document.getElementById('n8nVer').textContent='API v'+(h.version||'?');
+    }).catch(function(){
+      b.textContent='● Offline';b.className='n8n-badge error';
+    });
+  }
+  loadN8N();
 </script>
 </body>
 </html>
