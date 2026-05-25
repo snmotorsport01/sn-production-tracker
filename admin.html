@@ -74,7 +74,7 @@ var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vd
 
 // ===== Auth Guard =====
 (function(){
-  var t=sessionStorage.getItem('sn_token');
+  var t=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');if(!sessionStorage.getItem('sn_token')&&localStorage.getItem('sn_token')){sessionStorage.setItem('sn_token',localStorage.getItem('sn_token'));sessionStorage.setItem('sn_user',localStorage.getItem('sn_user'));}
   var u=sessionStorage.getItem('sn_user');
   if(!t||!u){window.location.href='login.html';return;}
   u=JSON.parse(u);
@@ -89,7 +89,7 @@ var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vd
 function snLogout(){
   var t=sessionStorage.getItem('sn_token');
   if(t)fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})});
-  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
+  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');
   window.location.href='login.html';
 }
 
