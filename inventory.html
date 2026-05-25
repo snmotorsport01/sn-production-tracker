@@ -103,7 +103,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
     'inventory.html':['admin','manager'],
     'finance.html':['admin'],
     'qr.html':['admin','manager','operator'],
-    'report.html':['admin','manager']
+    'report.html':['admin','manager'],'admin.html':['admin']
   };
   var allowed=perms[page]||['admin'];
   if(allowed.indexOf(u.role)===-1){
