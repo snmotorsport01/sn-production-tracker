@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>SN ERP — เข้าสู่ระบบ</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-container{width:100%;max-width:400px;padding:24px}
+.logo-section{text-align:center;margin-bottom:40px}
+.logo-section h1{font-size:2rem;font-weight:800;letter-spacing:2px;color:#fff}
+.logo-section p{color:#888;font-size:.85rem;letter-spacing:4px;margin-top:4px}
+.logo-icon{font-size:3rem;margin-bottom:12px}
+.tab-bar{display:flex;margin-bottom:24px;border-radius:12px;background:#1a1a1a;overflow:hidden}
+.tab-bar button{flex:1;padding:12px;background:transparent;border:none;color:#888;font-size:.9rem;cursor:pointer;transition:all .2s}
+.tab-bar button.active{background:#e74c3c;color:#fff;font-weight:600}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.8rem;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.form-group input,.form-group select{width:100%;padding:14px 16px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff;font-size:1rem;outline:none;transition:border .2s}
+.form-group input:focus,.form-group select:focus{border-color:#e74c3c}
+.pin-input-row{display:flex;gap:10px;justify-content:center}
+.pin-input-row input{width:52px;height:56px;text-align:center;font-size:1.5rem;font-weight:700;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff;outline:none;transition:border .2s}
+.pin-input-row input:focus{border-color:#e74c3c}
+.btn-primary{width:100%;padding:16px;background:#e74c3c;border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .2s}
+.btn-primary:hover{opacity:.9}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.error-msg{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:#e74c3c;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:none}
+.success-msg{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);color:#2ecc71;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:none}
+.info-text{text-align:center;color:#666;font-size:.8rem;margin-top:16px}
+.version-tag{position:fixed;bottom:12px;right:16px;color:#333;font-size:.7rem}
+.loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="login-container">
+  <div class="logo-section">
+    <div class="logo-icon">🏭</div>
+    <h1>SN ERP</h1>
+    <p>PRODUCTION & OPERATIONS</p>
+  </div>
+  <div class="tab-bar">
+    <button class="active" onclick="showTab('login')">เข้าสู่ระบบ</button>
+    <button onclick="showTab('register')">ลงทะเบียน</button>
+  </div>
+  <div id="errorMsg" class="error-msg"></div>
+  <div id="successMsg" class="success-msg"></div>
+  <form id="loginForm" onsubmit="doLogin(event)">
+    <div class="form-group">
+      <label>ชื่อผู้ใช้</label>
+      <input type="text" id="loginUser" placeholder="username" autocomplete="username" required>
+    </div>
+    <div class="form-group">
+      <label>PIN (4 หลัก)</label>
+      <div class="pin-input-row">
+        <input type="password" maxlength="1" inputmode="numeric" class="pin-digit" data-idx="0" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="pin-digit" data-idx="1" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="pin-digit" data-idx="2" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="pin-digit" data-idx="3" autocomplete="off">
+      </div>
+      <input type="hidden" id="loginPin">
+    </div>
+    <button type="submit" class="btn-primary" id="loginBtn">เข้าสู่ระบบ</button>
+  </form>
+  <form id="registerForm" style="display:none" onsubmit="doRegister(event)">
+    <div class="form-group">
+      <label>ชื่อผู้ใช้</label>
+      <input type="text" id="regUser" placeholder="username (ภาษาอังกฤษ)" required>
+    </div>
+    <div class="form-group">
+      <label>ชื่อแสดง</label>
+      <input type="text" id="regName" placeholder="ชื่อ-นามสกุล" required>
+    </div>
+    <div class="form-group">
+      <label>PIN (4 หลัก)</label>
+      <div class="pin-input-row">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin-digit" data-idx="0" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin-digit" data-idx="1" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin-digit" data-idx="2" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin-digit" data-idx="3" autocomplete="off">
+      </div>
+      <input type="hidden" id="regPin">
+    </div>
+    <div class="form-group">
+      <label>ยืนยัน PIN</label>
+      <div class="pin-input-row">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin2-digit" data-idx="0" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin2-digit" data-idx="1" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin2-digit" data-idx="2" autocomplete="off">
+        <input type="password" maxlength="1" inputmode="numeric" class="reg-pin2-digit" data-idx="3" autocomplete="off">
+      </div>
+      <input type="hidden" id="regPin2">
+    </div>
+    <p class="info-text" style="margin-bottom:12px">ลงทะเบียนเป็น Operator (ผู้ปฏิบัติงาน)</p>
+    <button type="submit" class="btn-primary" id="regBtn">ลงทะเบียน</button>
+  </form>
+  <p class="info-text" id="footerInfo">ใช้ PIN 4 หลักในการเข้าสู่ระบบ</p>
+</div>
+<div class="version-tag">SN ERP v2.9</div>
+<script>
+var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+(function(){var t=sessionStorage.getItem('sn_token');if(t)window.location.href='index.html'})();
+function showTab(tab){var b=document.querySelectorAll('.tab-bar button');b[0].className=tab==='login'?'active':'';b[1].className=tab==='register'?'active':'';document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';hideMessages()}
+function hideMessages(){document.getElementById('errorMsg').style.display='none';document.getElementById('successMsg').style.display='none'}
+function showError(m){var e=document.getElementById('errorMsg');e.textContent=m;e.style.display='block';document.getElementById('successMsg').style.display='none'}
+function showSuccess(m){var e=document.getElementById('successMsg');e.textContent=m;e.style.display='block';document.getElementById('errorMsg').style.display='none'}
+function setupPinInputs(sel,hid){var d=document.querySelectorAll(sel);d.forEach(function(inp,i){inp.addEventListener('input',function(){if(this.value.length===1&&i<3)d[i+1].focus();collectPin(sel,hid)});inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&this.value===''&&i>0){d[i-1].focus();d[i-1].value='';collectPin(sel,hid)}});inp.addEventListener('paste',function(e){e.preventDefault();var p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').substring(0,4);for(var j=0;j<p.length&&j<4;j++)d[j].value=p[j];if(p.length>0)d[Math.min(p.length,3)].focus();collectPin(sel,hid)})})}
+function collectPin(sel,hid){var d=document.querySelectorAll(sel);var p='';d.forEach(function(x){p+=x.value});document.getElementById(hid).value=p}
+setupPinInputs('.pin-digit','loginPin');setupPinInputs('.reg-pin-digit','regPin');setupPinInputs('.reg-pin2-digit','regPin2');
+function doLogin(e){e.preventDefault();hideMessages();var u=document.getElementById('loginUser').value.trim();var p=document.getElementById('loginPin').value;if(!u){showError('กรุณาระบุชื่อผู้ใช้');return}if(p.length!==4){showError('กรุณาระบุ PIN 4 หลัก');return}var btn=document.getElementById('loginBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังเข้าสู่ระบบ...';fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_login',username:u,pin:p})}).then(function(r){return r.json()}).then(function(d){if(d.success){sessionStorage.setItem('sn_token',d.token);sessionStorage.setItem('sn_user',JSON.stringify(d.user));window.location.href='index.html'}else{showError(d.error||'เข้าสู่ระบบไม่สำเร็จ');btn.disabled=false;btn.textContent='เข้าสู่ระบบ'}}).catch(function(err){showError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: '+err.message);btn.disabled=false;btn.textContent='เข้าสู่ระบบ'})}
+function doRegister(e){e.preventDefault();hideMessages();var u=document.getElementById('regUser').value.trim();var n=document.getElementById('regName').value.trim();var p=document.getElementById('regPin').value;var p2=document.getElementById('regPin2').value;if(!u){showError('กรุณาระบุชื่อผู้ใช้');return}if(!/^[a-zA-Z0-9_]+$/.test(u)){showError('ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษเท่านั้น');return}if(!n){showError('กรุณาระบุชื่อแสดง');return}if(p.length!==4){showError('กรุณาระบุ PIN 4 หลัก');return}if(p!==p2){showError('PIN ไม่ตรงกัน');return}var btn=document.getElementById('regBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังลงทะเบียน...';fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_register',username:u,name:n,pin:p,role:'operator'})}).then(function(r){return r.json()}).then(function(d){if(d.success){showSuccess('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');btn.disabled=false;btn.textContent='ลงทะเบียน';setTimeout(function(){showTab('login')},1500)}else{showError(d.error||'ลงทะเบียนไม่สำเร็จ');btn.disabled=false;btn.textContent='ลงทะเบียน'}}).catch(function(err){showError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: '+err.message);btn.disabled=false;btn.textContent='ลงทะเบียน'})}
+</script>
+</body>
+</html>
