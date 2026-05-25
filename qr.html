@@ -118,7 +118,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     'inventory.html':['admin','manager'],
     'finance.html':['admin'],
     'qr.html':['admin','manager','operator'],
-    'report.html':['admin','manager']
+    'report.html':['admin','manager'],'admin.html':['admin']
   };
   var allowed=perms[page]||['admin'];
   if(allowed.indexOf(u.role)===-1){
