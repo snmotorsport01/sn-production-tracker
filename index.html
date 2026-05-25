@@ -3,798 +3,220 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a0a">
-<title>SN Production</title>
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-      <link rel="apple-touch-icon" href="icon-192.png">
-      <link rel="manifest" href="manifest.json">
-  <style>
+<title>SN ERP — Hub</title>
+<style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
-  padding-bottom:72px;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
-.page{display:none;padding:16px 16px 24px;max-width:480px;margin:0 auto;animation:fadeIn .2s}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
+.logo{text-align:center;margin:24px 0 8px}
+.logo-text{font-size:28px;font-weight:800;letter-spacing:2px;color:#fff}
+.logo-sub{font-size:12px;color:#666;letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+.divider{width:40px;height:3px;background:#DC2626;border-radius:2px;margin:12px auto 32px}
 
-.bnav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#111;
-  border-top:1px solid #222;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:100}
-.bnav a{flex:1;text-align:center;color:#555;font-size:10px;text-decoration:none;padding:4px 0;transition:.15s}
-.bnav a.act{color:#DC2626}
-.bnav a svg{display:block;margin:0 auto 2px;width:24px;height:24px}
+.hub-grid{display:flex;flex-direction:column;gap:12px}
 
-.card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
-.card:active{background:#1a1a1a}
-.hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.val{font-size:15px;margin-bottom:10px}
-.big{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1.1}
-.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a1a1a}
-.row:last-child{border:none}
+.hub-card{background:#151515;border-radius:16px;padding:24px 20px;border:1px solid #1e1e1e;cursor:pointer;transition:all .15s;text-decoration:none;color:inherit;display:block;position:relative;overflow:hidden}
+.hub-card:active{transform:scale(.97);opacity:.85}
+.hub-card::after{content:'';position:absolute;top:0;right:0;width:120px;height:100%;opacity:.06;border-radius:50%;filter:blur(30px)}
 
-.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
-.b-created{background:#222;color:#888}
-.b-startprod{background:#2d1010;color:#f87171}
-.b-printfinish{background:#0c1e3d;color:#60a5fa}
-.b-outsource{background:#1e103d;color:#a78bfa}
-.b-qcpass{background:#0a2a1a;color:#4ade80}
-.b-shipped{background:#052e16;color:#22c55e}
+.hub-card.prod{border-left:3px solid #DC2626}
+.hub-card.prod::after{background:#DC2626}
+.hub-card.inv{border-left:3px solid #f59e0b}
+.hub-card.inv::after{background:#f59e0b}
+.hub-card.fin{border-left:3px solid #22c55e}
+.hub-card.fin::after{background:#22c55e}
 
-.btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
-  text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
-.btn:active{transform:scale(.97);opacity:.8}
-.btn-p{background:#DC2626;color:#fff}
-.btn-g{background:#22c55e;color:#000}
-.btn-r{background:#7f1d1d;color:#f87171;border:1px solid #991b1b}
-.btn-o{background:transparent;color:#aaa;border:1px solid #333}
+.hub-icon{font-size:28px;margin-bottom:8px}
+.hub-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.hub-desc{font-size:13px;color:#888;line-height:1.4}
+.hub-stats{display:flex;gap:16px;margin-top:14px}
+.hub-stat{text-align:center}
+.hub-stat .n{font-size:20px;font-weight:800}
+.hub-stat .l{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
-input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #262626;
-  background:#0d0d0d;color:#fff;font-size:15px;margin-bottom:8px;-webkit-appearance:none}
-input:focus,select:focus,textarea:focus{border-color:#DC2626;outline:none}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.hub-stat .n.red{color:#DC2626}
+.hub-stat .n.amber{color:#f59e0b}
+.hub-stat .n.green{color:#22c55e}
 
-.tl{position:relative;padding-left:28px;margin:8px 0}
-.tl::before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#222}
-.tl-i{position:relative;padding-bottom:18px}
-.tl-i:last-child{padding-bottom:0}
-.tl-d{position:absolute;left:-23px;top:3px;width:12px;height:12px;border-radius:50%;background:#151515;border:2px solid #333}
-.tl-d.done{background:#22c55e;border-color:#22c55e}
-.tl-d.now{background:#DC2626;border-color:#DC2626;box-shadow:0 0 10px #DC262655}
+.quick-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}
+.qlink{background:#151515;border-radius:12px;padding:14px;text-align:center;border:1px solid #1e1e1e;cursor:pointer;transition:.12s;text-decoration:none;color:#888;font-size:12px;font-weight:600}
+.qlink:active{transform:scale(.95);opacity:.8}
+.qlink .qi{font-size:20px;margin-bottom:4px;display:block}
 
-#qr-reader{width:100%;max-width:400px;margin:0 auto;border-radius:12px;overflow:hidden}
-#qr-reader video{border-radius:12px}
+.footer{text-align:center;margin-top:40px;padding:20px 0;color:#333;font-size:11px;letter-spacing:1px}
 
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.stat{background:#151515;border-radius:12px;padding:14px;border:1px solid #1e1e1e;text-align:center}
-.stat .n{font-size:28px;font-weight:800}
-
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
-  border-radius:50%;animation:spin .6s linear infinite}
+.loading{text-align:center;padding:20px;color:#555}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading{text-align:center;padding:40px;color:#555}
 
-.batch-item{display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:inherit}
-.batch-item:active{opacity:.7}
-
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
-  padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
-  z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast-ok{background:#22c55e;color:#000}
-.toast-err{background:#ef4444;color:#fff}
-
-.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;display:flex;
-  align-items:center;justify-content:center;padding:24px;animation:fadeIn .15s}
-.confirm-box{background:#1a1a1a;border-radius:16px;padding:24px;max-width:320px;width:100%;border:1px solid #333}
-
-/* Phase card */
-.phase-card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e;cursor:pointer;transition:.12s}
-.phase-card:active{transform:scale(.97);background:#1a1a1a}
-.phase-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;margin-bottom:6px}
+/* N8N Status Panel */
+.n8n-panel{margin:20px auto;max-width:600px;background:#151515;border:1px solid #2a2a2a;border-radius:16px;padding:20px;}
+.n8n-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.n8n-icon{font-size:20px;}
+.n8n-title{font-size:15px;font-weight:600;color:#e5e5e5;flex:1;}
+.n8n-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.n8n-badge.healthy{background:#0d3320;color:#4ade80;}
+.n8n-badge.warning{background:#3d2e08;color:#fbbf24;}
+.n8n-badge.error,.n8n-badge.no_data{background:#1a1a2e;color:#818cf8;}
+.n8n-badge.loading{background:#1a1a2e;color:#888;}
+.n8n-body{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.n8n-stat{text-align:center;padding:12px 8px;background:#0d0d0d;border-radius:10px;}
+.n8n-stat-val{font-size:18px;font-weight:700;color:#e5e5e5;}
+.n8n-stat-lbl{font-size:11px;color:#666;margin-top:4px;}
+.n8n-actions{display:flex;align-items:center;justify-content:space-between;}
+.n8n-btn{background:#1a1a2e;color:#818cf8;border:1px solid #2a2a4a;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;}
+.n8n-btn:hover{background:#252545;}
+.n8n-ver{font-size:11px;color:#555;}
 </style>
 </head>
 <body>
 
-<div class="toast toast-ok" id="toast"></div>
+<div class="logo">
+  <div class="logo-text">SN ERP</div>
+  <div class="logo-sub">Production &amp; Operations</div>
+</div>
+<div class="divider"></div>
 
-<div class="confirm-overlay" id="confirm-overlay" style="display:none">
-  <div class="confirm-box">
-    <div id="confirm-msg" style="font-size:16px;font-weight:700;margin-bottom:16px;text-align:center"></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-o" style="margin:0" onclick="hideConfirm()">ยกเลิก</button>
-      <button class="btn btn-r" style="margin:0" id="confirm-yes">ยืนยัน</button>
+<div class="hub-grid">
+
+  <!-- Production Dashboard -->
+  <a href="production.html" class="hub-card prod">
+    <div class="hub-icon">🏭</div>
+    <div class="hub-title">Production Dashboard</div>
+    <div class="hub-desc">ติดตาม Batch, สแกน QR, อัพเดทสถานะการผลิต</div>
+    <div class="hub-stats" id="prod-stats">
+      <div class="hub-stat"><div class="n red" id="ps-active">—</div><div class="l">กำลังผลิต</div></div>
+      <div class="hub-stat"><div class="n green" id="ps-done">—</div><div class="l">เสร็จแล้ว</div></div>
+      <div class="hub-stat"><div class="n amber" id="ps-total">—</div><div class="l">ทั้งหมด</div></div>
     </div>
-  </div>
+  </a>
+
+  <!-- Inventory -->
+  <a href="inventory.html" class="hub-card inv">
+    <div class="hub-icon">📦</div>
+    <div class="hub-title">Inventory Management</div>
+    <div class="hub-desc">สต็อกวัตถุดิบ, แจ้งเตือน, PO, BOM</div>
+    <div class="hub-stats" id="inv-stats">
+      <div class="hub-stat"><div class="n green" id="is-ok">—</div><div class="l">OK</div></div>
+      <div class="hub-stat"><div class="n amber" id="is-low">—</div><div class="l">ต่ำ</div></div>
+      <div class="hub-stat"><div class="n red" id="is-crit">—</div><div class="l">วิกฤต</div></div>
+    </div>
+  </a>
+
+  <!-- Finance -->
+  <a href="finance.html" class="hub-card fin">
+    <div class="hub-icon">💰</div>
+    <div class="hub-title">Financial</div>
+    <div class="hub-desc">บันทึกรายรับรายจ่าย, Cash Flow, ภาพรวมการเงิน</div>
+    <div class="hub-stats" id="fin-stats">
+      <div class="hub-stat"><div class="n green" id="fs-in">—</div><div class="l">รายรับ</div></div>
+      <div class="hub-stat"><div class="n red" id="fs-out">—</div><div class="l">รายจ่าย</div></div>
+      <div class="hub-stat"><div class="n amber" id="fs-net">—</div><div class="l">คงเหลือ</div></div>
+    </div>
+  </a>
+
 </div>
 
-<!-- ===== PAGE: HOME ===== -->
-<div class="page active" id="pg-home">
-  <div style="text-align:center;margin:12px 0 20px">
-    <img src="logo.svg" alt="SN Motorsports" style="height:14px;filter:brightness(0) invert(1)">
-    <div style="font-size:16px;font-weight:700;margin-top:2px;color:#fff">Production Tracker</div>
-    <div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
-  </div>
-  <div class="stats" id="stats">
-    <div class="stat"><div class="n" id="st-total">-</div><div class="hdr">Total</div></div>
-    <div class="stat"><div class="n" id="st-producing" style="color:#f87171">-</div><div class="hdr">Producing</div></div>
-    <div class="stat"><div class="n" id="st-done" style="color:#fbbf24">-</div><div class="hdr">QC/Done</div></div>
-    <div class="stat"><div class="n" id="st-shipped" style="color:#22c55e">-</div><div class="hdr">Shipped</div></div>
-  </div>
-  <button class="btn btn-p" onclick="nav('new')">+ สร้าง Batch ใหม่</button>
-  <button class="btn btn-o" onclick="nav('scan')">สแกน QR Code</button>
-  <button class="btn btn-o" onclick="printStationQR()" style="border-color:#DC2626;color:#DC2626">พิมพ์ Station QR Label (5 ดวง)</button>
-        <a href="report.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">Batch Report</a>
-<a href="inventory.html" class="btn btn-o" style="text-decoration:none;display:block;text-align:center">Inventory</a>
-  <div style="margin-top:16px">
-    <div class="hdr" style="margin-bottom:8px">Batch ล่าสุด</div>
-    <div id="recent-list"><div class="loading"><div class="spinner"></div></div></div>
-  </div>
+<!-- Quick Links -->
+<div class="quick-links">
+  <a href="production.html?tab=report" class="qlink"><span class="qi">📊</span>Batch Report</a>
+  <a href="qr.html" class="qlink"><span class="qi">📷</span>สแกน QR</a>
+  <a href="inventory.html?tab=po" class="qlink"><span class="qi">📋</span>สร้าง PO</a>
+  <a href="finance.html?tab=cashflow" class="qlink"><span class="qi">💸</span>Cash Flow</a>
 </div>
 
-<!-- ===== PAGE: PHASE (Station QR) ===== -->
-<div class="page" id="pg-phase">
-  <div id="phase-content"><div class="loading"><div class="spinner"></div></div></div>
-</div>
 
-<!-- ===== PAGE: SCAN ===== -->
-<div class="page" id="pg-scan">
-  <div class="hdr" style="margin-bottom:12px">สแกน QR Code</div>
-  <div class="card" style="padding:0;overflow:hidden">
-    <div id="qr-reader"></div>
-  </div>
-  <div id="scan-result" style="margin-top:12px"></div>
-  <div style="text-align:center;margin-top:12px;color:#555;font-size:13px">
-    เปิดกล้องแล้วหันไปที่ QR Label
-  </div>
+<div class="n8n-panel">
+<div class="n8n-header"><span class="n8n-icon">🔗</span><span class="n8n-title">N8N Integration Status</span><span class="n8n-badge loading" id="n8nBadge">...</span></div>
+<div class="n8n-body">
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nLastSync">—</div><div class="n8n-stat-lbl">Last Sync</div></div>
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nTotal">—</div><div class="n8n-stat-lbl">Total Syncs</div></div>
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nErrors">—</div><div class="n8n-stat-lbl">Errors (24h)</div></div>
+<div class="n8n-stat"><div class="n8n-stat-val" id="n8nModules">—</div><div class="n8n-stat-lbl">Modules</div></div>
 </div>
-
-<!-- ===== PAGE: NEW BATCH ===== -->
-<div class="page" id="pg-new">
-  <div class="hdr" style="margin-bottom:12px">สร้าง Batch ใหม่</div>
-  <div class="card">
-    <div class="hdr">สินค้า</div>
-    <select id="f-product">
-      <option value="PCX Velocity Stack">PCX Velocity Stack</option>
-      <option value="Aura Stream">Aura Stream</option>
-      <option value="Aura Beam">Aura Beam</option>
-      <option value="AXIS">AXIS</option>
-    </select>
-    <div class="hdr">จำนวน (ชิ้น)</div>
-    <input type="number" id="f-qty" value="1" min="1">
-    <div class="hdr">รุ่นรถ</div>
-    <input type="text" id="f-carModel" placeholder="Models">
-    <div class="hdr">ผู้ดำเนินการ</div>
-    <input type="text" id="f-operator" placeholder="ชื่อ">
-    <div class="hdr">หมายเหตุ</div>
-    <textarea id="f-notes" rows="2" placeholder="เช่น nozzle ใหม่, ปรับ temp"></textarea>
-    <button class="btn btn-p" onclick="doCreate()" id="btn-create">สร้าง Batch</button>
-  </div>
+<div class="n8n-actions"><button class="n8n-btn" onclick="loadN8N()">🔄 Refresh</button><span class="n8n-ver" id="n8nVer"></span></div>
 </div>
-
-<!-- ===== PAGE: BATCH DETAIL ===== -->
-<div class="page" id="pg-batch">
-  <div id="batch-content"><div class="loading"><div class="spinner"></div></div></div>
-</div>
-
-<!-- ===== PAGE: LIST ===== -->
-<div class="page" id="pg-list">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div class="hdr">Batch ทั้งหมด</div>
-    <select id="filter-status" onchange="renderList()" style="width:auto;margin:0;padding:8px 32px 8px 10px;font-size:13px">
-      <option value="">ทั้งหมด</option>
-      <option value="Created">Created</option>
-      <option value="Start Producing">Start Producing</option>
-      <option value="Print Finish">Print Finish</option>
-      <option value="Outsource">Outsource</option>
-      <option value="QC Pass">QC Pass</option>
-      <option value="Shipped">Shipped</option>
-    </select>
-  </div>
-  <div id="full-list"><div class="loading"><div class="spinner"></div></div></div>
-</div>
-
-<!-- ===== BOTTOM NAV ===== -->
-<div class="bnav">
-  <a href="#" onclick="return nav('home')" id="nav-home" class="act">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-    หน้าแรก</a>
-  <a href="#" onclick="return nav('scan')" id="nav-scan">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    สแกน QR</a>
-  <a href="#" onclick="return nav('new')" id="nav-new">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    สร้าง</a>
-  <a href="#" onclick="return nav('list')" id="nav-list">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
-    รายการ</a>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<div class="footer">SN Motorsports — ERP v2.0</div>
 
 <script>
-// ===== CONFIG =====
-var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
-var currentBatch = null;
-var currentPage = 'home';
-var scanner = null;
-var allBatches = [];
+var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
 
-// Phase definitions
-var PHASES = [
-  {num:1, status:"Start Producing", prev:"Created",           color:"#1a1a1a", label:"เริ่มผลิต"},
-  {num:2, status:"Print Finish",    prev:"Start Producing",   color:"#2563EB", label:"ปริ้นเสร็จ"},
-  {num:3, status:"Outsource",       prev:"Print Finish",      color:"#7C3AED", label:"ส่ง Outsource"},
-  {num:4, status:"QC Pass",         prev:"Outsource",         color:"#059669", label:"QC ผ่าน"},
-  {num:5, status:"Shipped",         prev:"QC Pass",           color:"#DC2626", label:"จัดส่งแล้ว"}
-];
-
-var STATUSES = ["Created","Start Producing","Print Finish","Outsource","QC Pass","Shipped"];
-
-// ===== API =====
 function callAPI(params) {
-  var qs = Object.keys(params).map(function(k) {
-    return encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
-  }).join('&');
-  var url = API_URL + '?' + qs;
-  return fetchJSON(url).catch(function() { return xhrJSON(url); });
+  var url = API + '?' + Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k])}).join('&');
+  return fetch(url).then(function(r){return r.json()});
 }
 
-function fetchJSON(url) {
-  return fetch(url, { redirect: 'follow' }).then(function(r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
+function fmt(n) {
+  if (n === undefined || n === null || isNaN(n)) return '—';
+  return Number(n).toLocaleString('th-TH');
+}
+
+// Load inventory stats
+callAPI({api:'listInventory'}).then(function(data) {
+  if (!data || !data.items) return;
+  var ok=0, low=0, crit=0;
+  data.items.forEach(function(item) {
+    var qty = Number(item.qty) || 0;
+    var min = Number(item.min) || 0;
+    if (qty <= 0) crit++;
+    else if (qty < min) crit++;
+    else if (qty < min * 1.5) low++;
+    else ok++;
   });
-}
+  document.getElementById('is-ok').textContent = ok;
+  document.getElementById('is-low').textContent = low;
+  document.getElementById('is-crit').textContent = crit;
+}).catch(function(){});
 
-function xhrJSON(url) {
-  return new Promise(function(resolve, reject) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.onload = function() {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try { resolve(JSON.parse(xhr.responseText)); }
-        catch(e) { reject(e); }
-      } else { reject(new Error('XHR ' + xhr.status)); }
-    };
-    xhr.onerror = function() { reject(new Error('XHR network error')); };
-    xhr.send();
+// Load cashflow stats
+callAPI({api:'listCashflow'}).then(function(data) {
+  if (!data) return;
+  document.getElementById('fs-in').textContent = '฿' + fmt(data.totalIncome || 0);
+  document.getElementById('fs-out').textContent = '฿' + fmt(data.totalExpense || 0);
+  var net = (data.totalIncome || 0) - (data.totalExpense || 0);
+  var el = document.getElementById('fs-net');
+  el.textContent = '฿' + fmt(net);
+  el.className = 'n ' + (net >= 0 ? 'green' : 'red');
+}).catch(function(){});
+
+// Load production stats
+callAPI({api:'listBatches'}).then(function(data) {
+  if (!data || !data.batches) return;
+  var active=0, done=0;
+  data.batches.forEach(function(b) {
+    if (b.status === 'QC ผ่าน' || b.status === 'เสร็จสิ้น') done++;
+    else active++;
   });
-}
+  document.getElementById('ps-active').textContent = active;
+  document.getElementById('ps-done').textContent = done;
+  document.getElementById('ps-total').textContent = data.batches.length;
+}).catch(function(){});
 
-// ===== NAVIGATION =====
-function nav(page, data) {
-  if (currentPage === 'scan' && scanner) {
-    try { scanner.stop(); } catch(e) {}
+  // === N8N Status ===
+  function loadN8N(){
+    var b=document.getElementById("n8nBadge");
+    b.textContent="Loading...";b.className="n8n-badge loading";
+    Promise.all([
+      fetch(API+"?api=n8nHealth").then(function(r){return r.json();}),
+      fetch(API+"?api=n8nSyncStatus").then(function(r){return r.json();})
+    ]).then(function(arr){
+      var h=arr[0],s=arr[1];
+      var st=s.status||"healthy";
+      var labels={healthy:"\u25CF Connected",warning:"\u26A0 Warning",no_data:"\u25CB Standby"};
+      b.textContent=labels[st]||st;
+      b.className="n8n-badge "+st;
+      document.getElementById("n8nLastSync").textContent=s.lastSync?new Date(s.lastSync).toLocaleString("th-TH",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"}):"\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35";
+      document.getElementById("n8nTotal").textContent=s.totalSyncs||0;
+      document.getElementById("n8nErrors").textContent=s.recentErrors||0;
+      document.getElementById("n8nModules").textContent=h.modules?h.modules.length:0;
+      document.getElementById("n8nVer").textContent="API v"+(h.version||"?");
+    }).catch(function(){
+      b.textContent="\u25CF Offline";b.className="n8n-badge error";
+    });
   }
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  document.querySelectorAll('.bnav a').forEach(function(a) { a.classList.remove('act'); });
-
-  var pg = document.getElementById('pg-' + page);
-  var nv = document.getElementById('nav-' + page);
-  if (pg) pg.classList.add('active');
-  if (nv) nv.classList.add('act');
-  currentPage = page;
-
-  if (page === 'home') loadHome();
-  if (page === 'scan') initScanner();
-  if (page === 'list') loadList();
-  if (page === 'batch' && data) loadBatch(data);
-  if (page === 'phase' && data) loadPhase(data);
-
-  window.scrollTo(0, 0);
-  return false;
-}
-
-// ===== HOME =====
-function loadHome() {
-  callAPI({ api: 'getStats' }).then(function(s) {
-    document.getElementById('st-total').textContent = s.total || 0;
-    document.getElementById('st-producing').textContent = (s.printing || 0);
-    document.getElementById('st-done').textContent = (s.done || 0);
-    document.getElementById('st-shipped').textContent = (s.shipped || 0);
-  }).catch(function() {});
-
-  callAPI({ api: 'listBatches' }).then(function(list) {
-    allBatches = list;
-    var recent = allBatches.slice(0, 5);
-    document.getElementById('recent-list').innerHTML = recent.length
-      ? recent.map(batchCard).join('')
-      : '<div class="card" style="text-align:center;color:#555">ยังไม่มี Batch</div>';
-  }).catch(function() {
-    document.getElementById('recent-list').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่</div>';
-  });
-}
-
-function batchCard(b) {
-  var bc = badgeClass(b.status);
-  return '<div class="card" onclick="nav(\'batch\',\'' + b.batchId + '\')" style="cursor:pointer">' +
-    '<div class="batch-item"><div>' +
-    '<div style="font-weight:700;font-size:15px">' + b.batchId + '</div>' +
-    '<div style="font-size:13px;color:#999">' + b.product + ' x' + b.qty + '</div>' +
-    '<div style="font-size:11px;color:#555">' + (b.carModel || '') + ' &middot; ' + b.created + '</div></div>' +
-    '<span class="badge ' + bc + '">' + b.status + '</span></div></div>';
-}
-
-function badgeClass(s) {
-  var m = {"Created":"b-created","Start Producing":"b-startprod","Print Finish":"b-printfinish",
-    "Outsource":"b-outsource","QC Pass":"b-qcpass","Shipped":"b-shipped",
-    "Printing":"b-startprod","Print Done":"b-printfinish","QC Passed":"b-qcpass","Packed":"b-outsource"};
-  return m[s] || "b-created";
-}
-
-// ===== PHASE PAGE (Station QR) =====
-function loadPhase(phaseNum) {
-  var phase = PHASES.find(function(p) { return p.num === parseInt(phaseNum); });
-  if (!phase) {
-    document.getElementById('phase-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">Phase ไม่ถูกต้อง</div>';
-    return;
-  }
-
-  document.getElementById('phase-content').innerHTML =
-    '<div style="text-align:center;margin-bottom:16px">' +
-    '<div style="display:inline-block;padding:6px 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:' + phase.color + '">' +
-    'Phase ' + phase.num + ' — ' + phase.status + '</div>' +
-    '<div style="font-size:13px;color:#666;margin-top:6px">เลือก Batch ที่ต้องการอัพเดท</div>' +
-    '</div>' +
-    '<div id="phase-list"><div class="loading"><div class="spinner"></div></div></div>';
-
-  callAPI({ api: 'listBatches' }).then(function(list) {
-    allBatches = list;
-    var eligible = list.filter(function(b) { return b.status === phase.prev; });
-    var el = document.getElementById('phase-list');
-    if (!el) return;
-
-    if (eligible.length === 0) {
-      el.innerHTML =
-        '<div class="card" style="text-align:center;padding:24px">' +
-        '<div style="font-size:36px;margin-bottom:8px">&#10003;</div>' +
-        '<div style="color:#888">ไม่มี Batch ที่รอเข้า Phase นี้</div>' +
-        '<div style="font-size:13px;color:#555;margin-top:4px">Batch ต้องอยู่สถานะ "' + phase.prev + '" ก่อน</div>' +
-        '</div>' +
-        '<button class="btn btn-o" onclick="nav(\'home\')">กลับหน้าแรก</button>';
-      return;
-    }
-
-    el.innerHTML = eligible.map(function(b) {
-      return '<div class="phase-card" onclick="confirmPhaseUpdate(\'' + b.batchId + '\',' + phase.num + ')">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center">' +
-        '<div>' +
-        '<div style="font-weight:700;font-size:16px">' + b.batchId + '</div>' +
-        '<div style="font-size:13px;color:#999;margin-top:2px">' + b.product + ' x' + b.qty + '</div>' +
-        '<div style="font-size:12px;color:#555">' + (b.carModel || '') + '</div>' +
-        '</div>' +
-        '<div style="text-align:right">' +
-        '<div style="font-size:12px;color:#666">' + b.created + '</div>' +
-        '<div style="font-size:20px;margin-top:4px">&#8594;</div>' +
-        '</div></div></div>';
-    }).join('') +
-    '<button class="btn btn-o" onclick="nav(\'home\')" style="margin-top:8px">กลับหน้าแรก</button>';
-  }).catch(function() {
-    var el = document.getElementById('phase-list');
-    if (el) el.innerHTML = '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ</div>';
-  });
-}
-
-function confirmPhaseUpdate(batchId, phaseNum) {
-  var phase = PHASES.find(function(p) { return p.num === phaseNum; });
-  if (!phase) return;
-
-  document.getElementById('confirm-msg').innerHTML =
-    '<div style="font-size:14px;color:#888;margin-bottom:8px">อัพเดทสถานะ</div>' +
-    '<div style="font-size:20px;font-weight:800">' + batchId + '</div>' +
-    '<div style="margin:10px 0">' +
-    '<span style="padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;color:#fff;background:' + phase.color + '">' +
-    phase.status + '</span></div>';
-  document.getElementById('confirm-yes').textContent = 'ยืนยัน';
-  document.getElementById('confirm-yes').className = 'btn btn-p';
-  document.getElementById('confirm-yes').style.margin = '0';
-  document.getElementById('confirm-yes').onclick = function() {
-    hideConfirm();
-    doPhaseUpdate(batchId, phase);
-  };
-  document.getElementById('confirm-overlay').style.display = 'flex';
-}
-
-function doPhaseUpdate(batchId, phase) {
-  var el = document.getElementById('phase-list');
-  if (el) el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-
-  callAPI({
-    api: 'updateStatus', batchId: batchId, status: phase.status,
-    operator: '', notes: 'Station QR scan'
-  }).then(function(res) {
-    if (res.success) {
-      toast(batchId + ' -> ' + phase.status, 'ok');
-      loadPhase(phase.num);
-    } else {
-      toast('Error: ' + (res.error || 'Unknown'), 'err');
-      loadPhase(phase.num);
-    }
-  }).catch(function() {
-    toast('เกิดข้อผิดพลาด', 'err');
-    loadPhase(phase.num);
-  });
-}
-
-// ===== QR SCANNER =====
-function initScanner() {
-  document.getElementById('scan-result').innerHTML = '';
-  if (scanner) { try { scanner.stop(); } catch(e) {} }
-
-  scanner = new Html5Qrcode("qr-reader");
-  scanner.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: { width: 250, height: 250 } },
-    function(decoded) {
-      // Handle phase QR
-      if (decoded.includes('phase=')) {
-        var pm = decoded.match(/phase=([1-5])/);
-        if (pm) {
-          scanner.stop().then(function() {
-            var pn = parseInt(pm[1]);
-            var phase = PHASES.find(function(p) { return p.num === pn; });
-            toast('Phase ' + pn + ': ' + (phase ? phase.status : ''), 'ok');
-            nav('phase', pn);
-          });
-          return;
-        }
-      }
-      // Handle batch QR
-      var bid = decoded;
-      if (decoded.includes('id=')) {
-        var m = decoded.match(/id=([A-Z0-9-]+)/);
-        if (m) bid = m[1];
-      }
-      if (bid.startsWith('SN-')) {
-        scanner.stop().then(function() {
-          toast('พบ ' + bid, 'ok');
-          nav('batch', bid);
-        });
-      }
-    },
-    function(err) {}
-  ).catch(function(err) {
-    document.getElementById('scan-result').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">' +
-      'ไม่สามารถเปิดกล้องได้<br><span style="font-size:13px;color:#666">ตรวจสอบ permission กล้อง</span></div>';
-  });
-}
-
-// ===== CREATE BATCH =====
-function doCreate() {
-  var btn = document.getElementById('btn-create');
-  btn.innerHTML = '<div class="spinner"></div>';
-  btn.disabled = true;
-
-  callAPI({
-    api: 'create',
-    product: document.getElementById('f-product').value,
-    qty: document.getElementById('f-qty').value,
-    carModel: document.getElementById('f-carModel').value,
-    operator: document.getElementById('f-operator').value,
-    notes: document.getElementById('f-notes').value
-  }).then(function(res) {
-    btn.textContent = 'สร้าง Batch';
-    btn.disabled = false;
-    if (res.success) {
-      toast('สร้าง ' + res.batchId + ' สำเร็จ!', 'ok');
-      document.getElementById('f-qty').value = 1;
-      document.getElementById('f-operator').value = '';
-      document.getElementById('f-notes').value = '';
-      nav('batch', res.batchId);
-    } else {
-      toast('Error: ' + (res.error || 'Unknown'), 'err');
-    }
-  }).catch(function(err) {
-    btn.textContent = 'สร้าง Batch';
-    btn.disabled = false;
-    toast('เกิดข้อผิดพลาด: ' + err, 'err');
-  });
-}
-
-// ===== BATCH DETAIL =====
-function loadBatch(batchId) {
-  document.getElementById('batch-content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-
-  callAPI({ api: 'getBatch', id: batchId }).then(function(b) {
-    if (b.error) {
-      document.getElementById('batch-content').innerHTML =
-        '<div class="card" style="text-align:center"><div class="big" style="color:#f87171">ไม่พบ</div>' +
-        '<div style="color:#666;margin-top:4px">' + batchId + '</div></div>';
-      return;
-    }
-    currentBatch = b;
-    renderBatch(b);
-  }).catch(function(err) {
-    document.getElementById('batch-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ<br>' +
-      '<span style="font-size:13px;color:#666">' + err + '</span></div>';
-  });
-}
-
-function renderBatch(b) {
-  var ci = STATUSES.indexOf(b.status);
-  if (ci < 0) ci = 0;
-  var next = ci < STATUSES.length - 1 ? STATUSES[ci + 1] : null;
-
-  var steps = [
-    {label:"สร้าง Batch",     time:b.created},
-    {label:"เริ่มผลิต",        time:b.startPrint || b.startProduce},
-    {label:"ปริ้นเสร็จ",       time:b.printDone || b.printFinish},
-    {label:"Outsource",       time:b.qcPass || b.outsource},
-    {label:"QC ผ่าน",         time:b.packed || b.qcPassTime},
-    {label:"จัดส่งแล้ว",       time:b.shipped}
-  ];
-
-  var tl = '<div class="tl">';
-  steps.forEach(function(s, i) {
-    var done = i <= ci;
-    var isCur = i === ci;
-    tl += '<div class="tl-i"><div class="tl-d ' + (isCur ? 'now' : done ? 'done' : '') + '"></div>' +
-      '<div class="hdr">' + s.label + '</div>' +
-      '<div style="font-size:13px;color:' + (done ? '#ccc' : '#444') + '">' + (s.time || '---') + '</div></div>';
-  });
-  tl += '</div>';
-
-  var viewUrl = window.location.href.split('?')[0] + '?id=' + b.batchId;
-  var qrApi = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(viewUrl);
-
-  var actionHtml = '';
-  if (next) {
-    var nextPhase = PHASES.find(function(p) { return p.status === next; });
-    var btnColor = next === "Shipped" ? "btn-g" : "btn-p";
-    actionHtml = '<div class="card"><div style="font-weight:700;margin-bottom:10px">อัพเดทสถานะ</div>' +
-      '<input type="text" id="u-operator" placeholder="ผู้ดำเนินการ" value="' + (b.operator || '') + '">' +
-      '<textarea id="u-notes" rows="2" placeholder="หมายเหตุ (ไม่บังคับ)"></textarea>' +
-      '<button class="btn ' + btnColor + '" onclick="doUpdate(\'' + next + '\')" id="btn-update">' +
-      (nextPhase ? nextPhase.label : next) + '</button>' +
-      '</div>';
-  }
-
-  document.getElementById('batch-content').innerHTML =
-    '<div style="margin-bottom:12px"><a href="#" onclick="return nav(\'list\')" style="color:#555;text-decoration:none;font-size:13px">&#8592; รายการทั้งหมด</a></div>' +
-    '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">' +
-    '<div><div class="hdr">Batch ID</div><div class="big">' + b.batchId + '</div></div>' +
-    '<span class="badge ' + badgeClass(b.status) + '">' + b.status + '</span></div></div>' +
-
-    '<div class="card">' +
-    '<div style="font-weight:700;margin-bottom:8px">ข้อมูล Batch</div>' +
-    '<div class="row"><span class="hdr" style="margin:0">สินค้า</span><span>' + b.product + '</span></div>' +
-    '<div class="row"><span class="hdr" style="margin:0">จำนวน</span><span>' + b.qty + ' ชิ้น</span></div>' +
-    '<div class="row"><span class="hdr" style="margin:0">รุ่นรถ</span><span>' + (b.carModel || '-') + '</span></div>' +
-    '<div class="row"><span class="hdr" style="margin:0">ผู้ดำเนินการ</span><span>' + (b.operator || '-') + '</span></div>' +
-    (b.notes ? '<div class="row"><span class="hdr" style="margin:0">หมายเหตุ</span><span style="font-size:13px;max-width:60%;text-align:right">' + b.notes + '</span></div>' : '') +
-    '</div>' +
-
-    '<div class="card"><div style="font-weight:700;margin-bottom:8px">Timeline</div>' + tl + '</div>' +
-
-    actionHtml +
-
-    '<div class="card" style="text-align:center"><div class="hdr" style="margin-bottom:8px">QR Label</div>' +
-    '<div style="background:#fff;border-radius:10px;padding:16px;display:inline-block">' +
-    '<img src="' + qrApi + '" style="width:160px;height:160px"></div>' +
-    '<div style="margin-top:8px"><button class="btn btn-o" onclick="printBatchQR()">ปริ้น Batch QR</button></div></div>' +
-
-    '<div style="display:flex;gap:8px;margin-top:4px">' +
-    '<button class="btn btn-o" style="flex:1" onclick="showEdit()">แก้ไข</button>' +
-    '<button class="btn btn-r" style="flex:1" onclick="confirmDelete()">ลบ Batch</button>' +
-    '</div>';
-}
-
-function doUpdate(status) {
-  var b = currentBatch;
-  if (!b) return;
-  var btn = document.getElementById('btn-update');
-  if (btn) { btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true; }
-
-  callAPI({
-    api: 'updateStatus', batchId: b.batchId, status: status,
-    operator: document.getElementById('u-operator') ? document.getElementById('u-operator').value : '',
-    notes: document.getElementById('u-notes') ? document.getElementById('u-notes').value : ''
-  }).then(function(res) {
-    if (res.success) {
-      toast(b.batchId + ' -> ' + status, 'ok');
-      loadBatch(b.batchId);
-    } else {
-      toast('Error: ' + (res.error || 'Unknown'), 'err');
-      if (btn) { btn.textContent = 'ลองใหม่'; btn.disabled = false; }
-    }
-  }).catch(function(err) {
-    if (btn) { btn.textContent = 'ลองใหม่'; btn.disabled = false; }
-    toast('เกิดข้อผิดพลาด', 'err');
-  });
-}
-
-// ===== EDIT BATCH =====
-function showEdit() {
-  var b = currentBatch;
-  if (!b) return;
-
-  var prodOpts = ["PCX Velocity Stack","Aura Stream","Aura Beam","AXIS"].map(function(p) {
-    return '<option value="' + p + '"' + (b.product === p ? ' selected' : '') + '>' + p + '</option>';
-  }).join('');
-
-  document.getElementById('batch-content').innerHTML =
-    '<div style="margin-bottom:12px"><a href="#" onclick="loadBatch(\'' + b.batchId + '\');return false" style="color:#555;text-decoration:none;font-size:13px">&#8592; ยกเลิก</a></div>' +
-    '<div class="card">' +
-    '<div style="font-weight:700;margin-bottom:4px;font-size:17px">แก้ไข ' + b.batchId + '</div>' +
-    '<div style="color:#555;font-size:13px;margin-bottom:14px">แก้ไขข้อมูลแล้วกดบันทึก</div>' +
-    '<div class="hdr">สินค้า</div>' +
-    '<select id="e-product">' + prodOpts + '</select>' +
-    '<div class="hdr">จำนวน (ชิ้น)</div>' +
-    '<input type="number" id="e-qty" value="' + b.qty + '" min="1">' +
-    '<div class="hdr">รุ่นรถ</div>' +
-    '<input type="text" id="e-carModel" value="' + (b.carModel || '') + '" placeholder="Model">' +
-    '<div class="hdr">ผู้ดำเนินการ</div>' +
-    '<input type="text" id="e-operator" value="' + (b.operator || '') + '">' +
-    '<div class="hdr">หมายเหตุ</div>' +
-    '<textarea id="e-notes" rows="3">' + (b.notes || '') + '</textarea>' +
-    '<button class="btn btn-p" onclick="doEdit()" id="btn-edit">บันทึก</button>' +
-    '<button class="btn btn-o" onclick="loadBatch(\'' + b.batchId + '\')">ยกเลิก</button>' +
-    '</div>';
-}
-
-function doEdit() {
-  var b = currentBatch;
-  if (!b) return;
-  var btn = document.getElementById('btn-edit');
-  btn.innerHTML = '<div class="spinner"></div>';
-  btn.disabled = true;
-
-  callAPI({
-    api: 'edit', batchId: b.batchId,
-    product: document.getElementById('e-product').value,
-    qty: document.getElementById('e-qty').value,
-    carModel: document.getElementById('e-carModel').value,
-    operator: document.getElementById('e-operator').value,
-    notes: document.getElementById('e-notes').value
-  }).then(function(res) {
-    if (res.success) {
-      toast('บันทึกสำเร็จ', 'ok');
-      loadBatch(b.batchId);
-    } else {
-      btn.textContent = 'บันทึก'; btn.disabled = false;
-      toast('Error: ' + (res.error || 'Unknown'), 'err');
-    }
-  }).catch(function(err) {
-    btn.textContent = 'บันทึก'; btn.disabled = false;
-    toast('เกิดข้อผิดพลาด', 'err');
-  });
-}
-
-// ===== DELETE =====
-function confirmDelete() {
-  var b = currentBatch;
-  if (!b) return;
-  document.getElementById('confirm-msg').textContent = 'ลบ ' + b.batchId + ' ?';
-  document.getElementById('confirm-yes').textContent = 'ยืนยันลบ';
-  document.getElementById('confirm-yes').className = 'btn btn-r';
-  document.getElementById('confirm-yes').style.margin = '0';
-  document.getElementById('confirm-yes').onclick = function() { hideConfirm(); doDelete(); };
-  document.getElementById('confirm-overlay').style.display = 'flex';
-}
-
-function hideConfirm() {
-  document.getElementById('confirm-overlay').style.display = 'none';
-}
-
-function doDelete() {
-  var b = currentBatch;
-  if (!b) return;
-  callAPI({ api: 'delete', batchId: b.batchId }).then(function(res) {
-    if (res.success) {
-      toast('ลบ ' + b.batchId + ' แล้ว', 'ok');
-      currentBatch = null;
-      nav('list');
-    } else {
-      toast('Error: ' + (res.error || 'Unknown'), 'err');
-    }
-  }).catch(function(err) {
-    toast('เกิดข้อผิดพลาด', 'err');
-  });
-}
-
-// ===== PRINT: Batch QR =====
-function printBatchQR() {
-  var b = currentBatch;
-  if (!b) return;
-  var viewUrl = window.location.href.split('?')[0] + '?id=' + b.batchId;
-  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(viewUrl);
-
-  var w = window.open('', '_blank');
-  w.document.write('<html><head><style>body{text-align:center;font-family:sans-serif;padding:20px}@page{margin:10mm}</style></head><body>' +
-    '<img src="https://snmotorsport01.github.io/sn-production-tracker/logo.svg" style="height:12px;filter:brightness(0) saturate(100%) invert(22%) sepia(93%) saturate(7471%) hue-rotate(357deg) brightness(91%) contrast(117%)" alt="SN Motorsports">' +
-    '<div style="font-size:22px;font-weight:700;margin:4px 0">' + b.batchId + '</div>' +
-    '<div style="font-size:12px;color:#888">' + b.product + ' | ' + (b.carModel || '') + '</div>' +
-    '<div style="margin:16px 0"><img src="' + qrUrl + '" style="width:200px;height:200px"></div>' +
-    '<div style="font-size:11px;color:#888">Scan to view batch details</div>' +
-    '<script>setTimeout(function(){window.print()},500)<\/script></body></html>');
-}
-
-// ===== PRINT: Station QR Labels =====
-function printStationQR() {
-  var base = window.location.href.split('?')[0];
-  var html = '<html><head><style>' +
-    'body{font-family:sans-serif;margin:0;padding:10mm}' +
-    '@page{margin:8mm}' +
-    '.grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}' +
-    '.label{width:180px;border:1.5px solid #ccc;border-radius:10px;padding:14px;text-align:center;page-break-inside:avoid}' +
-    '.brand{font-size:8px;letter-spacing:2.5px;color:#DC2626;font-weight:700}' +
-    '.qr{margin:8px auto;width:120px;height:120px}' +
-    '.phase{display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;margin-top:4px}' +
-    '.sub{font-size:9px;color:#aaa;margin-top:6px}' +
-    '</style></head><body>' +
-    '<div style="text-align:center;margin-bottom:16px">' +
-    '<img src="https://snmotorsport01.github.io/sn-production-tracker/logo.svg" style="height:10px;filter:brightness(0) saturate(100%) invert(22%) sepia(93%) saturate(7471%) hue-rotate(357deg) brightness(91%) contrast(117%)" alt="SN Motorsports">' +
-    '<div style="font-size:16px;font-weight:700;margin:2px 0">Station QR Labels</div>' +
-    '<div style="font-size:10px;color:#888">Production Tracker</div></div>' +
-    '<div class="grid">';
-
-  PHASES.forEach(function(p) {
-    var url = base + '?phase=' + p.num;
-    var qr = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=' + encodeURIComponent(url);
-    html += '<div class="label">' +
-      '<img src="https://snmotorsport01.github.io/sn-production-tracker/logo.svg" style="height:8px;filter:brightness(0) saturate(100%) invert(22%) sepia(93%) saturate(7471%) hue-rotate(357deg) brightness(91%) contrast(117%)" alt="SN Motorsports">' +
-      '<img src="' + qr + '" class="qr">' +
-      '<div class="phase" style="background:' + p.color + '">Phase ' + p.num + ': ' + p.status + '</div>' +
-      '<div class="sub">' + p.label + '</div>' +
-      '</div>';
-  });
-
-  html += '</div>' +
-    '<div style="text-align:center;margin-top:16px;font-size:9px;color:#aaa">' +
-    'ปริ้นแล้วตัดแยก ติดตามจุดต่างๆ ในสายการผลิต | snmotorsport01.github.io</div>' +
-    '<script>setTimeout(function(){window.print()},800)<\/script></body></html>';
-
-  var w = window.open('', '_blank');
-  w.document.write(html);
-}
-
-// ===== LIST =====
-function loadList() {
-  document.getElementById('full-list').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-  callAPI({ api: 'listBatches' }).then(function(list) {
-    allBatches = list;
-    renderList();
-  }).catch(function() {
-    document.getElementById('full-list').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่สำเร็จ</div>';
-  });
-}
-
-function renderList() {
-  var filter = document.getElementById('filter-status').value;
-  var filtered = filter ? allBatches.filter(function(b) { return b.status === filter; }) : allBatches;
-  document.getElementById('full-list').innerHTML = filtered.length
-    ? filtered.map(batchCard).join('')
-    : '<div class="card" style="text-align:center;color:#555;padding:24px">ไม่พบ Batch' + (filter ? ' (' + filter + ')' : '') + '</div>';
-}
-
-// ===== TOAST =====
-function toast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + (type === 'err' ? 'toast-err' : 'toast-ok') + ' show';
-  setTimeout(function() { t.className = 'toast toast-ok'; }, 2500);
-}
-
-// ===== INIT =====
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var phase = params.get('phase');
-  var id = params.get('id');
-
-  if (phase && parseInt(phase) >= 1 && parseInt(phase) <= 5) {
-    nav('phase', parseInt(phase));
-  } else if (id && id.startsWith('SN-')) {
-    nav('batch', id);
-  } else {
-    loadHome();
-  }
-})();
+  loadN8N();
 </script>
 </body>
 </html>
