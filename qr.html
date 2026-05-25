@@ -134,9 +134,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 })();
 function snLogout(){
   var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
-  var t=sessionStorage.getItem('sn_token');
+  var t=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');if(!sessionStorage.getItem('sn_token')&&localStorage.getItem('sn_token')){sessionStorage.setItem('sn_token',localStorage.getItem('sn_token'));sessionStorage.setItem('sn_user',localStorage.getItem('sn_user'));}
   fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
-  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
+  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');
   window.location.href='login.html';
 }
 </script>
