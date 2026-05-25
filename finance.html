@@ -50,9 +50,54 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .cf-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
 .cf-row:last-child{border-bottom:none}
 .cf-in{color:#4ade80}.cf-out{color:#f87171}
+
+.auth-bar{position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a1a1a;border-bottom:1px solid #333;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;font-size:.8rem}
+.auth-bar .user-info{color:#aaa}
+.auth-bar .user-info strong{color:#e74c3c}
+.auth-bar .role-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;margin-left:8px;text-transform:uppercase;font-weight:600}
+.auth-bar .role-admin{background:rgba(231,76,60,.2);color:#e74c3c}
+.auth-bar .role-manager{background:rgba(243,156,18,.2);color:#f39c12}
+.auth-bar .role-operator{background:rgba(46,204,113,.2);color:#2ecc71}
+.auth-bar .logout-btn{background:transparent;border:1px solid #555;color:#aaa;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.75rem}
+.auth-bar .logout-btn:hover{border-color:#e74c3c;color:#e74c3c}
 </style>
 </head>
-<body>
+<body><script>
+(function(){
+  var token=sessionStorage.getItem('sn_token');
+  var userStr=sessionStorage.getItem('sn_user');
+  if(!token||!userStr){window.location.href='login.html';return}
+  try{var u=JSON.parse(userStr)}catch(e){window.location.href='login.html';return}
+  // Permission check per page
+  var page=window.location.pathname.split('/').pop()||'index.html';
+  var perms={
+    'index.html':['admin','manager','operator'],
+    'production.html':['admin','manager','operator'],
+    'inventory.html':['admin','manager'],
+    'finance.html':['admin'],
+    'qr.html':['admin','manager','operator'],
+    'report.html':['admin','manager']
+  };
+  var allowed=perms[page]||['admin'];
+  if(allowed.indexOf(u.role)===-1){
+    alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องการ: '+allowed.join('/')+')');
+    window.location.href='index.html';return
+  }
+  // Inject auth bar
+  var bar=document.createElement('div');bar.className='auth-bar';
+  bar.innerHTML='<div class="user-info">👤 <strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span></div><button class="logout-btn" onclick="snLogout()">ออกจากระบบ</button>';
+  document.body.insertBefore(bar,document.body.firstChild);
+  document.body.style.paddingTop='44px';
+  window.snUser=u;window.snToken=token;
+})();
+function snLogout(){
+  var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+  var t=sessionStorage.getItem('sn_token');
+  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
+  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
+  window.location.href='login.html';
+}
+</script>
 
 <div id="toast" class="toast"></div>
 
