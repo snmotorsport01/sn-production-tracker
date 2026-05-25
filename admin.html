@@ -96,7 +96,7 @@ function snLogout(){
 // ===== Load Users =====
 function loadUsers(){
   var token = window._snToken;
-  fetch(API+'?action=authListUsers&token='+token)
+  fetch(API+'?api=authListUsers&token='+token)
   .then(function(r){return r.json();})
   .then(function(d){
     if(!d.success){document.getElementById('userList').innerHTML='<div class="empty-state">'+( d.error||'Failed to load')+'</div>';return;}
