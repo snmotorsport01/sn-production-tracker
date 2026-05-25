@@ -265,6 +265,18 @@ callAPI({api:'listBatches'}).then(function(data) {
  });
  }
  loadN8N();
+
+// === Admin Panel Button ===
+(function(){
+  var u=JSON.parse(sessionStorage.getItem('sn_user')||'{}');
+  if(u.role==='admin'){
+    var link=document.createElement('a');
+    link.href='admin.html';
+    link.style.cssText='position:fixed;bottom:16px;right:16px;background:#e74c3c;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:.85rem;font-weight:600;z-index:998;box-shadow:0 2px 8px rgba(0,0,0,.3)';
+    link.textContent='Admin Panel';
+    document.body.appendChild(link);
+  }
+})();
 </script>
 </body>
 </html>
