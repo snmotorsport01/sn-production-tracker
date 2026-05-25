@@ -86,105 +86,105 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 </head>
 <body><script>
 (function(){
-  var token=sessionStorage.getItem('sn_token');
-  var userStr=sessionStorage.getItem('sn_user');
-  if(!token||!userStr){window.location.href='login.html';return}
-  try{var u=JSON.parse(userStr)}catch(e){window.location.href='login.html';return}
-  // Permission check per page
-  var page=window.location.pathname.split('/').pop()||'index.html';
-  var perms={
-    'index.html':['admin','manager','operator'],
-    'production.html':['admin','manager','operator'],
-    'inventory.html':['admin','manager'],
-    'finance.html':['admin'],
-    'qr.html':['admin','manager','operator'],
-    'report.html':['admin','manager']
-  };
-  var allowed=perms[page]||['admin'];
-  if(allowed.indexOf(u.role)===-1){
-    alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องการ: '+allowed.join('/')+')');
-    window.location.href='index.html';return
-  }
-  // Inject auth bar
-  var bar=document.createElement('div');bar.className='auth-bar';
-  bar.innerHTML='<div class="user-info"><img src="logo.svg" style="height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span></div><button class="logout-btn" onclick="snLogout()">ออกจากระบบ</button>';
-  document.body.insertBefore(bar,document.body.firstChild);
-  document.body.style.paddingTop='44px';
-  window.snUser=u;window.snToken=token;
+ var token=sessionStorage.getItem('sn_token');
+ var userStr=sessionStorage.getItem('sn_user');
+ if(!token||!userStr){window.location.href='login.html';return}
+ try{var u=JSON.parse(userStr)}catch(e){window.location.href='login.html';return}
+ // Permission check per page
+ var page=window.location.pathname.split('/').pop()||'index.html';
+ var perms={
+ 'index.html':['admin','manager','operator'],
+ 'production.html':['admin','manager','operator'],
+ 'inventory.html':['admin','manager'],
+ 'finance.html':['admin'],
+ 'qr.html':['admin','manager','operator'],
+ 'report.html':['admin','manager']
+ };
+ var allowed=perms[page]||['admin'];
+ if(allowed.indexOf(u.role)===-1){
+ alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องการ: '+allowed.join('/')+')');
+ window.location.href='index.html';return
+ }
+ // Inject auth bar
+ var bar=document.createElement('div');bar.className='auth-bar';
+ bar.innerHTML='<div class="user-info"><img src="logo.svg" style="height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span></div><button class="logout-btn" onclick="snLogout()">ออกจากระบบ</button>';
+ document.body.insertBefore(bar,document.body.firstChild);
+ document.body.style.paddingTop='44px';
+ window.snUser=u;window.snToken=token;
 })();
 function snLogout(){
-  var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
-  var t=sessionStorage.getItem('sn_token');
-  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
-  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
-  window.location.href='login.html';
+ var API='https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
+ var t=sessionStorage.getItem('sn_token');
+ fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
+ sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
+ window.location.href='login.html';
 }
 </script>
 
 <div class="logo">
-  <div class="logo-text">SN ERP</div>
-  <div class="logo-sub">Production &amp; Operations</div>
+ <div class="logo-text">SN ERP</div>
+ <div class="logo-sub">Production &amp; Operations</div>
 </div>
 <div class="divider"></div>
 
 <div class="hub-grid">
 
-  <!-- Production Dashboard -->
-  <a href="production.html" class="hub-card prod">
-    <div class="hub-icon">🏭</div>
-    <div class="hub-title">Production Dashboard</div>
-    <div class="hub-desc">ติดตาม Batch, สแกน QR, อัพเดทสถานะการผลิต</div>
-    <div class="hub-stats" id="prod-stats">
-      <div class="hub-stat"><div class="n red" id="ps-active">—</div><div class="l">กำลังผลิต</div></div>
-      <div class="hub-stat"><div class="n green" id="ps-done">—</div><div class="l">เสร็จแล้ว</div></div>
-      <div class="hub-stat"><div class="n amber" id="ps-total">—</div><div class="l">ทั้งหมด</div></div>
-    </div>
-  </a>
+ <!-- Production Dashboard -->
+ <a href="production.html" class="hub-card prod">
+ <div class="hub-icon"></div>
+ <div class="hub-title">Production Dashboard</div>
+ <div class="hub-desc">ติดตาม Batch, สแกน QR, อัพเดทสถานะการผลิต</div>
+ <div class="hub-stats" id="prod-stats">
+ <div class="hub-stat"><div class="n red" id="ps-active">—</div><div class="l">กำลังผลิต</div></div>
+ <div class="hub-stat"><div class="n green" id="ps-done">—</div><div class="l">เสร็จแล้ว</div></div>
+ <div class="hub-stat"><div class="n amber" id="ps-total">—</div><div class="l">ทั้งหมด</div></div>
+ </div>
+ </a>
 
-  <!-- Inventory -->
-  <a href="inventory.html" class="hub-card inv">
-    <div class="hub-icon">📦</div>
-    <div class="hub-title">Inventory Management</div>
-    <div class="hub-desc">สต็อกวัตถุดิบ, แจ้งเตือน, PO, BOM</div>
-    <div class="hub-stats" id="inv-stats">
-      <div class="hub-stat"><div class="n green" id="is-ok">—</div><div class="l">OK</div></div>
-      <div class="hub-stat"><div class="n amber" id="is-low">—</div><div class="l">ต่ำ</div></div>
-      <div class="hub-stat"><div class="n red" id="is-crit">—</div><div class="l">วิกฤต</div></div>
-    </div>
-  </a>
+ <!-- Inventory -->
+ <a href="inventory.html" class="hub-card inv">
+ <div class="hub-icon"></div>
+ <div class="hub-title">Inventory Management</div>
+ <div class="hub-desc">สต็อกวัตถุดิบ, แจ้งเตือน, PO, BOM</div>
+ <div class="hub-stats" id="inv-stats">
+ <div class="hub-stat"><div class="n green" id="is-ok">—</div><div class="l">OK</div></div>
+ <div class="hub-stat"><div class="n amber" id="is-low">—</div><div class="l">ต่ำ</div></div>
+ <div class="hub-stat"><div class="n red" id="is-crit">—</div><div class="l">วิกฤต</div></div>
+ </div>
+ </a>
 
-  <!-- Finance -->
-  <a href="finance.html" class="hub-card fin">
-    <div class="hub-icon">💰</div>
-    <div class="hub-title">Financial</div>
-    <div class="hub-desc">บันทึกรายรับรายจ่าย, Cash Flow, ภาพรวมการเงิน</div>
-    <div class="hub-stats" id="fin-stats">
-      <div class="hub-stat"><div class="n green" id="fs-in">—</div><div class="l">รายรับ</div></div>
-      <div class="hub-stat"><div class="n red" id="fs-out">—</div><div class="l">รายจ่าย</div></div>
-      <div class="hub-stat"><div class="n amber" id="fs-net">—</div><div class="l">คงเหลือ</div></div>
-    </div>
-  </a>
+ <!-- Finance -->
+ <a href="finance.html" class="hub-card fin">
+ <div class="hub-icon"></div>
+ <div class="hub-title">Financial</div>
+ <div class="hub-desc">บันทึกรายรับรายจ่าย, Cash Flow, ภาพรวมการเงิน</div>
+ <div class="hub-stats" id="fin-stats">
+ <div class="hub-stat"><div class="n green" id="fs-in">—</div><div class="l">รายรับ</div></div>
+ <div class="hub-stat"><div class="n red" id="fs-out">—</div><div class="l">รายจ่าย</div></div>
+ <div class="hub-stat"><div class="n amber" id="fs-net">—</div><div class="l">คงเหลือ</div></div>
+ </div>
+ </a>
 
 </div>
 
 <!-- Quick Links -->
 <div class="quick-links">
-  <a href="production.html?tab=report" class="qlink"><span class="qi">📊</span>Batch Report</a>
-  <a href="qr.html" class="qlink"><span class="qi">📷</span>สแกน QR</a>
-  <a href="inventory.html?tab=po" class="qlink"><span class="qi">📋</span>สร้าง PO</a>
-  <a href="finance.html?tab=cashflow" class="qlink"><span class="qi">💸</span>Cash Flow</a>
+ <a href="production.html?tab=report" class="qlink"><span class="qi"></span>Batch Report</a>
+ <a href="qr.html" class="qlink"><span class="qi"></span>สแกน QR</a>
+ <a href="inventory.html?tab=po" class="qlink"><span class="qi"></span>สร้าง PO</a>
+ <a href="finance.html?tab=cashflow" class="qlink"><span class="qi"></span>Cash Flow</a>
 </div>
 
 
 <div class="n8n-panel">
-<div class="n8n-header"><span class="n8n-icon">🔗</span><span class="n8n-title">N8N Integration Status</span><span class="n8n-badge loading" id="n8nBadge">...</span></div>
+<div class="n8n-header"><span class="n8n-icon"></span><span class="n8n-title">N8N Integration Status</span><span class="n8n-badge loading" id="n8nBadge">...</span></div>
 <div class="n8n-body">
 <div class="n8n-stat"><div class="n8n-stat-val" id="n8nLastSync">—</div><div class="n8n-stat-lbl">Last Sync</div></div>
 <div class="n8n-stat"><div class="n8n-stat-val" id="n8nTotal">—</div><div class="n8n-stat-lbl">Total Syncs</div></div>
 <div class="n8n-stat"><div class="n8n-stat-val" id="n8nErrors">—</div><div class="n8n-stat-lbl">Errors (24h)</div></div>
 <div class="n8n-stat"><div class="n8n-stat-val" id="n8nModules">—</div><div class="n8n-stat-lbl">Modules</div></div>
 </div>
-<div class="n8n-actions"><button class="n8n-btn" onclick="loadN8N()">🔄 Refresh</button><span class="n8n-ver" id="n8nVer"></span></div>
+<div class="n8n-actions"><button class="n8n-btn" onclick="loadN8N()">Refresh</button><span class="n8n-ver" id="n8nVer"></span></div>
 </div>
 <div class="footer">SN Motorsports — ERP v2.0</div>
 
@@ -192,79 +192,79 @@ function snLogout(){
 var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
 
 function callAPI(params) {
-  var url = API + '?' + Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k])}).join('&');
-  return fetch(url).then(function(r){return r.json()});
+ var url = API + '?' + Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k])}).join('&');
+ return fetch(url).then(function(r){return r.json()});
 }
 
 function fmt(n) {
-  if (n === undefined || n === null || isNaN(n)) return '—';
-  return Number(n).toLocaleString('th-TH');
+ if (n === undefined || n === null || isNaN(n)) return '—';
+ return Number(n).toLocaleString('th-TH');
 }
 
 // Load inventory stats
 callAPI({api:'listInventory'}).then(function(data) {
-  if (!data || !data.items) return;
-  var ok=0, low=0, crit=0;
-  data.items.forEach(function(item) {
-    var qty = Number(item.qty) || 0;
-    var min = Number(item.min) || 0;
-    if (qty <= 0) crit++;
-    else if (qty < min) crit++;
-    else if (qty < min * 1.5) low++;
-    else ok++;
-  });
-  document.getElementById('is-ok').textContent = ok;
-  document.getElementById('is-low').textContent = low;
-  document.getElementById('is-crit').textContent = crit;
+ if (!data || !data.items) return;
+ var ok=0, low=0, crit=0;
+ data.items.forEach(function(item) {
+ var qty = Number(item.qty) || 0;
+ var min = Number(item.min) || 0;
+ if (qty <= 0) crit++;
+ else if (qty < min) crit++;
+ else if (qty < min * 1.5) low++;
+ else ok++;
+ });
+ document.getElementById('is-ok').textContent = ok;
+ document.getElementById('is-low').textContent = low;
+ document.getElementById('is-crit').textContent = crit;
 }).catch(function(){});
 
 // Load cashflow stats
 callAPI({api:'listCashflow'}).then(function(data) {
-  if (!data) return;
-  document.getElementById('fs-in').textContent = '฿' + fmt(data.totalIncome || 0);
-  document.getElementById('fs-out').textContent = '฿' + fmt(data.totalExpense || 0);
-  var net = (data.totalIncome || 0) - (data.totalExpense || 0);
-  var el = document.getElementById('fs-net');
-  el.textContent = '฿' + fmt(net);
-  el.className = 'n ' + (net >= 0 ? 'green' : 'red');
+ if (!data) return;
+ document.getElementById('fs-in').textContent = '฿' + fmt(data.totalIncome || 0);
+ document.getElementById('fs-out').textContent = '฿' + fmt(data.totalExpense || 0);
+ var net = (data.totalIncome || 0) - (data.totalExpense || 0);
+ var el = document.getElementById('fs-net');
+ el.textContent = '฿' + fmt(net);
+ el.className = 'n ' + (net >= 0 ? 'green' : 'red');
 }).catch(function(){});
 
 // Load production stats
 callAPI({api:'listBatches'}).then(function(data) {
-  if (!data || !data.batches) return;
-  var active=0, done=0;
-  data.batches.forEach(function(b) {
-    if (b.status === 'QC ผ่าน' || b.status === 'เสร็จสิ้น') done++;
-    else active++;
-  });
-  document.getElementById('ps-active').textContent = active;
-  document.getElementById('ps-done').textContent = done;
-  document.getElementById('ps-total').textContent = data.batches.length;
+ if (!data || !data.batches) return;
+ var active=0, done=0;
+ data.batches.forEach(function(b) {
+ if (b.status === 'QC ผ่าน' || b.status === 'เสร็จสิ้น') done++;
+ else active++;
+ });
+ document.getElementById('ps-active').textContent = active;
+ document.getElementById('ps-done').textContent = done;
+ document.getElementById('ps-total').textContent = data.batches.length;
 }).catch(function(){});
 
-  // === N8N Status ===
-  function loadN8N(){
-    var b=document.getElementById("n8nBadge");
-    b.textContent="Loading...";b.className="n8n-badge loading";
-    Promise.all([
-      fetch(API+"?api=n8nHealth").then(function(r){return r.json();}),
-      fetch(API+"?api=n8nSyncStatus").then(function(r){return r.json();})
-    ]).then(function(arr){
-      var h=arr[0],s=arr[1];
-      var st=s.status||"healthy";
-      var labels={healthy:"\u25CF Connected",warning:"\u26A0 Warning",no_data:"\u25CB Standby"};
-      b.textContent=labels[st]||st;
-      b.className="n8n-badge "+st;
-      document.getElementById("n8nLastSync").textContent=s.lastSync?new Date(s.lastSync).toLocaleString("th-TH",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"}):"\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35";
-      document.getElementById("n8nTotal").textContent=s.totalSyncs||0;
-      document.getElementById("n8nErrors").textContent=s.recentErrors||0;
-      document.getElementById("n8nModules").textContent=h.modules?h.modules.length:0;
-      document.getElementById("n8nVer").textContent="API v"+(h.version||"?");
-    }).catch(function(){
-      b.textContent="\u25CF Offline";b.className="n8n-badge error";
-    });
-  }
-  loadN8N();
+ // === N8N Status ===
+ function loadN8N(){
+ var b=document.getElementById("n8nBadge");
+ b.textContent="Loading...";b.className="n8n-badge loading";
+ Promise.all([
+ fetch(API+"?api=n8nHealth").then(function(r){return r.json();}),
+ fetch(API+"?api=n8nSyncStatus").then(function(r){return r.json();})
+ ]).then(function(arr){
+ var h=arr[0],s=arr[1];
+ var st=s.status||"healthy";
+ var labels={healthy:"\u25CF Connected",warning:"\u26A0 Warning",no_data:"\u25CB Standby"};
+ b.textContent=labels[st]||st;
+ b.className="n8n-badge "+st;
+ document.getElementById("n8nLastSync").textContent=s.lastSync?new Date(s.lastSync).toLocaleString("th-TH",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"}):"\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35";
+ document.getElementById("n8nTotal").textContent=s.totalSyncs||0;
+ document.getElementById("n8nErrors").textContent=s.recentErrors||0;
+ document.getElementById("n8nModules").textContent=h.modules?h.modules.length:0;
+ document.getElementById("n8nVer").textContent="API v"+(h.version||"?");
+ }).catch(function(){
+ b.textContent="\u25CF Offline";b.className="n8n-badge error";
+ });
+ }
+ loadN8N();
 </script>
 </body>
 </html>
