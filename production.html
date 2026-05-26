@@ -115,11 +115,10 @@ justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 .confirm-btns button{flex:1}
 
 /* Bottom nav */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;border-top:1px solid #1e1e1e;
-padding:12px 16px;display:flex;gap:8px;justify-content:center;z-index:100}
-.bottom-nav a{text-decoration:none;color:#888;font-size:12px;font-weight:600;padding:8px 16px;
-border-radius:10px;background:#151515;border:1px solid #1e1e1e;transition:.12s}
-.bottom-nav a:active{transform:scale(.95);opacity:.8}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;justify-content:center;max-width:600px;margin:0 auto;z-index:100}
+.bottom-nav a{flex:1;text-align:center;padding:10px 4px 8px;text-decoration:none;color:#555;font-size:10px;font-weight:600;transition:.12s;max-width:100px}
+.bottom-nav a.active{color:#DC2626}
+.bottom-nav .bn-icon{font-size:20px;display:block;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -135,7 +134,7 @@ border-radius:10px;background:#151515;border:1px solid #1e1e1e;transition:.12s}
 <!-- Quick Actions -->
 <div style="display:flex;gap:8px;margin:16px 0 12px">
   <button class="btn btn-p" style="flex:1;margin:0;font-size:13px;padding:10px" onclick="openCreateBatch()">＋ สร้าง Batch ใหม่</button>
-  <a href="index.html" class="btn btn-o" style="flex:0 0 auto;margin:0;text-decoration:none;font-size:13px;padding:10px">📷 QR</a>
+  <a href="qr.html" class="btn btn-o" style="flex:0 0 auto;margin:0;text-decoration:none;font-size:13px;padding:10px">📷 QR</a>
 </div>
 
 <!-- Create Batch Modal -->
@@ -231,9 +230,11 @@ border-radius:10px;background:#151515;border:1px solid #1e1e1e;transition:.12s}
 <div style="height:70px"></div>
 
 <div class="bottom-nav">
-  <a href="hub.html">🏠 Hub</a>
-  <a href="index.html">📷 สแกน QR</a>
-  <a href="inventory.html">📦 สต็อก</a>
+  <a href="index.html"><span class="bn-icon">🏠</span>Hub</a>
+  <a href="production.html" class="active"><span class="bn-icon">🏭</span>Production</a>
+  <a href="inventory.html"><span class="bn-icon">📦</span>Inventory</a>
+  <a href="finance.html"><span class="bn-icon">💰</span>Finance</a>
+  <a href="qr.html"><span class="bn-icon">📷</span>QR</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
