@@ -247,16 +247,12 @@ function snLogout(){
 <!-- ===== BOTTOM NAV ===== -->
 <div class="bnav">
   <a href="#" onclick="return nav('home')" id="nav-home" class="act">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
     หน้าแรก</a>
   <a href="#" onclick="return nav('scan')" id="nav-scan">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     สแกน QR</a>
   <a href="#" onclick="return nav('new')" id="nav-new">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
     สร้าง</a>
   <a href="#" onclick="return nav('list')" id="nav-list">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
     รายการ</a>
 </div>
 
@@ -762,14 +758,7 @@ function printBatchQR() {
     '<div style="margin:16px 0"><img src="' + qrUrl + '" style="width:200px;height:200px"></div>' +
     '<div style="font-size:11px;color:#888">Scan to view batch details</div>' +
     '<script>setTimeout(function(){window.print()},500)<\/script>
-<div style="height:56px"></div>
-<div class="bottom-nav">
-<a href="index.html">Hub</a>
-<a href="production.html">Production</a>
-<a href="inventory.html">Inventory</a>
-<a href="finance.html">Finance</a>
-<a href="qr.html" class="active">QR</a>
-</div>
+
 </body></html>');
 }
 
@@ -855,5 +844,14 @@ function toast(msg, type) {
   }
 })();
 </script>
+
+<div style="height:56px"></div>
+<div class="bottom-nav">
+<a href="index.html">Hub</a>
+<a href="production.html">Production</a>
+<a href="inventory.html">Inventory</a>
+<a href="finance.html">Finance</a>
+<a href="qr.html" class="active">QR</a>
+</div>
 </body>
 </html>
