@@ -18,11 +18,10 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-.bnav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#111;
-  border-top:1px solid #222;padding:6px 0;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:100}
-.bnav a{flex:1;text-align:center;color:#555;font-size:10px;text-decoration:none;padding:4px 0;transition:.15s}
-.bnav a.act{color:#DC2626}
-.bnav a svg{display:block;margin:0 auto 2px;width:24px;height:24px}
+
+
+
+
 
 .card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
 .card:active{background:#1a1a1a}
@@ -245,16 +244,7 @@ function snLogout(){
 </div>
 
 <!-- ===== BOTTOM NAV ===== -->
-<div class="bnav">
-  <a href="#" onclick="return nav('home')" id="nav-home" class="act">
-    หน้าแรก</a>
-  <a href="#" onclick="return nav('scan')" id="nav-scan">
-    สแกน QR</a>
-  <a href="#" onclick="return nav('new')" id="nav-new">
-    สร้าง</a>
-  <a href="#" onclick="return nav('list')" id="nav-list">
-    รายการ</a>
-</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
