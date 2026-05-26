@@ -68,14 +68,11 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
 .badge-income{background:#1b5e20;color:#4caf50}
 .badge-expense{background:#b71c1c33;color:#e53935}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;justify-content:center;max-width:600px;margin:0 auto;z-index:100}
-.bottom-nav a{flex:1;text-align:center;padding:12px 4px;text-decoration:none;color:#555;font-size:11px;font-weight:600;transition:.12s;max-width:100px}
-.bottom-nav a.active{color:#22c55e}
 </style>
 </head>
 <body>
 
-<a href="index.html" class="nav-back">&larr; Hub</a>
+<a href="index.html" class="nav-back">&larr; กลับหน้าหลัก</a>
 <h1>Finance — รายรับรายจ่าย</h1>
 <p class="subtitle">Import Invoice PDF &bull; Cashflow Summary</p>
 <div id="rateBar" style="background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:.8rem">
@@ -86,6 +83,7 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 <!-- Tabs -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('cashflow')">Cashflow</div>
+  <div class="tab" onclick="switchTab('payments')">รายรับ-รายจ่าย</div>
   <div class="tab" onclick="switchTab('invoices')">รายการ Invoice</div>
   <div class="tab" onclick="switchTab('import')">Import Invoice</div>
 </div>
@@ -107,6 +105,76 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 
   <h2 style="font-size:1rem;margin-bottom:12px;color:#fff">รายเดือน</h2>
   <div class="cashflow-grid" id="cfGrid">
+    <div class="loading">กำลังโหลด...</div>
+  </div>
+</div>
+
+<!-- ===================== TAB: Payments (CRUD) ===================== -->
+<div id="tab-payments" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <div class="filter-row" style="margin-bottom:0">
+      <select id="payTypeFilter" onchange="loadPayments()">
+        <option value="">ทั้งหมด</option>
+        <option value="income">รายรับ</option>
+        <option value="expense">รายจ่าย</option>
+      </select>
+      <input type="month" id="payMonthFilter" onchange="loadPayments()">
+    </div>
+    <button class="btn btn-primary" onclick="showPaymentForm()" style="padding:8px 14px;font-size:.82rem">+ เพิ่มรายการ</button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div id="payFormArea" style="display:none" class="card">
+    <h2 id="payFormTitle">เพิ่มรายการใหม่</h2>
+    <input type="hidden" id="payEditRow" value="">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">วันที่</label>
+        <input type="date" id="payDate" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">ประเภท</label>
+        <select id="payType" class="select-box">
+          <option value="income">รายรับ</option>
+          <option value="expense">รายจ่าย</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">จำนวนเงิน (USD)</label>
+        <input type="number" step="0.01" id="payAmount" placeholder="0.00" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">หมวดหมู่</label>
+        <select id="payCategory" class="select-box">
+          <option value="product_sale">ขายสินค้า</option>
+          <option value="service">บริการ</option>
+          <option value="material">วัตถุดิบ</option>
+          <option value="shipping">ค่าส่ง</option>
+          <option value="salary">เงินเดือน</option>
+          <option value="marketing">การตลาด</option>
+          <option value="utility">ค่าสาธารณูปโภค</option>
+          <option value="other">อื่นๆ</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">ผู้จ่าย/ผู้รับ</label>
+      <input type="text" id="paySupplier" placeholder="ชื่อลูกค้า / Supplier" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">หมายเหตุ</label>
+      <input type="text" id="payNotes" placeholder="รายละเอียดเพิ่มเติม" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnPaySave" onclick="savePayment()">บันทึก</button>
+      <button class="btn btn-secondary" onclick="hidePaymentForm()">ยกเลิก</button>
+    </div>
+  </div>
+
+  <!-- Payment List -->
+  <div id="payList">
     <div class="loading">กำลังโหลด...</div>
   </div>
 </div>
@@ -251,14 +319,16 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs
 // ============================================================
 function switchTab(tab) {
   currentTab = tab;
+  var tabNames = ["cashflow","payments","invoices","import"];
   document.querySelectorAll(".tabs .tab").forEach(function(el, i) {
-    el.classList.toggle("active", ["cashflow","invoices","import"][i] === tab);
+    el.classList.toggle("active", tabNames[i] === tab);
   });
-  document.getElementById("tab-cashflow").style.display = tab === "cashflow" ? "" : "none";
-  document.getElementById("tab-invoices").style.display = tab === "invoices" ? "" : "none";
-  document.getElementById("tab-import").style.display = tab === "import" ? "" : "none";
+  tabNames.forEach(function(t) {
+    document.getElementById("tab-" + t).style.display = t === tab ? "" : "none";
+  });
 
   if (tab === "cashflow") loadCashflow();
+  if (tab === "payments") loadPayments();
   if (tab === "invoices") loadInvoices();
 }
 
@@ -488,7 +558,7 @@ async function saveInvoice() {
     });
     var data = await res.json();
     if (data.success) {
-      toast("บันทึก " + parsedInvoice.invoiceId + " สำเร่จ!");
+      toast("บันทึก " + parsedInvoice.invoiceId + " สำเร็จ!");
       clearPreview();
     } else {
       toast(data.error || "เกิดข้อผิดพลาด");
@@ -643,6 +713,162 @@ async function loadCashflow() {
 }
 
 // ============================================================
+// Payments CRUD (Expenses sheet)
+// ============================================================
+var allPayments = [];
+
+async function loadPayments() {
+  var container = document.getElementById("payList");
+  container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+
+  try {
+    var res = await fetch(API + "?api=listPayments");
+    var data = await res.json();
+    if (!data.success) { container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
+
+    allPayments = data.payments || [];
+    renderPayments();
+  } catch (err) {
+    container.innerHTML = '<div class="empty">' + err.message + '</div>';
+  }
+}
+
+function renderPayments() {
+  var container = document.getElementById("payList");
+  var typeF = document.getElementById("payTypeFilter").value;
+  var monthF = document.getElementById("payMonthFilter").value;
+
+  var filtered = allPayments.filter(function(p) {
+    if (typeF && p.type !== typeF) return false;
+    if (monthF) {
+      var d = p.date || "";
+      if (d.length >= 7 && d.substring(0, 7) !== monthF) return false;
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">ยังไม่มีรายการ — กด "+ เพิ่มรายการ" เพื่อเริ่มบันทึก</div>';
+    return;
+  }
+
+  var catLabels = { product_sale: "ขายสินค้า", service: "บริการ", material: "วัตถุดิบ", shipping: "ค่าส่ง", salary: "เงินเดือน", marketing: "การตลาด", utility: "สาธารณูปโภค", other: "อื่นๆ" };
+
+  container.innerHTML = "";
+  filtered.forEach(function(p) {
+    var isExp = p.type === "expense";
+    var typeClass = isExp ? "badge-expense" : "badge-income";
+    var typeLabel = isExp ? "รายจ่าย" : "รายรับ";
+    var amtClass = isExp ? "red" : "green";
+    var amt = parseFloat(p.amount) || 0;
+    var catText = catLabels[p.category] || p.category || "-";
+
+    var div = document.createElement("div");
+    div.className = "inv-item";
+    div.innerHTML = '<div class="inv-left">' +
+      '<div class="inv-id"><span class="badge ' + typeClass + '">' + typeLabel + '</span> ' + esc(catText) + '</div>' +
+      '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
+      '</div>' +
+      '<div class="inv-amount ' + amtClass + '">$' + amt.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888">' + toTHB(amt) + ' THB</div>' : '') + '</div>' +
+      '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="แก้ไข" style="color:#ffc107">E</button>' +
+      '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="ลบ">X</button>';
+    container.appendChild(div);
+  });
+}
+
+function showPaymentForm(editData) {
+  document.getElementById("payFormArea").style.display = "";
+  if (editData) {
+    document.getElementById("payFormTitle").textContent = "แก้ไขรายการ";
+    document.getElementById("payEditRow").value = editData.row;
+    document.getElementById("payDate").value = editData.date || "";
+    document.getElementById("payType").value = editData.type || "expense";
+    document.getElementById("payAmount").value = editData.amount || "";
+    document.getElementById("payCategory").value = editData.category || "other";
+    document.getElementById("paySupplier").value = editData.supplier || "";
+    document.getElementById("payNotes").value = editData.notes || "";
+  } else {
+    document.getElementById("payFormTitle").textContent = "เพิ่มรายการใหม่";
+    document.getElementById("payEditRow").value = "";
+    document.getElementById("payDate").value = new Date().toISOString().substring(0, 10);
+    document.getElementById("payType").value = "expense";
+    document.getElementById("payAmount").value = "";
+    document.getElementById("payCategory").value = "other";
+    document.getElementById("paySupplier").value = "";
+    document.getElementById("payNotes").value = "";
+  }
+  document.getElementById("payDate").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function hidePaymentForm() {
+  document.getElementById("payFormArea").style.display = "none";
+}
+
+async function savePayment() {
+  var date = document.getElementById("payDate").value;
+  var type = document.getElementById("payType").value;
+  var amount = document.getElementById("payAmount").value;
+  var category = document.getElementById("payCategory").value;
+  var supplier = document.getElementById("paySupplier").value;
+  var notes = document.getElementById("payNotes").value;
+  var editRow = document.getElementById("payEditRow").value;
+
+  if (!date || !amount) { toast("กรุณากรอกวันที่และจำนวนเงิน"); return; }
+
+  var btn = document.getElementById("btnPaySave");
+  btn.disabled = true;
+  btn.textContent = "กำลังบันทึก...";
+
+  var params = "date=" + encodeURIComponent(date) +
+    "&type=" + encodeURIComponent(type) +
+    "&amount=" + encodeURIComponent(amount) +
+    "&category=" + encodeURIComponent(category) +
+    "&supplier=" + encodeURIComponent(supplier) +
+    "&notes=" + encodeURIComponent(notes);
+
+  var apiName = editRow ? "editPayment" : "recordPayment";
+  if (editRow) params += "&row=" + editRow;
+
+  try {
+    var res = await fetch(API + "?api=" + apiName + "&" + params);
+    var data = await res.json();
+    if (data.success) {
+      toast(editRow ? "แก้ไขสำเร็จ" : "เพิ่มรายการสำเร็จ");
+      hidePaymentForm();
+      loadPayments();
+    } else {
+      toast(data.error || "เกิดข้อผิดพลาด");
+    }
+  } catch (err) {
+    toast(err.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = "บันทึก";
+}
+
+function editPaymentRow(row) {
+  var p = allPayments.find(function(item) { return item.row === row; });
+  if (p) showPaymentForm(p);
+}
+
+async function deletePaymentRow(row) {
+  if (!confirm("ลบรายการนี้?")) return;
+  try {
+    var res = await fetch(API + "?api=deletePayment&row=" + row);
+    var data = await res.json();
+    if (data.success) {
+      toast("ลบรายการแล้ว");
+      loadPayments();
+    } else {
+      toast(data.error || "Error");
+    }
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+// ============================================================
 // Utilities
 // ============================================================
 function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
@@ -661,13 +887,5 @@ function toast(msg) {
   loadCashflow();
 })();
 </script>
-<div style="height:60px"></div>
-<div class="bottom-nav">
-  <a href="index.html">Hub</a>
-  <a href="production.html">Production</a>
-  <a href="inventory.html">Inventory</a>
-  <a href="finance.html" class="active">Finance</a>
-  <a href="qr.html">QR</a>
-</div>
 </body>
 </html>
