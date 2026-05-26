@@ -68,11 +68,15 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
 .badge-income{background:#1b5e20;color:#4caf50}
 .badge-expense{background:#b71c1c33;color:#e53935}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;justify-content:center;max-width:600px;margin:0 auto;z-index:100}
+.bottom-nav a{flex:1;text-align:center;padding:10px 4px 8px;text-decoration:none;color:#555;font-size:10px;font-weight:600;transition:.12s;max-width:100px}
+.bottom-nav a.active{color:#22c55e}
+.bottom-nav .bn-icon{font-size:20px;display:block;margin-bottom:2px}
 </style>
 </head>
 <body>
 
-<a href="index.html" class="nav-back">&larr; กลับหน้าหลัก</a>
+<a href="index.html" class="nav-back">&larr; Hub</a>
 <h1>Finance — รายรับรายจ่าย</h1>
 <p class="subtitle">Import Invoice PDF &bull; Cashflow Summary</p>
 <div id="rateBar" style="background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:.8rem">
@@ -485,7 +489,7 @@ async function saveInvoice() {
     });
     var data = await res.json();
     if (data.success) {
-      toast("บันทึก " + parsedInvoice.invoiceId + " สำเร็จ!");
+      toast("บันทึก " + parsedInvoice.invoiceId + " สำเร่จ!");
       clearPreview();
     } else {
       toast(data.error || "เกิดข้อผิดพลาด");
@@ -658,5 +662,13 @@ function toast(msg) {
   loadCashflow();
 })();
 </script>
+<div style="height:60px"></div>
+<div class="bottom-nav">
+  <a href="index.html"><span class="bn-icon">🏠</span>Hub</a>
+  <a href="production.html"><span class="bn-icon">🏭</span>Production</a>
+  <a href="inventory.html"><span class="bn-icon">📦</span>Inventory</a>
+  <a href="finance.html" class="active"><span class="bn-icon">💰</span>Finance</a>
+  <a href="qr.html"><span class="bn-icon">📷</span>QR</a>
+</div>
 </body>
 </html>
