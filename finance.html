@@ -724,9 +724,14 @@ async function loadPayments() {
   try {
     var res = await fetch(API + "?api=listPayments");
     var data = await res.json();
-    if (!data.success) { container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
-
-    allPayments = data.payments || [];
+    // API returns array directly OR {success,payments}
+    if (Array.isArray(data)) {
+      allPayments = data;
+    } else if (data.success) {
+      allPayments = data.payments || [];
+    } else {
+      container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return;
+    }
     renderPayments();
   } catch (err) {
     container.innerHTML = '<div class="empty">' + err.message + '</div>';
