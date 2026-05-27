@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0a0a0a">
-<title>Inventory — SN Production</title>
+<title>Inventory â SN Production</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
@@ -109,7 +109,7 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 <input type="number" id="restockQty" min="1" placeholder="Enter quantity to add">
 </div>
 <div class="form-group">
-<label>Unit Cost (฿)</label>
+<label>Unit Cost (à¸¿)</label>
 <input type="number" id="restockCost" min="0" step="0.01" placeholder="Cost per unit (optional)">
 </div>
 <div class="form-group">
@@ -128,7 +128,7 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 <!-- Header -->
 <div style="text-align:center;margin:12px 0 20px">
 <div style="font-size:16px;font-weight:700;color:#fff">Inventory Management</div>
-<div style="font-size:12px;color:#666;margin-top:2px">SN Motorsports — Material Tracking</div>
+<div style="font-size:12px;color:#666;margin-top:2px">SN Motorsports â Material Tracking</div>
 <div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
 </div>
 
@@ -184,7 +184,7 @@ function toast(msg, type) {
   setTimeout(function() { t.className = 'toast'; }, 2500);
 }
 
-// ── Tab switching ──
+// ââ Tab switching ââ
 function switchTab(tab) {
   ['stock','alerts','po','bom'].forEach(function(t) {
     document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
@@ -198,7 +198,7 @@ function switchTab(tab) {
   if (tab === 'bom') loadBOM();
 }
 
-// ── Stock List ──
+// ââ Stock List ââ
 function loadInventory() {
   callAPI({ api: 'listInventory' }).then(function(data) {
     allInventory = data;
@@ -249,12 +249,13 @@ function renderStock(items) {
     html += '<div class="stock-row" data-name="' + (it.item || '').toLowerCase() + '">';
     html += '<div class="stock-info">';
     html += '<div class="stock-name">' + (it.item || 'Unknown') + '</div>';
-    html += '<div class="stock-meta">' + (it.category || '-') + ' · Min: ' + (it.min || 0) + ' · ' + (it.unit || '-') + '</div>';
+    html += '<div class="stock-meta">' + (it.category || '-') + ' Â· Min: ' + (it.min || 0) + ' Â· ' + (it.unit || '-') + '</div>';
     html += '<div class="stock-bar"><div class="stock-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>';
     html += '</div>';
     html += '<div class="stock-qty"><div class="n" style="color:' + s.color + '">' + (it.stock || 0) + '</div>';
     html += '<span class="badge ' + s.cls + '">' + s.label + '</span></div>';
     html += '<button class="btn btn-sm btn-o" style="margin-left:8px;border-color:' + s.color + ';color:' + s.color + '" onclick="openRestock(' + idx + ')">+</button>';
+      html += '<button class="btn btn-sm btn-o" style="margin-left:4px;border-color:#ff4444;color:#ff4444" onclick="deleteInventoryItem(' + idx + ')">-</button>';
     html += '</div>';
   });
   html += '</div>';
@@ -285,7 +286,7 @@ function updateAlertBadge(items) {
   }
 }
 
-// ── Restock Modal ──
+// ââ Restock Modal ââ
 function openRestock(idx) {
   var it = allInventory[idx];
   currentRestockItem = it;
@@ -335,7 +336,7 @@ function submitRestock() {
   });
 }
 
-// ── Alerts Tab ──
+// ââ Alerts Tab ââ
 function loadAlerts() {
   var items = allInventory;
   if (!items.length) {
@@ -355,7 +356,7 @@ function renderAlerts(items) {
 
   if (!alerts.length) {
     document.getElementById('alerts-content').innerHTML =
-      '<div class="card" style="text-align:center;padding:24px"><div style="font-size:28px;margin-bottom:8px">✓</div><div style="color:#4ade80;font-weight:600">All stock levels OK</div></div>';
+      '<div class="card" style="text-align:center;padding:24px"><div style="font-size:28px;margin-bottom:8px">â</div><div style="color:#4ade80;font-weight:600">All stock levels OK</div></div>';
     return;
   }
 
@@ -368,7 +369,7 @@ function renderAlerts(items) {
     html += '<div class="stock-row">';
     html += '<div class="stock-info">';
     html += '<div class="stock-name" style="color:' + s.color + '">' + it.item + '</div>';
-    html += '<div class="stock-meta">Stock: ' + it.stock + ' / Min: ' + it.min + ' · Need: ' + deficit + ' ' + (it.unit || '') + '</div>';
+    html += '<div class="stock-meta">Stock: ' + it.stock + ' / Min: ' + it.min + ' Â· Need: ' + deficit + ' ' + (it.unit || '') + '</div>';
     html += '</div>';
     html += '<span class="badge ' + s.cls + '">' + s.label + '</span>';
     html += '</div>';
@@ -413,7 +414,7 @@ function createPOFromAlerts() {
   });
 }
 
-// ── PO Drafts Tab ──
+// ââ PO Drafts Tab ââ
 function loadPOs() {
   callAPI({ api: 'listPODrafts' }).then(function(data) {
     allPOs = data;
@@ -447,7 +448,7 @@ function renderPOs(pos) {
   document.getElementById('po-content').innerHTML = html;
 }
 
-// ── BOM Tab ──
+// ââ BOM Tab ââ
 function loadBOM() {
   callAPI({ api: 'listBOM' }).then(function(data) {
     bomData = data;
@@ -467,7 +468,7 @@ function renderBOM(items) {
 
   var totalCost = 0;
   var html = '<div class="card">';
-  html += '<div style="font-weight:700;margin-bottom:4px">SN Mirror — Bill of Materials</div>';
+  html += '<div style="font-weight:700;margin-bottom:4px">SN Mirror â Bill of Materials</div>';
   html += '<div style="font-size:12px;color:#666;margin-bottom:10px">Materials required per 1 unit</div>';
 
   items.forEach(function(it) {
@@ -475,13 +476,13 @@ function renderBOM(items) {
     totalCost += cost;
     html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:13px">';
     html += '<div><span style="color:#fff">' + it.item + '</span> <span style="color:#666">x' + it.qty + ' ' + (it.unit || '') + '</span></div>';
-    html += '<div style="color:#f59e0b;font-weight:600">฿' + cost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
+    html += '<div style="color:#f59e0b;font-weight:600">à¸¿' + cost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
     html += '</div>';
   });
 
   html += '<div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-weight:700;font-size:14px;border-top:2px solid #333;margin-top:4px">';
   html += '<div>Total per unit</div>';
-  html += '<div style="color:#DC2626">฿' + totalCost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
+  html += '<div style="color:#DC2626">à¸¿' + totalCost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
   html += '</div>';
   html += '</div>';
 
@@ -509,16 +510,30 @@ function calcBOM() {
     html += '<div>' + it.item + '</div>';
     html += '<div style="color:' + (enough ? '#4ade80' : '#f87171') + '">';
     html += need + ' needed / ' + stock + ' in stock';
-    html += (enough ? ' ✓' : ' ✗') + '</div>';
+    html += (enough ? ' â' : ' â') + '</div>';
     html += '</div>';
   });
   html += '</div>';
   document.getElementById('bomCalcResult').innerHTML = html;
 }
 
-// ── Init ──
+// ââ Init ââ
 loadInventory();
-</script>
+
+    function deleteInventoryItem(idx) {
+      var item = allInventory[idx];
+      if (!item) return;
+      if (!confirm("\u0e25\u0e1a " + item.item + " \u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e04\u0e25\u0e31\u0e07?")) return;
+      callAPI({api:"deleteInventoryItem", item: item.item}).then(function(r) {
+        if (r.success) {
+          toast(item.item + " \u0e16\u0e39\u0e01\u0e25\u0e1a\u0e41\u0e25\u0e49\u0e27","#4CAF50");
+          loadInventory();
+        } else {
+          toast("Error: " + (r.error || "Unknown"),"#f44");
+        }
+      }).catch(function(e) { toast("Error: " + e.message,"#f44"); });
+    }
+    </script>
 <div style="height:60px"></div>
 <div class="bottom-nav">
   <a href="index.html">Hub</a>
