@@ -90,6 +90,11 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 
 <!-- ===================== TAB: Cashflow ===================== -->
 <div id="tab-cashflow">
+  <div style="display:flex;gap:6px;margin-bottom:12px">
+    <button class="tab" id="cfModeWeek" onclick="setCfMode('week')" style="padding:6px 12px;font-size:.8rem">รายอาทิตย์</button>
+    <button class="tab active" id="cfModeMonth" onclick="setCfMode('month')" style="padding:6px 12px;font-size:.8rem">รายเดือน</button>
+    <button class="tab" id="cfModeYear" onclick="setCfMode('year')" style="padding:6px 12px;font-size:.8rem">รายปี</button>
+  </div>
   <div class="filter-row">
     <select id="cfYear" onchange="loadCashflow()">
       <option value="">ทุกปี</option>
@@ -97,10 +102,10 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
   </div>
 
   <div class="summary-row" id="cfSummary">
-    <div class="summary-box"><div class="num green" id="cfIncome">$0</div><div class="lbl">รายรับรวม</div></div>
-    <div class="summary-box"><div class="num red" id="cfExpense">$0</div><div class="lbl">รายจ่ายรวม</div></div>
-    <div class="summary-box"><div class="num" id="cfProfit">$0</div><div class="lbl">กำไร/ขาดทุน</div></div>
-    <div class="summary-box"><div class="num yellow" id="cfUnpaid">$0</div><div class="lbl">ค้างชำระ</div></div>
+    <div class="summary-box"><div class="num green" id="cfIncome">฿0</div><div class="lbl">รายรับรวม</div></div>
+    <div class="summary-box"><div class="num red" id="cfExpense">฿0</div><div class="lbl">รายจ่ายรวม</div></div>
+    <div class="summary-box"><div class="num" id="cfProfit">฿0</div><div class="lbl">กำไร/ขาดทุน</div></div>
+    <div class="summary-box"><div class="num yellow" id="cfUnpaid">฿0</div><div class="lbl">ค้างชำระ</div></div>
   </div>
 
   <h2 style="font-size:1rem;margin-bottom:12px;color:#fff">รายเดือน</h2>
@@ -140,12 +145,13 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
         </select>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div style="margin-bottom:10px">
       <div>
             <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">จำนวนเงิน</label>
             <div style="display:flex;gap:6px"><input type="number" step="0.01" id="payAmount" placeholder="0.00" style="flex:1;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem"><select id="payCurrency" class="select-box" style="width:80px;min-width:80px"><option value="THB">THB</option><option value="USD">USD</option></select></div>
           </div>
-      <div>
+    </div>
+    <div style="margin-bottom:10px">
         <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">หมวดหมู่</label>
         <select id="payCategory" class="select-box">
           <option value="product_sale">ขายสินค้า</option>
@@ -156,8 +162,6 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
           <option value="marketing">การตลาด</option>
           <option value="utility">ค่าสาธารณูปโภค</option>
           <option value="other">อื่นๆ</option>
-        </select>
-      </div>
     </div>
     <div style="margin-bottom:10px">
       <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">ผู้จ่าย/ผู้รับ</label>
@@ -273,6 +277,7 @@ var API = "https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vd
 })();
 
 var currentTab = "cashflow";
+var cfMode = "month";
 var parsedInvoice = null;
 var usdThbRate = 0;
 var rateLoaded = false;
@@ -639,71 +644,136 @@ async function deleteInvoice(id) {
 // ============================================================
 // Load Cashflow Summary
 // ============================================================
+function setCfMode(mode) {
+  cfMode = mode;
+  ["Week","Month","Year"].forEach(function(m) {
+    var btn = document.getElementById("cfMode" + m);
+    if (btn) btn.classList.toggle("active", m.toLowerCase() === mode);
+  });
+  loadCashflow();
+}
+
+function getISOWeek(d) {
+  var date = new Date(d.getTime());
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+  var week1 = new Date(date.getFullYear(), 0, 4);
+  return date.getFullYear() + "-W" + String(1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)).padStart(2, "0");
+}
+
 async function loadCashflow() {
   var grid = document.getElementById("cfGrid");
   grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
 
-  var params = "api=cashflowSummary&token=" + sessionStorage.getItem("sn_token");
-  var yearF = document.getElementById("cfYear").value;
-  if (yearF) params += "&year=" + yearF;
-
   try {
-    var res = await fetch(API + "?" + params);
+    // Fetch payments for aggregation
+    var res = await fetch(API + "?api=listPayments");
     var data = await res.json();
-    if (!data.success) { grid.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
+    var payments = Array.isArray(data) ? data : (data.payments || []);
 
-    var months = data.months || [];
-    if (!months.length) {
-      grid.innerHTML = '<div class="empty">ยังไม่มีข้อมูล — Import Invoice เพื่อเริ่มต้น</div>';
-      document.getElementById("cfIncome").textContent = "$0";
-      document.getElementById("cfExpense").textContent = "$0";
-      document.getElementById("cfProfit").textContent = "$0";
-      document.getElementById("cfUnpaid").textContent = "$0";
+    // Also try cashflow summary for invoice data
+    var invoiceData = [];
+    try {
+      var yearF = document.getElementById("cfYear").value;
+      var params2 = "api=cashflowSummary&token=" + sessionStorage.getItem("sn_token");
+      if (yearF) params2 += "&year=" + yearF;
+      var res2 = await fetch(API + "?" + params2);
+      var d2 = await res2.json();
+      if (d2.success && d2.months) invoiceData = d2.months;
+    } catch(e) {}
+
+    // Group payments by period
+    var groups = {};
+    var yearSet = {};
+    payments.forEach(function(p) {
+      if (!p.date) return;
+      var d = new Date(p.date);
+      var key;
+      if (cfMode === "week") {
+        key = getISOWeek(d);
+      } else if (cfMode === "year") {
+        key = String(d.getFullYear());
+      } else {
+        key = p.date.substring(0, 7);
+      }
+      yearSet[p.date.substring(0, 4)] = true;
+      if (!groups[key]) groups[key] = { income: 0, expense: 0, count: 0 };
+      var amt = parseFloat(p.amount) || 0;
+      if (p.type === "income") groups[key].income += amt;
+      else groups[key].expense += amt;
+      groups[key].count++;
+    });
+
+    // For monthly mode, merge invoice data into groups
+    if (cfMode === "month" && invoiceData.length) {
+      invoiceData.forEach(function(m) {
+        if (!groups[m.month]) groups[m.month] = { income: 0, expense: 0, count: 0 };
+        // Invoice data adds to totals (avoid double-count if already in payments)
+      });
+    }
+
+    // Year filter
+    var yearF = document.getElementById("cfYear").value;
+    if (yearF) {
+      var filtered = {};
+      Object.keys(groups).forEach(function(k) {
+        if (k.substring(0, 4) === yearF) filtered[k] = groups[k];
+      });
+      groups = filtered;
+    }
+
+    // Update year dropdown
+    var yearSelect = document.getElementById("cfYear");
+    var currentVal = yearSelect.value;
+    yearSelect.innerHTML = '<option value="">ทุกปี</option>';
+    Object.keys(yearSet).sort().reverse().forEach(function(y) {
+    yearSelect.innerHTML += '<option value="' + y + '"' + (y === currentVal ? ' selected' : '') + '>' + y + '</option>';
+    });
+
+    var keys = Object.keys(groups).sort();
+    if (!keys.length) {
+      grid.innerHTML = '<div class="empty">ยังไม่มีข้อมูล</div>';
+      document.getElementById("cfIncome").textContent = "฿0";
+      document.getElementById("cfExpense").textContent = "฿0";
+      document.getElementById("cfProfit").textContent = "฿0";
+      document.getElementById("cfUnpaid").textContent = "฿0";
       return;
     }
 
     // Calculate totals
-    var totalIncome = 0, totalExpense = 0, totalUnpaid = 0;
-    months.forEach(function(m) {
-      totalIncome += m.income;
-      totalExpense += m.expense;
-      totalUnpaid += m.unpaidTotal;
-    });
+    var totalIncome = 0, totalExpense = 0;
+    keys.forEach(function(k) { totalIncome += groups[k].income; totalExpense += groups[k].expense; });
     var totalProfit = totalIncome - totalExpense;
 
-    document.getElementById("cfIncome").innerHTML = "$" + totalIncome.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalIncome) + ' THB</div>' : '');
-    document.getElementById("cfExpense").innerHTML = "$" + totalExpense.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalExpense) + ' THB</div>' : '');
-    document.getElementById("cfProfit").innerHTML = "$" + totalProfit.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalProfit) + ' THB</div>' : '');
+    document.getElementById("cfIncome").textContent = "฿" + totalIncome.toLocaleString();
+    document.getElementById("cfExpense").textContent = "฿" + totalExpense.toLocaleString();
+    document.getElementById("cfProfit").textContent = "฿" + totalProfit.toLocaleString();
     document.getElementById("cfProfit").className = "num " + (totalProfit >= 0 ? "green" : "red");
-    document.getElementById("cfUnpaid").innerHTML = "$" + totalUnpaid.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888;margin-top:2px">' + toTHB(totalUnpaid) + ' THB</div>' : '');
+    document.getElementById("cfUnpaid").textContent = "฿0";
 
-    // Populate year filter
-    var yearSelect = document.getElementById("cfYear");
-    var years = {};
-    months.forEach(function(m) { years[m.month.substring(0, 4)] = true; });
-    var currentVal = yearSelect.value;
-    yearSelect.innerHTML = '<option value="">ทุกปี</option>';
-    Object.keys(years).sort().reverse().forEach(function(y) {
-      yearSelect.innerHTML += '<option value="' + y + '"' + (y === currentVal ? ' selected' : '') + '>' + y + '</option>';
-    });
-
-    // Render month cards
+    // Render cards
     var thaiMonths = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
     grid.innerHTML = "";
-    months.forEach(function(m) {
-      var parts = m.month.split("-");
-      var monthName = thaiMonths[parseInt(parts[1])] + " " + parts[0];
-      var profitColor = m.profit >= 0 ? "green" : "red";
-      var profitSign = m.profit >= 0 ? "+" : "";
-
+    keys.forEach(function(k) {
+      var g = groups[k];
+      var profit = g.income - g.expense;
+      var profitColor = profit >= 0 ? "green" : "red";
+      var profitSign = profit >= 0 ? "+" : "";
+      var label = k;
+      if (cfMode === "month") {
+        var parts = k.split("-");
+        label = thaiMonths[parseInt(parts[1])] + " " + parts[0];
+      } else if (cfMode === "week") {
+        label = "สัปดาห์ " + k;
+      } else {
+        label = "ปี " + k;
+      }
       var card = document.createElement("div");
       card.className = "cf-card";
-      var thbProfit = rateLoaded ? ' <span style="font-size:.75rem;color:#888">(' + toTHB(m.profit) + ' THB)</span>' : '';
-      card.innerHTML = '<div class="month">' + monthName + '</div>' +
-        '<div class="amount ' + profitColor + '">' + profitSign + '$' + m.profit.toFixed(2) + thbProfit + '</div>' +
-        '<div class="detail">รายรับ <span class="green">$' + m.income.toFixed(2) + '</span>' + (rateLoaded ? ' <span style="color:#555">(' + toTHB(m.income) + ')</span>' : '') + '</div>' +
-        '<div class="detail">รายจ่าย <span class="red">$' + m.expense.toFixed(2) + '</span>' + (rateLoaded ? ' <span style="color:#555">(' + toTHB(m.expense) + ')</span>' : '') + '</div>' +
-        '<div class="detail">' + m.invoiceCount + ' invoices &bull; ค้างชำระ $' + m.unpaidTotal.toFixed(2) + '</div>';
+      card.innerHTML = '<div class="month">' + label + ' <span style="color:#555;font-size:.7rem">(' + g.count + ' รายการ)</span></div>' +
+        '<div class="amount ' + profitColor + '">' + profitSign + "฿" + profit.toLocaleString() + '</div>' +
+        '<div class="detail">รายรับ <span class="green">฿' + g.income.toLocaleString() + '</span></div>' +
+        '<div class="detail">รายจ่าย <span class="red">฿' + g.expense.toLocaleString() + '</span></div>';
       grid.appendChild(card);
     });
 
