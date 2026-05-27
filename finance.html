@@ -771,7 +771,8 @@ function renderPayments() {
     var div = document.createElement("div");
     div.className = "inv-item";
     div.innerHTML = '<div class="inv-left">' +
-      '<div class="inv-id"><span class="badge ' + typeClass + '">' + typeLabel + '</span> ' + esc(catText) + '</div>' +
+      '<div class="inv-id"><span class="badge ' + typeClass + '">' + typeLabel + '</span></div>' +
+      '<div style="color:#aaa;font-size:.78rem;margin-top:2px">' + esc(catText) + '</div>' +
       '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
       '</div>' +
       '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : '$') + amt.toLocaleString() + '</div>' +
