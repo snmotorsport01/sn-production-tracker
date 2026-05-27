@@ -774,7 +774,7 @@ function renderPayments() {
       '<div class="inv-id"><span class="badge ' + typeClass + '">' + typeLabel + '</span> ' + esc(catText) + '</div>' +
       '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
       '</div>' +
-      '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : ' + '</div>' +
+      '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : '$') + amt.toLocaleString() + '</div>' +
       '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="แก้ไข" style="color:#ffc107">E</button>' +
       '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="ลบ">X</button>';
     container.appendChild(div);
