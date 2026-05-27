@@ -124,6 +124,25 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 <button class="btn btn-o" onclick="closeModal()">Cancel</button>
 </div>
 </div>
+  <div id="editItemModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;overflow-y:auto">
+    <div class="card" style="max-width:400px;margin:40px auto;padding:20px">
+      <h3 id="editItemTitle" style="margin-bottom:16px">แก้ไข Item</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <label>Category<input id="editCategory" class="input" type="text"></label>
+        <label>Stock<input id="editStock" class="input" type="number"></label>
+        <label>Min<input id="editMin" class="input" type="number"></label>
+        <label>Max<input id="editMax" class="input" type="number"></label>
+        <label>Unit<input id="editUnit" class="input" type="text"></label>
+        <label>Unit Cost<input id="editUnitCost" class="input" type="number" step="0.01"></label>
+        <label>Supplier<input id="editSupplier" class="input" type="text"></label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-p" onclick="saveEditItem()" style="flex:1">บันทึก</button>
+        <button class="btn btn-o" onclick="closeEditModal()" style="flex:1">ยกเลิก</button>
+      </div>
+      <button class="btn" onclick="confirmDeleteItem()" style="width:100%;margin-top:12px;background:#331111;color:#ff4444;border:1px solid #ff4444">ลบ Item นี้ออกจากระบบ</button>
+    </div>
+  </div>
 
 <!-- Header -->
 <div style="text-align:center;margin:12px 0 20px">
@@ -248,14 +267,14 @@ function renderStock(items) {
     var pct = Math.min(100, Math.round((it.stock / maxVal) * 100));
     html += '<div class="stock-row" data-name="' + (it.item || '').toLowerCase() + '">';
     html += '<div class="stock-info">';
-    html += '<div class="stock-name">' + (it.item || 'Unknown') + '</div>';
+    html += '<div class="stock-name" style="cursor:pointer;text-decoration:underline dotted" onclick="openEditItem(' + idx + ')">' + (it.item || 'Unknown') + '</div>';
     html += '<div class="stock-meta">' + (it.category || '-') + ' · Min: ' + (it.min || 0) + ' · ' + (it.unit || '-') + '</div>';
     html += '<div class="stock-bar"><div class="stock-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>';
     html += '</div>';
     html += '<div class="stock-qty"><div class="n" style="color:' + s.color + '">' + (it.stock || 0) + '</div>';
     html += '<span class="badge ' + s.cls + '">' + s.label + '</span></div>';
     html += '<button class="btn btn-sm btn-o" style="margin-left:8px;border-color:' + s.color + ';color:' + s.color + '" onclick="openRestock(' + idx + ')">+</button>';
-      html += '<button class="btn btn-sm btn-o" style="margin-left:4px;border-color:#ff4444;color:#ff4444" onclick="deleteInventoryItem(' + idx + ')">-</button>';
+      html += '<button class="btn btn-sm btn-o" style="margin-left:4px;border-color:#ff4444;color:#ff4444" onclick="openReduceStock(' + idx + ')">-</button>';
     html += '</div>';
   });
   html += '</div>';
@@ -520,18 +539,62 @@ function calcBOM() {
 // ── Init ──
 loadInventory();
 
-    function deleteInventoryItem(idx) {
+    var currentEditIdx = null;
+    function openReduceStock(idx) {
       var item = allInventory[idx];
       if (!item) return;
-      if (!confirm('ลบ ' + item.item + ' ออกจากคลัง?')) return;
-      callAPI({api:'deleteInventoryItem', item: item.item}).then(function(r) {
-        if (r.success) {
-          toast(item.item + ' ถูกลบแล้ว','#4CAF50');
-          loadInventory();
-        } else {
-          toast('Error: ' + (r.error || 'Unknown'),'#f44');
-        }
-      }).catch(function(e) { toast('Error: ' + e.message,'#f44'); });
+      var qty = prompt("ลดจำนวน " + item.item + " (สต็อกปัจจุบัน: " + item.stock + " " + (item.unit||"") + ")\nระบุจำนวนที่ต้องการลด:");
+      if (!qty || isNaN(qty) || Number(qty) <= 0) return;
+      var newStock = Math.max(0, item.stock - Number(qty));
+      callAPI({api:"updateInventoryItem", item:item.item, stock:newStock}).then(function(r) {
+        if (r.success) { toast(item.item + " ลดเหลือ " + newStock,"#4CAF50"); loadInventory(); }
+        else { toast("Error: " + (r.error||"Unknown"),"#f44"); }
+      }).catch(function(e) { toast("Error: "+e.message,"#f44"); });
+    }
+
+    function openEditItem(idx) {
+      var item = allInventory[idx];
+      if (!item) return;
+      currentEditIdx = idx;
+      document.getElementById("editItemTitle").textContent = "แก้ไข: " + item.item;
+      document.getElementById("editCategory").value = item.category || "";
+      document.getElementById("editStock").value = item.stock || 0;
+      document.getElementById("editMin").value = item.min || 0;
+      document.getElementById("editMax").value = item.max || 0;
+      document.getElementById("editUnit").value = item.unit || "";
+      document.getElementById("editUnitCost").value = item.unitCost || 0;
+      document.getElementById("editSupplier").value = item.supplier || "";
+      document.getElementById("editItemModal").style.display = "block";
+    }
+
+    function closeEditModal() { document.getElementById("editItemModal").style.display = "none"; currentEditIdx = null; }
+
+    function saveEditItem() {
+      if (currentEditIdx === null) return;
+      var item = allInventory[currentEditIdx];
+      var params = { api:"updateInventoryItem", item:item.item,
+        category: document.getElementById("editCategory").value,
+        stock: document.getElementById("editStock").value,
+        min: document.getElementById("editMin").value,
+        max: document.getElementById("editMax").value,
+        unit: document.getElementById("editUnit").value,
+        unitCost: document.getElementById("editUnitCost").value,
+        supplier: document.getElementById("editSupplier").value
+      };
+      callAPI(params).then(function(r) {
+        if (r.success) { toast(item.item + " อัปเดตแล้ว","#4CAF50"); closeEditModal(); loadInventory(); }
+        else { toast("Error: "+(r.error||"Unknown"),"#f44"); }
+      }).catch(function(e) { toast("Error: "+e.message,"#f44"); });
+    }
+
+    function confirmDeleteItem() {
+      if (currentEditIdx === null) return;
+      var item = allInventory[currentEditIdx];
+      if (!confirm("ลบ " + item.item + " ออกจากระบบถาวร?")) return;
+      callAPI({api:"deleteInventoryItem", item:item.item}).then(function(r) {
+        if (r.success) { toast(item.item + " ถูกลบแล้ว","#4CAF50"); closeEditModal(); loadInventory(); }
+        else { toast("Error: "+(r.error||"Unknown"),"#f44"); }
+      }).catch(function(e) { toast("Error: "+e.message,"#f44"); });
     }
     </script>
 <div style="height:60px"></div>
