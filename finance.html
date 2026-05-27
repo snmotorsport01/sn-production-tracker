@@ -142,9 +142,9 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div>
-        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">จำนวนเงิน (USD)</label>
-        <input type="number" step="0.01" id="payAmount" placeholder="0.00" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
-      </div>
+            <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">จำนวนเงิน</label>
+            <div style="display:flex;gap:6px"><input type="number" step="0.01" id="payAmount" placeholder="0.00" style="flex:1;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem"><select id="payCurrency" class="select-box" style="width:80px;min-width:80px"><option value="THB">THB</option><option value="USD">USD</option></select></div>
+          </div>
       <div>
         <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">หมวดหมู่</label>
         <select id="payCategory" class="select-box">
@@ -774,7 +774,7 @@ function renderPayments() {
       '<div class="inv-id"><span class="badge ' + typeClass + '">' + typeLabel + '</span> ' + esc(catText) + '</div>' +
       '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
       '</div>' +
-      '<div class="inv-amount ' + amtClass + '">$' + amt.toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888">' + toTHB(amt) + ' THB</div>' : '') + '</div>' +
+      '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : ' + '</div>' +
       '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="แก้ไข" style="color:#ffc107">E</button>' +
       '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="ลบ">X</button>';
     container.appendChild(div);
@@ -789,6 +789,7 @@ function showPaymentForm(editData) {
     document.getElementById("payDate").value = editData.date || "";
     document.getElementById("payType").value = editData.type || "expense";
     document.getElementById("payAmount").value = editData.amount || "";
+        document.getElementById("payCurrency").value = editData.currency || "THB";
     document.getElementById("payCategory").value = editData.category || "other";
     document.getElementById("paySupplier").value = editData.supplier || "";
     document.getElementById("payNotes").value = editData.notes || "";
@@ -798,6 +799,7 @@ function showPaymentForm(editData) {
     document.getElementById("payDate").value = new Date().toISOString().substring(0, 10);
     document.getElementById("payType").value = "expense";
     document.getElementById("payAmount").value = "";
+        document.getElementById("payCurrency").value = "THB";
     document.getElementById("payCategory").value = "other";
     document.getElementById("paySupplier").value = "";
     document.getElementById("payNotes").value = "";
@@ -829,7 +831,129 @@ async function savePayment() {
     "&amount=" + encodeURIComponent(amount) +
     "&category=" + encodeURIComponent(category) +
     "&supplier=" + encodeURIComponent(supplier) +
-    "&notes=" + encodeURIComponent(notes);
+    "&notes=" + encodeURIComponent(notes) + "&currency=" + encodeURIComponent(document.getElementById("payCurrency").value);
+
+  var apiName = editRow ? "editPayment" : "recordPayment";
+  if (editRow) params += "&row=" + editRow;
+
+  try {
+    var res = await fetch(API + "?api=" + apiName + "&" + params);
+    var data = await res.json();
+    if (data.success) {
+      toast(editRow ? "แก้ไขสำเร็จ" : "เพิ่มรายการสำเร็จ");
+      hidePaymentForm();
+      loadPayments();
+    } else {
+      toast(data.error || "เกิดข้อผิดพลาด");
+    }
+  } catch (err) {
+    toast(err.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = "บันทึก";
+}
+
+function editPaymentRow(row) {
+  var p = allPayments.find(function(item) { return item.row === row; });
+  if (p) showPaymentForm(p);
+}
+
+async function deletePaymentRow(row) {
+  if (!confirm("ลบรายการนี้?")) return;
+  try {
+    var res = await fetch(API + "?api=deletePayment&row=" + row);
+    var data = await res.json();
+    if (data.success) {
+      toast("ลบรายการแล้ว");
+      loadPayments();
+    } else {
+      toast(data.error || "Error");
+    }
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+// ============================================================
+// Utilities
+// ============================================================
+function esc(s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
+function toast(msg) {
+  var el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(function() { el.classList.remove("show"); }, 3000);
+}
+
+// ============================================================
+// Init — load exchange rate first, then cashflow
+// ============================================================
+(async function() {
+  await loadExchangeRate();
+  loadCashflow();
+})();
+</script>
+</body>
+</html>
+) + amt.toFixed(2) + ' <span style="font-size:.7rem;color:#888">' + (p.currency||'THB') + '</span>' + (rateLoaded && (p.currency||'THB')==='USD' ? '<div style="font-size:.7rem;color:#888">' + toTHB(amt) + ' THB</div>' : '') + '</div>' +
+      '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="แก้ไข" style="color:#ffc107">E</button>' +
+      '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="ลบ">X</button>';
+    container.appendChild(div);
+  });
+}
+
+function showPaymentForm(editData) {
+  document.getElementById("payFormArea").style.display = "";
+  if (editData) {
+    document.getElementById("payFormTitle").textContent = "แก้ไขรายการ";
+    document.getElementById("payEditRow").value = editData.row;
+    document.getElementById("payDate").value = editData.date || "";
+    document.getElementById("payType").value = editData.type || "expense";
+    document.getElementById("payAmount").value = editData.amount || "";
+        document.getElementById("payCurrency").value = editData.currency || "THB";
+    document.getElementById("payCategory").value = editData.category || "other";
+    document.getElementById("paySupplier").value = editData.supplier || "";
+    document.getElementById("payNotes").value = editData.notes || "";
+  } else {
+    document.getElementById("payFormTitle").textContent = "เพิ่มรายการใหม่";
+    document.getElementById("payEditRow").value = "";
+    document.getElementById("payDate").value = new Date().toISOString().substring(0, 10);
+    document.getElementById("payType").value = "expense";
+    document.getElementById("payAmount").value = "";
+        document.getElementById("payCurrency").value = "THB";
+    document.getElementById("payCategory").value = "other";
+    document.getElementById("paySupplier").value = "";
+    document.getElementById("payNotes").value = "";
+  }
+  document.getElementById("payDate").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function hidePaymentForm() {
+  document.getElementById("payFormArea").style.display = "none";
+}
+
+async function savePayment() {
+  var date = document.getElementById("payDate").value;
+  var type = document.getElementById("payType").value;
+  var amount = document.getElementById("payAmount").value;
+  var category = document.getElementById("payCategory").value;
+  var supplier = document.getElementById("paySupplier").value;
+  var notes = document.getElementById("payNotes").value;
+  var editRow = document.getElementById("payEditRow").value;
+
+  if (!date || !amount) { toast("กรุณากรอกวันที่และจำนวนเงิน"); return; }
+
+  var btn = document.getElementById("btnPaySave");
+  btn.disabled = true;
+  btn.textContent = "กำลังบันทึก...";
+
+  var params = "date=" + encodeURIComponent(date) +
+    "&type=" + encodeURIComponent(type) +
+    "&amount=" + encodeURIComponent(amount) +
+    "&category=" + encodeURIComponent(category) +
+    "&supplier=" + encodeURIComponent(supplier) +
+    "&notes=" + encodeURIComponent(notes) + "&currency=" + encodeURIComponent(document.getElementById("payCurrency").value);
 
   var apiName = editRow ? "editPayment" : "recordPayment";
   if (editRow) params += "&row=" + editRow;
