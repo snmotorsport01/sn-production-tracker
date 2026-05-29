@@ -52,7 +52,8 @@ select.select-box{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-
 </style>
 </head>
 <body>
-<a href="index.html" class="nav-back">← กลับหน้าหลัก</a>
+
+<a href="index.html" class="nav-back">&larr; กลับหน้าหลัก</a>
 <h2>วิเคราะห์ต้นทุน AURA</h2>
 <p class="subtitle">T-spec — ราคาขาย ฿25,900 ทุก Variant</p>
 
@@ -97,248 +98,349 @@ select.select-box{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-
 <div class="toast" id="toast"></div>
 
 <script>
-var SELL=25900;
-var COST_PER_G=2.082;
+var SELL = 25900;
+var COST_PER_G = 2.082;
+var SHEET_ID = '1RLo_XIeSFy0Uva_o4-ha_VynLCjw_TucP7sxCWi1msY';
+var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
 
-var FIXED_ITEMS=[
-{name:'PA12-CF joint',cost:85.28},
-{name:'Lens',cost:2180},
-{name:'Carbon Housing',cost:3500},
-{name:'ABS',cost:144.16},
-{name:'Spring',cost:62.56},
-{name:'Round head M6x30',cost:32},
-{name:'Flush countersink M6x12',cost:430},
-{name:'M6x30 Strut',cost:42},
-{name:'M6 Nylon Nut',cost:15},
-{name:'M6 Heat Insert',cost:86.40},
-{name:'Finishing',cost:500},
-{name:'\u0e02\u0e19\u0e2a\u0e48\u0e07\u0e23\u0e30\u0e2b\u0e27\u0e48\u0e32\u0e07\u0e1c\u0e25\u0e34\u0e15',cost:1000},
-{name:'\u0e02\u0e19\u0e2a\u0e48\u0e07\u0e16\u0e36\u0e07\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32',cost:2500},
-{name:'Package',cost:200},
-{name:'CAD/R&D',cost:1295},
-{name:'Marketing',cost:2590},
-{name:'\u0e04\u0e48\u0e32\u0e40\u0e2a\u0e37\u0e48\u0e2d\u0e21\u0e2a\u0e20\u0e32\u0e1e\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07',cost:458}
+var FIXED_ITEMS = [
+  {name:'PA12-CF joint', cost:85.28},
+  {name:'Lens', cost:2180},
+  {name:'Carbon Housing', cost:3500},
+  {name:'ABS', cost:144.16},
+  {name:'Spring', cost:62.56},
+  {name:'Round head M6x30', cost:32},
+  {name:'Flush countersink M6x12', cost:430},
+  {name:'M6x30 Strut', cost:42},
+  {name:'M6 Nylon Nut', cost:15},
+  {name:'M6 Heat Insert', cost:86.40},
+  {name:'Finishing', cost:500},
+  {name:'ขนส่งระหว่างผลิต', cost:1000},
+  {name:'ขนส่งถึงลูกค้า', cost:2500},
+  {name:'Package', cost:200},
+  {name:'CAD/R&D', cost:1295},
+  {name:'Marketing', cost:2590},
+  {name:'ค่าเสื่อมสภาพเครื่อง', cost:458}
 ];
 
-var VARIANTS=[
-{id:'S1',name:'Stream V1',type:'stream',arm:214.93,armCost:447.48,matTotal:11224.89,total:15567.89,profit:39.89},
-{id:'B1',name:'Beam V1',type:'beam',arm:183.27,armCost:381.57,matTotal:11158.97,total:15501.97,profit:40.15},
-{id:'S2',name:'Stream V2',type:'stream',arm:300.23,armCost:625.08,matTotal:11402.48,total:15745.48,profit:39.21},
-{id:'B2',name:'Beam V2',type:'beam',arm:285.27,armCost:593.93,matTotal:11371.34,total:15714.34,profit:39.33},
-{id:'S3',name:'Stream V3',type:'stream',arm:426.83,armCost:888.66,matTotal:11666.06,total:16009.06,profit:38.19},
-{id:'B3',name:'Beam V3',type:'beam',arm:419.86,armCost:874.15,matTotal:11651.55,total:15994.55,profit:38.24}
+var FALLBACK_VARIANTS = [
+  {id:'S1', name:'Aura T-spec', type:'stream', arm:214.93, armCost:447.48, matTotal:11224.89, total:15567.89, profit:39.89},
+  {id:'S2', name:'Aura A80', type:'stream', arm:183.27, armCost:381.57, matTotal:11158.97, total:15501.97, profit:40.15},
+  {id:'S3', name:'Aura FD2R', type:'stream', arm:300.23, armCost:625.08, matTotal:11402.48, total:15745.48, profit:39.21},
+  {id:'S4', name:'Aura FL5', type:'stream', arm:285.27, armCost:593.93, matTotal:11371.34, total:15714.34, profit:39.33},
+  {id:'B1', name:'Aura EG6', type:'beam', arm:426.83, armCost:888.66, matTotal:11666.06, total:16009.06, profit:38.19},
+  {id:'B2', name:'Aura EK9', type:'beam', arm:419.86, armCost:874.15, matTotal:11651.55, total:15994.55, profit:38.24}
 ];
 
-var currentFilter='all';
-var selectedVariant=null;
+var VARIANTS = [];
+var currentFilter = 'all';
+var selectedVariant = null;
+var dataSource = 'loading';
 
-function fmt(n){return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmtShort(n){return n.toLocaleString('th-TH',{maximumFractionDigits:0});}
+/* ===== Dynamic Data Loading ===== */
+function buildVariant(name, type, armWeight, sellPrice) {
+  var armCost = Math.round(armWeight * COST_PER_G * 100) / 100;
+  var fixedSum = FIXED_ITEMS.reduce(function(s,i){return s+i.cost;},0);
+  var total = Math.round((fixedSum + armCost) * 100) / 100;
+  var overhead = 4343; // CAD/R&D 1295 + Marketing 2590 + ค่าเสื่อม 458
+  var matTotal = Math.round((total - overhead) * 100) / 100;
+  var profit = sellPrice > 0 ? Math.round((sellPrice - total) / sellPrice * 10000) / 100 : 0;
+  var sCount = VARIANTS.filter(function(v){return v.type==='stream'}).length;
+  var bCount = VARIANTS.filter(function(v){return v.type==='beam'}).length;
+  var id = type === 'beam' ? 'B'+(bCount+1) : 'S'+(sCount+1);
+  return {id:id, name:name, type:type, arm:armWeight, armCost:armCost, matTotal:matTotal, total:total, profit:profit};
+}
+
+function fetchGviz(tabName) {
+  var url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(tabName);
+  return fetch(url).then(function(r){return r.text();}).then(function(txt){
+    var json = JSON.parse(txt.replace(/^[^{]*/, '').replace(/[^}]*$/, ''));
+    return json.table ? json.table.rows : [];
+  });
+}
+
+function loadDynamic() {
+  fetchGviz('Config').then(function(rows){
+    if(!rows || rows.length < 2) throw new Error('No config data');
+    var products = [];
+    for(var i=0; i<rows.length; i++){
+      var c = rows[i].c;
+      if(!c || !c[0] || !c[0].v) continue;
+      var tabName = c[0].v.toString().trim();
+      if(tabName === 'tab_name') continue; // skip header
+      products.push({
+        tabName: tabName,
+        name: c[1] ? c[1].v.toString().trim() : tabName,
+        type: c[2] ? c[2].v.toString().trim() : 'stream',
+        sellPrice: c[3] ? parseFloat(c[3].v) : SELL,
+        armWeight: c[4] ? parseFloat(c[4].v) : 0
+      });
+    }
+    if(products.length === 0) throw new Error('No products found');
+    VARIANTS = [];
+    products.forEach(function(p){
+      SELL = p.sellPrice || SELL;
+      VARIANTS.push(buildVariant(p.name, p.type, p.armWeight, p.sellPrice));
+    });
+    dataSource = 'gviz';
+    document.querySelector('.subtitle').textContent = 'Dynamic — ราคาขาย ฿'+fmtShort(SELL)+' ทุก Variant (Live)';
+    render();
+  }).catch(function(e){
+    console.warn('Gviz failed, trying API...', e);
+    loadFromAPI();
+  });
+}
+
+function loadFromAPI() {
+  fetch(API_URL+'?api=getProducts').then(function(r){return r.json();}).then(function(data){
+    if(!data.success || !data.products || data.products.length===0) throw new Error('API failed');
+    VARIANTS = [];
+    data.products.forEach(function(p){
+      var armW = p.arm || 0;
+      var sp = p.sellPrice || SELL;
+      SELL = sp;
+      VARIANTS.push(buildVariant(p.name, p.type, armW, sp));
+    });
+    dataSource = 'api';
+    document.querySelector('.subtitle').textContent = 'API — ราคาขาย ฿'+fmtShort(SELL)+' ทุก Variant';
+    render();
+  }).catch(function(e){
+    console.warn('API failed, using fallback', e);
+    useFallback();
+  });
+}
+
+function useFallback() {
+  VARIANTS = FALLBACK_VARIANTS.slice();
+  dataSource = 'fallback';
+  document.querySelector('.subtitle').textContent = 'Offline — ราคาขาย ฿'+fmtShort(SELL)+' ทุก Variant';
+  render();
+}
+
+function fmt(n){ return n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtShort(n){ return n.toLocaleString('th-TH',{maximumFractionDigits:0}); }
 
 function filtered(){
-if(currentFilter==='all')return VARIANTS;
-return VARIANTS.filter(function(v){return v.type===currentFilter;});
+  if(currentFilter==='all') return VARIANTS;
+  return VARIANTS.filter(function(v){return v.type===currentFilter;});
 }
 
 function setFilter(f){
-currentFilter=f;
-document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
-document.getElementById('tab'+f.charAt(0).toUpperCase()+f.slice(1)).classList.add('active');
-selectedVariant=null;
-document.getElementById('detailSection').style.display='none';
-render();
+  currentFilter = f;
+  document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab'+f.charAt(0).toUpperCase()+f.slice(1)).classList.add('active');
+  selectedVariant = null;
+  document.getElementById('detailSection').style.display='none';
+  render();
 }
 
 function render(){
-updateSummary();
-drawBarChart();
-populatePieSelect();
-drawPie();
-renderVariants();
+  updateSummary();
+  drawBarChart();
+  populatePieSelect();
+  drawPie();
+  renderVariants();
 }
 
 function updateSummary(){
-var list=filtered();
-var avg=list.reduce(function(s,v){return s+v.total;},0)/list.length;
-var avgP=list.reduce(function(s,v){return s+v.profit;},0)/list.length;
-var mn=Math.min.apply(null,list.map(function(v){return v.total;}));
-var mx=Math.max.apply(null,list.map(function(v){return v.total;}));
-document.getElementById('sumCost').textContent='\u0e3f'+fmtShort(avg);
-document.getElementById('sumProfit').textContent=avgP.toFixed(2)+'%';
-document.getElementById('sumMin').textContent='\u0e3f'+fmtShort(mn);
-document.getElementById('sumMax').textContent='\u0e3f'+fmtShort(mx);
+  var list = filtered();
+  var avg = list.reduce(function(s,v){return s+v.total;},0)/list.length;
+  var avgP = list.reduce(function(s,v){return s+v.profit;},0)/list.length;
+  var mn = Math.min.apply(null,list.map(function(v){return v.total;}));
+  var mx = Math.max.apply(null,list.map(function(v){return v.total;}));
+  document.getElementById('sumCost').textContent = '฿'+fmtShort(avg);
+  document.getElementById('sumProfit').textContent = avgP.toFixed(2)+'%';
+  document.getElementById('sumMin').textContent = '฿'+fmtShort(mn);
+  document.getElementById('sumMax').textContent = '฿'+fmtShort(mx);
 }
 
 function drawBarChart(){
-var c=document.getElementById('chartBar');
-var dpr=window.devicePixelRatio||1;
-var w=c.parentElement.clientWidth;
-var h=200;
-c.width=w*dpr;c.height=h*dpr;
-c.style.width=w+'px';c.style.height=h+'px';
-var ctx=c.getContext('2d');
-ctx.scale(dpr,dpr);
-ctx.clearRect(0,0,w,h);
-var list=filtered();
-var n=list.length;
-if(!n)return;
-var pad=40,right=16,top=20,bot=40;
-var cw=(w-pad-right)/n;
-var barW=Math.min(cw*0.6,36);
-var minP=36,maxP=42;
-ctx.strokeStyle='#222';ctx.lineWidth=1;
-ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='right';
-for(var i=0;i<=3;i++){
-var val=minP+i*2;
-var y=top+(1-(val-minP)/(maxP-minP))*(h-top-bot);
-ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-right,y);ctx.stroke();
-ctx.fillText(val+'%',pad-4,y+4);
-}
-list.forEach(function(v,i){
-var x=pad+i*cw+cw/2-barW/2;
-var ratio=(v.profit-minP)/(maxP-minP);
-var barH=ratio*(h-top-bot);
-var y=h-bot-barH;
-var color=v.type==='stream'?'#e53935':'#4caf50';
-ctx.fillStyle=color;
-roundRect(ctx,x,y,barW,barH,4);
-ctx.fill();
-ctx.fillStyle='#e0e0e0';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
-ctx.fillText(v.profit.toFixed(1)+'%',x+barW/2,y-6);
-ctx.fillStyle='#888';ctx.font='10px sans-serif';
-ctx.fillText(v.id,x+barW/2,h-bot+14);
-ctx.fillText(v.arm.toFixed(0)+'g',x+barW/2,h-bot+26);
-});
+  var c = document.getElementById('chartBar');
+  var dpr = window.devicePixelRatio||1;
+  var w = c.parentElement.clientWidth;
+  var h = 200;
+  c.width = w*dpr; c.height = h*dpr;
+  c.style.width = w+'px'; c.style.height = h+'px';
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+
+  var list = filtered();
+  var n = list.length;
+  if(!n) return;
+  var pad = 40, right=16, top=20, bot=40;
+  var cw = (w-pad-right)/n;
+  var barW = Math.min(cw*0.6, 36);
+  var minP = 36, maxP = 42;
+
+  ctx.strokeStyle='#222'; ctx.lineWidth=1;
+  ctx.fillStyle='#666'; ctx.font='11px sans-serif'; ctx.textAlign='right';
+  for(var i=0;i<=3;i++){
+    var val = minP + i*2;
+    var y = top + (1-(val-minP)/(maxP-minP))*(h-top-bot);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-right,y); ctx.stroke();
+    ctx.fillText(val+'%', pad-4, y+4);
+  }
+
+  list.forEach(function(v,i){
+    var x = pad + i*cw + cw/2 - barW/2;
+    var ratio = (v.profit-minP)/(maxP-minP);
+    var barH = ratio*(h-top-bot);
+    var y = h-bot-barH;
+    var color = v.type==='stream'?'#e53935':'#4caf50';
+
+    ctx.fillStyle = color;
+    roundRect(ctx, x, y, barW, barH, 4);
+    ctx.fill();
+
+    ctx.fillStyle='#e0e0e0'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(v.profit.toFixed(1)+'%', x+barW/2, y-6);
+
+    ctx.fillStyle='#888'; ctx.font='10px sans-serif';
+    ctx.fillText(v.id, x+barW/2, h-bot+14);
+    ctx.fillText(v.arm.toFixed(0)+'g', x+barW/2, h-bot+26);
+  });
 }
 
 function roundRect(ctx,x,y,w,h,r){
-ctx.beginPath();
-ctx.moveTo(x+r,y);
-ctx.lineTo(x+w-r,y);
-ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-ctx.lineTo(x+w,y+h);
-ctx.lineTo(x,y+h);
-ctx.lineTo(x,y+r);
-ctx.quadraticCurveTo(x,y,x+r,y);
-ctx.closePath();
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h);
+  ctx.lineTo(x,y+h);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
 }
 
 function populatePieSelect(){
-var sel=document.getElementById('pieSelect');
-var list=filtered();
-sel.innerHTML='';
-list.forEach(function(v){
-var o=document.createElement('option');
-o.value=v.id;
-o.textContent=v.name+' (ARM '+v.arm+'g)';
-sel.appendChild(o);
-});
+  var sel = document.getElementById('pieSelect');
+  var list = filtered();
+  sel.innerHTML = '';
+  list.forEach(function(v){
+    var o = document.createElement('option');
+    o.value = v.id;
+    o.textContent = v.name + ' (ARM '+v.arm+'g)';
+    sel.appendChild(o);
+  });
 }
 
 function drawPie(){
-var sel=document.getElementById('pieSelect');
-var vid=sel.value;
-var v=VARIANTS.find(function(x){return x.id===vid;});
-if(!v)return;
-var groups=[
-{name:'PA12-CF ARM',val:v.armCost,color:'#e53935'},
-{name:'PA12-CF joint',val:85.28,color:'#f44336'},
-{name:'Lens',val:2180,color:'#2196f3'},
-{name:'Carbon Housing',val:3500,color:'#1976d2'},
-{name:'\u0e2d\u0e30\u0e44\u0e2b\u0e25\u0e48/\u0e19\u0e47\u0e2d\u0e15',val:144.16+62.56+32+430+42+15+86.40,color:'#ff9800'},
-{name:'Finishing',val:500,color:'#9c27b0'},
-{name:'\u0e02\u0e19\u0e2a\u0e48\u0e07',val:1000+2500,color:'#00bcd4'},
-{name:'Package',val:200,color:'#607d8b'},
-{name:'CAD/R&D',val:1295,color:'#8bc34a'},
-{name:'Marketing',val:2590,color:'#ffeb3b'},
-{name:'\u0e04\u0e48\u0e32\u0e40\u0e2a\u0e37\u0e48\u0e2d\u0e21',val:458,color:'#795548'}
-];
-var total=groups.reduce(function(s,g){return s+g.val;},0);
-var c=document.getElementById('chartPie');
-var dpr=window.devicePixelRatio||1;
-var w=c.parentElement.clientWidth;
-var h=260;
-c.width=w*dpr;c.height=h*dpr;
-c.style.width=w+'px';c.style.height=h+'px';
-var ctx=c.getContext('2d');
-ctx.scale(dpr,dpr);
-ctx.clearRect(0,0,w,h);
-var cx=w/2,cy=120,R=90,r=50;
-var angle=-Math.PI/2;
-groups.forEach(function(g){
-var slice=(g.val/total)*Math.PI*2;
-ctx.beginPath();
-ctx.arc(cx,cy,R,angle,angle+slice);
-ctx.arc(cx,cy,r,angle+slice,angle,true);
-ctx.closePath();
-ctx.fillStyle=g.color;
-ctx.fill();
-angle+=slice;
-});
-ctx.fillStyle='#e0e0e0';ctx.font='bold 14px sans-serif';ctx.textAlign='center';
-ctx.fillText('\u0e3f'+fmtShort(total),cx,cy-2);
-ctx.fillStyle='#888';ctx.font='11px sans-serif';
-ctx.fillText('\u0e15\u0e49\u0e19\u0e17\u0e38\u0e19\u0e23\u0e27\u0e21',cx,cy+14);
-var leg=document.getElementById('pieLegend');
-leg.innerHTML='';
-groups.forEach(function(g){
-var pct=((g.val/total)*100).toFixed(1);
-leg.innerHTML+='<div class="legend-item"><span class="legend-dot" style="background:'+g.color+'"></span>'+g.name+' \u0e3f'+fmtShort(g.val)+' ('+pct+'%)</div>';
-});
-leg.style.cssText='display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px';
+  var sel = document.getElementById('pieSelect');
+  var vid = sel.value;
+  var v = VARIANTS.find(function(x){return x.id===vid;});
+  if(!v) return;
+
+  var groups = [
+    {name:'PA12-CF ARM', val:v.armCost, color:'#e53935'},
+    {name:'PA12-CF joint', val:85.28, color:'#f44336'},
+    {name:'Lens', val:2180, color:'#2196f3'},
+    {name:'Carbon Housing', val:3500, color:'#1976d2'},
+    {name:'อะไหล่/น็อต', val:144.16+62.56+32+430+42+15+86.40, color:'#ff9800'},
+    {name:'Finishing', val:500, color:'#9c27b0'},
+    {name:'ขนส่ง', val:1000+2500, color:'#00bcd4'},
+    {name:'Package', val:200, color:'#607d8b'},
+    {name:'CAD/R&D', val:1295, color:'#8bc34a'},
+    {name:'Marketing', val:2590, color:'#ffeb3b'},
+    {name:'ค่าเสื่อม', val:458, color:'#795548'}
+  ];
+  var total = groups.reduce(function(s,g){return s+g.val;},0);
+
+  var c = document.getElementById('chartPie');
+  var dpr = window.devicePixelRatio||1;
+  var w = c.parentElement.clientWidth;
+  var h = 260;
+  c.width = w*dpr; c.height = h*dpr;
+  c.style.width = w+'px'; c.style.height = h+'px';
+  var ctx = c.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+
+  var cx = w/2, cy = 120, R = 90, r = 50;
+  var angle = -Math.PI/2;
+
+  groups.forEach(function(g){
+    var slice = (g.val/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,angle,angle+slice);
+    ctx.arc(cx,cy,r,angle+slice,angle,true);
+    ctx.closePath();
+    ctx.fillStyle = g.color;
+    ctx.fill();
+    angle += slice;
+  });
+
+  ctx.fillStyle='#e0e0e0'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('฿'+fmtShort(total), cx, cy-2);
+  ctx.fillStyle='#888'; ctx.font='11px sans-serif';
+  ctx.fillText('ต้นทุนรวม', cx, cy+14);
+
+  var leg = document.getElementById('pieLegend');
+  leg.innerHTML = '';
+  groups.forEach(function(g){
+    var pct = ((g.val/total)*100).toFixed(1);
+    leg.innerHTML += '<div class="legend-item"><span class="legend-dot" style="background:'+g.color+'"></span>'+g.name+' ฿'+fmtShort(g.val)+' ('+pct+'%)</div>';
+  });
+  leg.style.cssText='display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px';
 }
 
 function renderVariants(){
-var list=filtered();
-var html='';
-list.forEach(function(v){
-var color=v.type==='stream'?'#e53935':'#4caf50';
-var badge=v.type==='stream'?'badge-stream':'badge-beam';
-var label=v.type==='stream'?'Stream':'Beam';
-var profitAmt=SELL-v.total;
-var sel=selectedVariant===v.id?' selected':'';
-html+='<div class="variant-card'+sel+'" onclick="selectVariant(\''+v.id+'\')"><div class="v-header"><span class="v-name">'+v.name+'</span><span class="badge '+badge+'">'+label+'</span></div>';
-html+='<div class="v-row"><span>ARM: '+v.arm+'g</span><span>\u0e15\u0e49\u0e19\u0e17\u0e38\u0e19: <span class="val">\u0e3f'+fmt(v.total)+'</span></span></div>';
-html+='<div class="v-row"><span>\u0e01\u0e33\u0e44\u0e23: <span class="val green">\u0e3f'+fmt(profitAmt)+'</span></span><span>Margin: <span class="val green">'+v.profit+'%</span></span></div>';
-html+='<div class="progress-bar"><div class="progress-fill" style="width:'+v.profit+'%;background:'+color+'"></div></div></div>';
-});
-document.getElementById('variantList').innerHTML=html;
+  var list = filtered();
+  var html = '';
+  list.forEach(function(v){
+    var color = v.type==='stream'?'#e53935':'#4caf50';
+    var badge = v.type==='stream'?'badge-stream':'badge-beam';
+    var label = v.type==='stream'?'Stream':'Beam';
+    var profitAmt = SELL - v.total;
+    var sel = selectedVariant===v.id?' selected':'';
+    html += '<div class="variant-card'+sel+'" onclick="selectVariant(\''+v.id+'\')">';
+    html += '<div class="v-header"><span class="v-name">'+v.name+'</span><span class="badge '+badge+'">'+label+'</span></div>';
+    html += '<div class="v-row"><span>ARM: '+v.arm+'g</span><span>ต้นทุน: <span class="val">฿'+fmt(v.total)+'</span></span></div>';
+    html += '<div class="v-row"><span>กำไร: <span class="val green">฿'+fmt(profitAmt)+'</span></span><span>Margin: <span class="val green">'+v.profit+'%</span></span></div>';
+    html += '<div class="progress-bar"><div class="progress-fill" style="width:'+v.profit+'%;background:'+color+'"></div></div>';
+    html += '</div>';
+  });
+  document.getElementById('variantList').innerHTML = html;
 }
 
 function selectVariant(id){
-if(selectedVariant===id){
-selectedVariant=null;
-document.getElementById('detailSection').style.display='none';
-renderVariants();
-return;
-}
-selectedVariant=id;
-renderVariants();
-var v=VARIANTS.find(function(x){return x.id===id;});
-if(!v)return;
-var html='<div class="section-title" style="margin-top:0">\u0e23\u0e32\u0e22\u0e25\u0e30\u0e40\u0e2d\u0e35\u0e22\u0e14\u0e15\u0e49\u0e19\u0e17\u0e38\u0e19 — '+v.name+'</div>';
-html+='<table class="cost-table">';
-html+='<tr><th>#</th><th>\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23</th><th class="num-col">\u0e15\u0e49\u0e19\u0e17\u0e38\u0e19 (\u0e3f)</th></tr>';
-html+='<tr><td>1</td><td>PA12-CF ARM ('+v.arm+'g)</td><td class="num-col">'+fmt(v.armCost)+'</td></tr>';
-FIXED_ITEMS.forEach(function(item,i){
-html+='<tr><td>'+(i+2)+'</td><td>'+item.name+'</td><td class="num-col">'+fmt(item.cost)+'</td></tr>';
-});
-html+='<tr class="total-row"><td></td><td>\u0e15\u0e49\u0e19\u0e17\u0e38\u0e19\u0e27\u0e31\u0e2a\u0e14\u0e38\u0e23\u0e27\u0e21</td><td class="num-col">'+fmt(v.matTotal)+'</td></tr>';
-html+='<tr class="total-row"><td></td><td>\u0e15\u0e49\u0e19\u0e17\u0e38\u0e19\u0e23\u0e27\u0e21\u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14</td><td class="num-col" style="color:#e53935">'+fmt(v.total)+'</td></tr>';
-html+='<tr class="total-row"><td></td><td>\u0e01\u0e33\u0e44\u0e23\u0e2a\u0e38\u0e17\u0e18\u0e34</td><td class="num-col green">'+fmt(SELL-v.total)+' ('+v.profit+'%)</td></tr>';
-html+='</table>';
-document.getElementById('detailCard').innerHTML=html;
-document.getElementById('detailSection').style.display='block';
-document.getElementById('detailSection').scrollIntoView({behavior:'smooth',block:'start'});
+  if(selectedVariant===id){
+    selectedVariant=null;
+    document.getElementById('detailSection').style.display='none';
+    renderVariants();
+    return;
+  }
+  selectedVariant = id;
+  renderVariants();
+  var v = VARIANTS.find(function(x){return x.id===id;});
+  if(!v) return;
+
+  var html = '<div class="section-title" style="margin-top:0">รายละเอียดต้นทุน — '+v.name+'</div>';
+  html += '<table class="cost-table">';
+  html += '<tr><th>#</th><th>รายกาย</th><th class="num-col">ต้นทุน (฿)</th></tr>';
+  html += '<tr><td>1</td><td>PA12-CF ARM ('+v.arm+'g)</td><td class="num-col">'+fmt(v.armCost)+'</td></tr>';
+  FIXED_ITEMS.forEach(function(item,i){
+    html += '<tr><td>'+(i+2)+'</td><td>'+item.name+'</td><td class="num-col">'+fmt(item.cost)+'</td></tr>';
+  });
+  html += '<tr class="total-row"><td></td><td>ต้นทุนวัสดุรวม</td><td class="num-col">'+fmt(v.matTotal)+'</td></tr>';
+  html += '<tr class="total-row"><td></td><td>ต้นทุนรวมทั้งหมด</td><td class="num-col" style="color:#e53935">'+fmt(v.total)+'</td></tr>';
+  html += '<tr class="total-row"><td></td><td>กำไรสุทธิ</td><td class="num-col green">'+fmt(SELL-v.total)+' ('+v.profit+'%)</td></tr>';
+  html += '</table>';
+
+  document.getElementById('detailCard').innerHTML = html;
+  document.getElementById('detailSection').style.display='block';
+  document.getElementById('detailSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+/* Auth guard */
 (function(){
-var t=localStorage.getItem('sn_token')||sessionStorage.getItem('sn_token');
-if(!t){window.location.href='login.html';return;}
+  var t = localStorage.getItem('sn_token') || sessionStorage.getItem('sn_token');
+  if(!t){ window.location.href='login.html'; return; }
 })();
 
-render();
-window.addEventListener('resize',function(){drawBarChart();drawPie();});
+loadDynamic();
+window.addEventListener('resize', function(){ if(VARIANTS.length) { drawBarChart(); drawPie(); } });
 </script>
 </body>
 </html>
