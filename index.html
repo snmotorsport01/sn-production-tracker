@@ -210,7 +210,7 @@ window.location.href='login.html';
 
     <div class="section">
       <a href="cost.html" class="section-head">
-        <div class="section-icon cost" style="background:#9c27b0"></div>
+        <div class="section-icon" style="background:rgba(156,39,176,.12)"></div>
         <div class="section-info">
           <div class="section-title">Cost Analysis</div>
           <div class="section-desc">วิเคราะห์ต้นทุน AURA</div>
@@ -219,20 +219,20 @@ window.location.href='login.html';
       </a>
       <!-- Flow -->
       <div class="flow-row">
-        <span class="flow-step">Stream vs Beam</span><span class="flow-arrow">→</span>
+        <span class="flow-step">Stream vs Beam</span><span class="flow-sep">→</span>
         <span class="flow-step">เปรียบเทียบ Variant</span>
       </div>
       <!-- Stats -->
-      <div class="section-stats">
-        <div class="stat"><div class="stat-num" style="color:#4caf50">~39%</div><div class="stat-label">กำไรเฉลี่ย</div></div>
-        <div class="stat"><div class="stat-num">6</div><div class="stat-label">Variants</div></div>
-        <div class="stat"><div class="stat-num" style="color:#e53935">฿25,900</div><div class="stat-label">ราคาขาย</div></div>
+      <div class="section-stats" id="cost-stats">
+        <div class="stat-item"><div class="stat-val green" id="cs-margin">~39%</div><div class="stat-lbl">กำไรเฉลี่ย</div></div>
+        <div class="stat-item"><div class="stat-val" id="cs-variants">6</div><div class="stat-lbl">Variants</div></div>
+        <div class="stat-item"><div class="stat-val red" id="cs-price">฿25,900</div><div class="stat-lbl">ราคาขาย</div></div>
       </div>
       <!-- Sub-links -->
       <div class="sub-links">
-        <a href="cost.html">Dashboard›</a>
-        <a href="cost.html#stream">Stream›</a>
-        <a href="cost.html#beam">Beam›</a>
+        <a href="cost.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
+        <a href="cost.html#stream" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Stream</span><span class="sl-arrow">›</span></a>
+        <a href="cost.html#beam" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Beam</span><span class="sl-arrow">›</span></a>
       </div>
     </div>
 
