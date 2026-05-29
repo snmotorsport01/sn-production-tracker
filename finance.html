@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SN ERP â Finance</title>
+<title>SN ERP Ã¢ÂÂ Finance</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0a">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -72,8 +72,8 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 </head>
 <body>
 
-<a href="index.html" class="nav-back">&larr; à¸à¸¥à¸±à¸à¸«à¸à¹à¸²à¸«à¸¥à¸±à¸</a>
-<h1>Finance â à¸£à¸²à¸¢à¸£à¸±à¸à¸£à¸²à¸¢à¸à¹à¸²à¸¢</h1>
+<a href="index.html" class="nav-back">&larr; Ã Â¸ÂÃ Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¸Â«Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â«Ã Â¸Â¥Ã Â¸Â±Ã Â¸Â</a>
+<h1>Finance Ã¢ÂÂ Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸ÂÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢</h1>
 <p class="subtitle">Import Invoice PDF &bull; Cashflow Summary</p>
 <div id="rateBar" style="background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:.8rem">
   <span style="color:#888">USD/THB: <strong id="rateValue" style="color:#ffc107">loading...</strong></span>
@@ -83,34 +83,34 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 <!-- Tabs -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('cashflow')">Cashflow</div>
-  <div class="tab" onclick="switchTab('payments')">à¸£à¸²à¸¢à¸£à¸±à¸-à¸£à¸²à¸¢à¸à¹à¸²à¸¢</div>
-  <div class="tab" onclick="switchTab('invoices')">à¸£à¸²à¸¢à¸à¸²à¸£ Invoice</div>
+  <div class="tab" onclick="switchTab('payments')">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â-Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢</div>
+  <div class="tab" onclick="switchTab('invoices')">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ Invoice</div>
   <div class="tab" onclick="switchTab('import')">Import Invoice</div>
 </div>
 
 <!-- ===================== TAB: Cashflow ===================== -->
 <div id="tab-cashflow">
   <div style="display:flex;gap:6px;margin-bottom:12px">
-    <button class="tab" id="cfModeWeek" onclick="setCfMode('week')" style="padding:6px 12px;font-size:.8rem">à¸£à¸²à¸¢à¸­à¸²à¸à¸´à¸à¸¢à¹</button>
-    <button class="tab active" id="cfModeMonth" onclick="setCfMode('month')" style="padding:6px 12px;font-size:.8rem">à¸£à¸²à¸¢à¹à¸à¸·à¸­à¸</button>
-    <button class="tab" id="cfModeYear" onclick="setCfMode('year')" style="padding:6px 12px;font-size:.8rem">à¸£à¸²à¸¢à¸à¸µ</button>
+    <button class="tab" id="cfModeWeek" onclick="setCfMode('week')" style="padding:6px 12px;font-size:.8rem">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â­Ã Â¸Â²Ã Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¸Â¢Ã Â¹Â</button>
+    <button class="tab active" id="cfModeMonth" onclick="setCfMode('month')" style="padding:6px 12px;font-size:.8rem">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¹ÂÃ Â¸ÂÃ Â¸Â·Ã Â¸Â­Ã Â¸Â</button>
+    <button class="tab" id="cfModeYear" onclick="setCfMode('year')" style="padding:6px 12px;font-size:.8rem">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Âµ</button>
   </div>
   <div class="filter-row">
     <select id="cfYear" onchange="loadCashflow()">
-      <option value="">à¸à¸¸à¸à¸à¸µ</option>
+      <option value="">Ã Â¸ÂÃ Â¸Â¸Ã Â¸ÂÃ Â¸ÂÃ Â¸Âµ</option>
     </select>
   </div>
 
   <div class="summary-row" id="cfSummary">
-    <div class="summary-box"><div class="num green" id="cfIncome">à¸¿0</div><div class="lbl">à¸£à¸²à¸¢à¸£à¸±à¸à¸£à¸§à¸¡</div></div>
-    <div class="summary-box"><div class="num red" id="cfExpense">à¸¿0</div><div class="lbl">à¸£à¸²à¸¢à¸à¹à¸²à¸¢à¸£à¸§à¸¡</div></div>
-    <div class="summary-box"><div class="num" id="cfProfit">à¸¿0</div><div class="lbl">à¸à¸³à¹à¸£/à¸à¸²à¸à¸à¸¸à¸</div></div>
-    <div class="summary-box"><div class="num yellow" id="cfUnpaid">à¸¿0</div><div class="lbl">à¸à¹à¸²à¸à¸à¸³à¸£à¸°</div></div>
+    <div class="summary-box"><div class="num green" id="cfIncome">Ã Â¸Â¿0</div><div class="lbl">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸ÂÃ Â¸Â£Ã Â¸Â§Ã Â¸Â¡</div></div>
+    <div class="summary-box"><div class="num red" id="cfExpense">Ã Â¸Â¿0</div><div class="lbl">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â§Ã Â¸Â¡</div></div>
+    <div class="summary-box"><div class="num" id="cfProfit">Ã Â¸Â¿0</div><div class="lbl">Ã Â¸ÂÃ Â¸Â³Ã Â¹ÂÃ Â¸Â£/Ã Â¸ÂÃ Â¸Â²Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¸Ã Â¸Â</div></div>
+    <div class="summary-box"><div class="num yellow" id="cfUnpaid">Ã Â¸Â¿0</div><div class="lbl">Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂÃ Â¸ÂÃ Â¸Â³Ã Â¸Â£Ã Â¸Â°</div></div>
   </div>
 
-  <h2 style="font-size:1rem;margin-bottom:12px;color:#fff">à¸£à¸²à¸¢à¹à¸à¸·à¸­à¸</h2>
+  <h2 style="font-size:1rem;margin-bottom:12px;color:#fff">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¹ÂÃ Â¸ÂÃ Â¸Â·Ã Â¸Â­Ã Â¸Â</h2>
   <div class="cashflow-grid" id="cfGrid">
-    <div class="loading">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</div>
+    <div class="loading">Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â...</div>
   </div>
 </div>
 
@@ -119,67 +119,67 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
     <div class="filter-row" style="margin-bottom:0">
       <select id="payTypeFilter" onchange="loadPayments()">
-        <option value="">à¸à¸±à¹à¸à¸«à¸¡à¸</option>
-        <option value="income">à¸£à¸²à¸¢à¸£à¸±à¸</option>
-        <option value="expense">à¸£à¸²à¸¢à¸à¹à¸²à¸¢</option>
+        <option value="">Ã Â¸ÂÃ Â¸Â±Ã Â¹ÂÃ Â¸ÂÃ Â¸Â«Ã Â¸Â¡Ã Â¸Â</option>
+        <option value="income">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â</option>
+        <option value="expense">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢</option>
       </select>
       <input type="month" id="payMonthFilter" onchange="loadPayments()">
     </div>
-    <button class="btn btn-primary" onclick="showPaymentForm()" style="padding:8px 14px;font-size:.82rem">+ à¹à¸à¸´à¹à¸¡à¸£à¸²à¸¢à¸à¸²à¸£</button>
+    <button class="btn btn-primary" onclick="showPaymentForm()" style="padding:8px 14px;font-size:.82rem">+ Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£</button>
   </div>
 
   <!-- Add/Edit Form -->
   <div id="payFormArea" style="display:none" class="card">
-    <h2 id="payFormTitle">à¹à¸à¸´à¹à¸¡à¸£à¸²à¸¢à¸à¸²à¸£à¹à¸«à¸¡à¹</h2>
+    <h2 id="payFormTitle">Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¹ÂÃ Â¸Â«Ã Â¸Â¡Ã Â¹Â</h2>
     <input type="hidden" id="payEditRow" value="">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div>
-        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸§à¸±à¸à¸à¸µà¹</label>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">Ã Â¸Â§Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸ÂµÃ Â¹Â</label>
         <input type="date" id="payDate" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
       </div>
       <div>
-        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸à¸£à¸°à¹à¸ à¸</label>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">Ã Â¸ÂÃ Â¸Â£Ã Â¸Â°Ã Â¹ÂÃ Â¸Â Ã Â¸Â</label>
         <select id="payType" class="select-box">
-          <option value="income">à¸£à¸²à¸¢à¸£à¸±à¸</option>
-          <option value="expense">à¸£à¸²à¸¢à¸à¹à¸²à¸¢</option>
+          <option value="income">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â</option>
+          <option value="expense">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢</option>
         </select>
       </div>
     </div>
     <div style="margin-bottom:10px">
       <div>
-            <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸à¸³à¸à¸§à¸à¹à¸à¸´à¸</label>
+            <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">Ã Â¸ÂÃ Â¸Â³Ã Â¸ÂÃ Â¸Â§Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸Â</label>
             <div style="display:flex;gap:6px"><input type="number" step="0.01" id="payAmount" placeholder="0.00" style="flex:1;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem"><select id="payCurrency" class="select-box" style="width:80px;min-width:80px"><option value="THB">THB</option><option value="USD">USD</option></select></div>
           </div>
     </div>
     <div style="margin-bottom:10px">
-        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸«à¸¡à¸§à¸à¸«à¸¡à¸¹à¹</label>
+        <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â§Ã Â¸ÂÃ Â¸Â«Ã Â¸Â¡Ã Â¸Â¹Ã Â¹Â</label>
         <select id="payCategory" class="select-box" onchange="onCategoryChange()">
-          <option value="product_sale">à¸à¸²à¸¢à¸ªà¸´à¸à¸à¹à¸²</option>
-          <option value="service">à¸à¸£à¸´à¸à¸²à¸£</option>
-          <option value="material">à¸§à¸±à¸à¸à¸¸à¸à¸´à¸</option>
-          <option value="shipping">à¸à¹à¸²à¸ªà¹à¸</option>
-          <option value="salary">à¹à¸à¸´à¸à¹à¸à¸·à¸­à¸</option>
-          <option value="marketing">à¸à¸²à¸£à¸à¸¥à¸²à¸</option>
-          <option value="utility">à¸à¹à¸²à¸ªà¸²à¸à¸²à¸£à¸à¸¹à¸à¹à¸ à¸</option>
-          <option value="other">à¸­à¸·à¹à¸à¹</option>
+          <option value="product_sale">Ã Â¸ÂÃ Â¸Â²Ã Â¸Â¢Ã Â¸ÂªÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²</option>
+          <option value="service">Ã Â¸ÂÃ Â¸Â£Ã Â¸Â´Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£</option>
+          <option value="material">Ã Â¸Â§Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¸Ã Â¸ÂÃ Â¸Â´Ã Â¸Â</option>
+          <option value="shipping">Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂªÃ Â¹ÂÃ Â¸Â</option>
+          <option value="salary">Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â·Ã Â¸Â­Ã Â¸Â</option>
+          <option value="marketing">Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂÃ Â¸Â¥Ã Â¸Â²Ã Â¸Â</option>
+          <option value="utility">Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂªÃ Â¸Â²Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂÃ Â¸Â¹Ã Â¸ÂÃ Â¹ÂÃ Â¸Â Ã Â¸Â</option>
+          <option value="other">Ã Â¸Â­Ã Â¸Â·Ã Â¹ÂÃ Â¸ÂÃ Â¹Â</option>
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸à¸¹à¹à¸à¹à¸²à¸¢/à¸à¸¹à¹à¸£à¸±à¸</label>
-      <input type="text" id="paySupplier" placeholder="à¸à¸·à¹à¸­à¸¥à¸¹à¸à¸à¹à¸² / Supplier" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
+      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">Ã Â¸ÂÃ Â¸Â¹Ã Â¹ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢/Ã Â¸ÂÃ Â¸Â¹Ã Â¹ÂÃ Â¸Â£Ã Â¸Â±Ã Â¸Â</label>
+      <input type="text" id="paySupplier" placeholder="Ã Â¸ÂÃ Â¸Â·Ã Â¹ÂÃ Â¸Â­Ã Â¸Â¥Ã Â¸Â¹Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â² / Supplier" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸«à¸¡à¸²à¸¢à¹à¸«à¸à¸¸</label>
-      <input type="text" id="payNotes" placeholder="à¸£à¸²à¸¢à¸¥à¸°à¹à¸­à¸µà¸¢à¸à¹à¸à¸´à¹à¸¡à¹à¸à¸´à¸¡" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
+      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â¢Ã Â¹ÂÃ Â¸Â«Ã Â¸ÂÃ Â¸Â¸</label>
+      <input type="text" id="payNotes" placeholder="Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â¥Ã Â¸Â°Ã Â¹ÂÃ Â¸Â­Ã Â¸ÂµÃ Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸Â¡" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" id="btnPaySave" onclick="savePayment()">à¸à¸±à¸à¸à¸¶à¸</button>
-      <button class="btn btn-secondary" onclick="hidePaymentForm()">à¸¢à¸à¹à¸¥à¸´à¸</button>
+      <button class="btn btn-primary" id="btnPaySave" onclick="savePayment()">Ã Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â</button>
+      <button class="btn btn-secondary" onclick="hidePaymentForm()">Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¥Ã Â¸Â´Ã Â¸Â</button>
     </div>
   </div>
 
   <!-- Payment List -->
   <div id="payList">
-    <div class="loading">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</div>
+    <div class="loading">Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â...</div>
   </div>
 </div>
 
@@ -187,21 +187,21 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 <div id="tab-invoices" style="display:none">
   <div class="filter-row">
     <select id="invTypeFilter" onchange="loadInvoices()">
-      <option value="">à¸à¸±à¹à¸à¸«à¸¡à¸</option>
-      <option value="income">à¸£à¸²à¸¢à¸£à¸±à¸</option>
-      <option value="expense">à¸£à¸²à¸¢à¸à¹à¸²à¸¢</option>
+      <option value="">Ã Â¸ÂÃ Â¸Â±Ã Â¹ÂÃ Â¸ÂÃ Â¸Â«Ã Â¸Â¡Ã Â¸Â</option>
+      <option value="income">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â</option>
+      <option value="expense">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢</option>
     </select>
     <input type="month" id="invMonthFilter" onchange="loadInvoices()">
   </div>
-<!-- Product Model Dropdown — shown when category = ขายสินค้า -->
+<!-- Product Model Dropdown â shown when category = à¸à¸²à¸¢à¸ªà¸´à¸à¸à¹à¸² -->
 <div id="payProductModelArea" style="margin-bottom:10px">
-<label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">รุ่นสินค้า</label>
+<label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">à¸£à¸¸à¹à¸à¸ªà¸´à¸à¸à¹à¸²</label>
 <select id="payProductModel" class="select-box">
-<option value="">กำลังโหลด...</option>
+<option value="">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</option>
 </select>
 </div>
   <div id="invList">
-    <div class="loading">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</div>
+    <div class="loading">Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â...</div>
   </div>
 </div>
 
@@ -209,11 +209,11 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 <div id="tab-import" style="display:none">
   <div class="card">
     <h2>Import Invoice PDF</h2>
-    <p style="color:#888;font-size:.82rem;margin-bottom:16px">à¸­à¸±à¸à¹à¸«à¸¥à¸à¹à¸à¸¥à¹ PDF à¸à¸²à¸ Invoice Fly â à¸£à¸°à¸à¸à¸à¸°à¸­à¹à¸²à¸à¸à¹à¸­à¸¡à¸¹à¸¥à¸­à¸±à¸à¹à¸à¸¡à¸±à¸à¸´</p>
+    <p style="color:#888;font-size:.82rem;margin-bottom:16px">Ã Â¸Â­Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â¥Ã Â¹Â PDF Ã Â¸ÂÃ Â¸Â²Ã Â¸Â Invoice Fly Ã¢ÂÂ Ã Â¸Â£Ã Â¸Â°Ã Â¸ÂÃ Â¸ÂÃ Â¸ÂÃ Â¸Â°Ã Â¸Â­Ã Â¹ÂÃ Â¸Â²Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â­Ã Â¸Â¡Ã Â¸Â¹Ã Â¸Â¥Ã Â¸Â­Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â¡Ã Â¸Â±Ã Â¸ÂÃ Â¸Â´</p>
 
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <div class="icon">PDF</div>
-      <p>à¸à¸¥à¸´à¸à¸«à¸£à¸·à¸­à¸¥à¸²à¸à¹à¸à¸¥à¹ PDF à¸¡à¸²à¸§à¸²à¸à¸à¸µà¹à¸à¸µà¹</p>
+      <p>Ã Â¸ÂÃ Â¸Â¥Ã Â¸Â´Ã Â¸ÂÃ Â¸Â«Ã Â¸Â£Ã Â¸Â·Ã Â¸Â­Ã Â¸Â¥Ã Â¸Â²Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â¥Ã Â¹Â PDF Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â§Ã Â¸Â²Ã Â¸ÂÃ Â¸ÂÃ Â¸ÂµÃ Â¹ÂÃ Â¸ÂÃ Â¸ÂµÃ Â¹Â</p>
     </div>
     <input type="file" id="fileInput" accept=".pdf" onchange="handleFile(this.files[0])">
 
@@ -221,10 +221,10 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
     <div id="previewArea" style="display:none">
       <div class="preview-card">
         <div class="preview-row"><span class="label">Invoice #</span><span class="value" id="pvId">-</span></div>
-        <div class="preview-row"><span class="label">à¸§à¸±à¸à¸à¸µà¹</span><span class="value" id="pvDate">-</span></div>
-        <div class="preview-row"><span class="label">à¸¥à¸¹à¸à¸à¹à¸²</span><span class="value" id="pvCustomer">-</span></div>
+        <div class="preview-row"><span class="label">Ã Â¸Â§Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸ÂµÃ Â¹Â</span><span class="value" id="pvDate">-</span></div>
+        <div class="preview-row"><span class="label">Ã Â¸Â¥Ã Â¸Â¹Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²</span><span class="value" id="pvCustomer">-</span></div>
         <table class="items-table" id="pvItems">
-          <thead><tr><th>à¸£à¸²à¸¢à¸à¸²à¸£</th><th>à¸à¸³à¸à¸§à¸</th><th>à¸£à¸²à¸à¸²/à¸à¸´à¹à¸</th><th>à¸£à¸§à¸¡</th></tr></thead>
+          <thead><tr><th>Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£</th><th>Ã Â¸ÂÃ Â¸Â³Ã Â¸ÂÃ Â¸Â§Ã Â¸Â</th><th>Ã Â¸Â£Ã Â¸Â²Ã Â¸ÂÃ Â¸Â²/Ã Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â</th><th>Ã Â¸Â£Ã Â¸Â§Ã Â¸Â¡</th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="preview-row" style="border-top:1px solid #333;margin-top:6px;padding-top:8px"><span class="label">Subtotal</span><span class="value" id="pvSubtotal">-</span></div>
@@ -234,27 +234,27 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
       </div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <label style="font-size:.82rem;color:#888">à¸à¸£à¸°à¹à¸ à¸:</label>
+        <label style="font-size:.82rem;color:#888">Ã Â¸ÂÃ Â¸Â£Ã Â¸Â°Ã Â¹ÂÃ Â¸Â Ã Â¸Â:</label>
         <select id="pvType" class="select-box" style="width:auto;flex:1">
-          <option value="income">à¸£à¸²à¸¢à¸£à¸±à¸ (Income)</option>
-          <option value="expense">à¸£à¸²à¸¢à¸à¹à¸²à¸¢ (Expense)</option>
+          <option value="income">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â (Income)</option>
+          <option value="expense">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢ (Expense)</option>
         </select>
       </div>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <label style="font-size:.82rem;color:#888">à¸«à¸¡à¸§à¸:</label>
+        <label style="font-size:.82rem;color:#888">Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â§Ã Â¸Â:</label>
         <select id="pvCategory" class="select-box" style="width:auto;flex:1">
-          <option value="product_sale">à¸à¸²à¸¢à¸ªà¸´à¸à¸à¹à¸²</option>
-          <option value="service">à¸à¸£à¸´à¸à¸²à¸£</option>
-          <option value="material">à¸§à¸±à¸à¸à¸¸à¸à¸´à¸</option>
-          <option value="shipping">à¸à¹à¸²à¸ªà¹à¸</option>
-          <option value="other">à¸­à¸·à¹à¸à¹</option>
+          <option value="product_sale">Ã Â¸ÂÃ Â¸Â²Ã Â¸Â¢Ã Â¸ÂªÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²</option>
+          <option value="service">Ã Â¸ÂÃ Â¸Â£Ã Â¸Â´Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£</option>
+          <option value="material">Ã Â¸Â§Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¸Ã Â¸ÂÃ Â¸Â´Ã Â¸Â</option>
+          <option value="shipping">Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂªÃ Â¹ÂÃ Â¸Â</option>
+          <option value="other">Ã Â¸Â­Ã Â¸Â·Ã Â¹ÂÃ Â¸ÂÃ Â¹Â</option>
         </select>
       </div>
-      <textarea id="pvNotes" placeholder="à¸«à¸¡à¸²à¸¢à¹à¸«à¸à¸¸ (à¹à¸¡à¹à¸à¸±à¸à¸à¸±à¸)" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.82rem;resize:vertical;min-height:50px;margin-bottom:8px"></textarea>
+      <textarea id="pvNotes" placeholder="Ã Â¸Â«Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â¢Ã Â¹ÂÃ Â¸Â«Ã Â¸ÂÃ Â¸Â¸ (Ã Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â±Ã Â¸Â)" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.82rem;resize:vertical;min-height:50px;margin-bottom:8px"></textarea>
 
       <div class="btn-row">
-        <button class="btn btn-primary" id="btnSave" onclick="saveInvoice()">à¸à¸±à¸à¸à¸¶à¸</button>
-        <button class="btn btn-secondary" onclick="clearPreview()">à¸¢à¸à¹à¸¥à¸´à¸</button>
+        <button class="btn btn-primary" id="btnSave" onclick="saveInvoice()">Ã Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â</button>
+        <button class="btn btn-secondary" onclick="clearPreview()">Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¥Ã Â¸Â´Ã Â¸Â</button>
       </div>
     </div>
   </div>
@@ -280,7 +280,7 @@ var AURA_SHEET_ID = "1RLo_XIeSFy0Uva_o4-ha_VynLCjw_TucP7sxCWi1msY";
   if (!t) { window.location.href = "login.html"; return; }
   try {
     var u = JSON.parse(sessionStorage.getItem("sn_user") || "{}");
-    if (u.role === "operator") { alert("à¹à¸¡à¹à¸¡à¸µà¸ªà¸´à¸à¸à¸´à¹à¹à¸à¹à¸²à¸à¸¶à¸à¸«à¸à¹à¸²à¸à¸µà¹"); window.location.href = "index.html"; return; }
+    if (u.role === "operator") { alert("Ã Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸Â¡Ã Â¸ÂµÃ Â¸ÂªÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¹ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂÃ Â¸Â¶Ã Â¸ÂÃ Â¸Â«Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂÃ Â¸ÂµÃ Â¹Â"); window.location.href = "index.html"; return; }
   } catch(e){}
 })();
 
@@ -292,7 +292,7 @@ var rateLoaded = false;
 var productList = [];
 
 // ============================================================
-// Exchange Rate â USD to THB (free API, updates daily)
+// Exchange Rate Ã¢ÂÂ USD to THB (free API, updates daily)
 // ============================================================
 // ============================================================
 // Load Product List (dynamic: API -> gviz -> fallback)
@@ -345,7 +345,7 @@ async function loadProductList() {
 
 function populateProductDropdown() {
   var sel = document.getElementById("payProductModel");
-  sel.innerHTML = '<option value="">-- เลือกรุ่น --</option>';
+  sel.innerHTML = '<option value="">-- à¹à¸¥à¸·à¸­à¸à¸£à¸¸à¹à¸ --</option>';
   productList.forEach(function(p) {
     var opt = document.createElement("option");
     opt.value = p.name;
@@ -425,11 +425,11 @@ dropZone.addEventListener("drop", function(e) {
 });
 
 // ============================================================
-// PDF Parsing â Invoice Fly format
+// PDF Parsing Ã¢ÂÂ Invoice Fly format
 // ============================================================
 function handleFile(file) {
   if (!file || file.type !== "application/pdf") {
-    toast("à¸à¸£à¸¸à¸à¸²à¹à¸¥à¸·à¸­à¸à¹à¸à¸¥à¹ PDF");
+    toast("Ã Â¸ÂÃ Â¸Â£Ã Â¸Â¸Ã Â¸ÂÃ Â¸Â²Ã Â¹ÂÃ Â¸Â¥Ã Â¸Â·Ã Â¸Â­Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â¥Ã Â¹Â PDF");
     return;
   }
   var reader = new FileReader();
@@ -497,7 +497,7 @@ async function parsePDF(data) {
     var balanceMatch = allText.match(/BALANCE\s*DUE\s*\$?([\d,]+\.?\d*)/i);
     if (balanceMatch) invoice.balanceDue = parseFloat(balanceMatch[1].replace(/,/g, ""));
 
-    // Extract line items â find text between the header row and SUBTOTAL
+    // Extract line items Ã¢ÂÂ find text between the header row and SUBTOTAL
     var headerY = null;
     var subtotalY = null;
 
@@ -565,7 +565,7 @@ async function parsePDF(data) {
 
   } catch (err) {
     console.error("PDF parse error:", err);
-    toast("à¹à¸¡à¹à¸ªà¸²à¸¡à¸²à¸£à¸à¸­à¹à¸²à¸ PDF: " + err.message);
+    toast("Ã Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸ÂªÃ Â¸Â²Ã Â¸Â¡Ã Â¸Â²Ã Â¸Â£Ã Â¸ÂÃ Â¸Â­Ã Â¹ÂÃ Â¸Â²Ã Â¸Â PDF: " + err.message);
   }
 }
 
@@ -593,7 +593,7 @@ function showPreview(inv) {
 
   if (!inv.items.length) {
     var tr = document.createElement("tr");
-    tr.innerHTML = "<td colspan='4' style='color:#888;text-align:center'>à¹à¸¡à¹à¸à¸à¸£à¸²à¸¢à¸à¸²à¸£à¸ªà¸´à¸à¸à¹à¸²</td>";
+    tr.innerHTML = "<td colspan='4' style='color:#888;text-align:center'>Ã Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸ÂÃ Â¸ÂÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂªÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²</td>";
     tbody.appendChild(tr);
   }
 }
@@ -608,11 +608,11 @@ function clearPreview() {
 // Save invoice to API
 // ============================================================
 async function saveInvoice() {
-  if (!parsedInvoice) { toast("à¸à¸£à¸¸à¸à¸²à¸­à¸±à¸à¹à¸«à¸¥à¸ PDF à¸à¹à¸­à¸"); return; }
+  if (!parsedInvoice) { toast("Ã Â¸ÂÃ Â¸Â£Ã Â¸Â¸Ã Â¸ÂÃ Â¸Â²Ã Â¸Â­Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â PDF Ã Â¸ÂÃ Â¹ÂÃ Â¸Â­Ã Â¸Â"); return; }
 
   var btn = document.getElementById("btnSave");
   btn.disabled = true;
-  btn.textContent = "à¸à¸³à¸¥à¸±à¸à¸à¸±à¸à¸à¸¶à¸...";
+  btn.textContent = "Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â...";
 
   var payload = {
     action: "add_invoice",
@@ -638,17 +638,17 @@ async function saveInvoice() {
     });
     var data = await res.json();
     if (data.success) {
-      toast("à¸à¸±à¸à¸à¸¶à¸ " + parsedInvoice.invoiceId + " à¸ªà¸³à¹à¸£à¹à¸!");
+      toast("Ã Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â " + parsedInvoice.invoiceId + " Ã Â¸ÂªÃ Â¸Â³Ã Â¹ÂÃ Â¸Â£Ã Â¹ÂÃ Â¸Â!");
       clearPreview();
     } else {
-      toast(data.error || "à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸");
+      toast(data.error || "Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â­Ã Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¥Ã Â¸Â²Ã Â¸Â");
     }
   } catch (err) {
     toast(err.message);
   }
 
   btn.disabled = false;
-  btn.textContent = "à¸à¸±à¸à¸à¸¶à¸";
+  btn.textContent = "Ã Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â";
 }
 
 // ============================================================
@@ -656,7 +656,7 @@ async function saveInvoice() {
 // ============================================================
 async function loadInvoices() {
   var container = document.getElementById("invList");
-  container.innerHTML = '<div class="loading">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</div>';
+  container.innerHTML = '<div class="loading">Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â...</div>';
 
   var params = "api=listInvoices&token=" + sessionStorage.getItem("sn_token");
   var typeF = document.getElementById("invTypeFilter").value;
@@ -670,12 +670,12 @@ async function loadInvoices() {
     if (!data.success) { container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
 
     var invoices = data.invoices || [];
-    if (!invoices.length) { container.innerHTML = '<div class="empty">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£ Invoice</div>'; return; }
+    if (!invoices.length) { container.innerHTML = '<div class="empty">Ã Â¸Â¢Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸Â¡Ã Â¸ÂµÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ Invoice</div>'; return; }
 
     container.innerHTML = "";
     invoices.forEach(function(inv) {
       var typeClass = inv.type === "expense" ? "badge-expense" : "badge-income";
-      var typeLabel = inv.type === "expense" ? "à¸£à¸²à¸¢à¸à¹à¸²à¸¢" : "à¸£à¸²à¸¢à¸£à¸±à¸";
+      var typeLabel = inv.type === "expense" ? "Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢" : "Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â";
       var amountClass = inv.type === "expense" ? "red" : "green";
 
       var div = document.createElement("div");
@@ -685,7 +685,7 @@ async function loadInvoices() {
         '<div class="inv-meta">' + esc(inv.date) + ' &bull; ' + esc(inv.customer) + '</div>' +
         '</div>' +
         '<div class="inv-amount ' + amountClass + '">$' + (inv.total || 0).toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888">' + toTHB(inv.total || 0) + ' THB</div>' : '') + '</div>' +
-        '<button class="del-btn" onclick="deleteInvoice(\'' + esc(inv.invoiceId) + '\')" title="à¸¥à¸">X</button>';
+        '<button class="del-btn" onclick="deleteInvoice(\'' + esc(inv.invoiceId) + '\')" title="Ã Â¸Â¥Ã Â¸Â">X</button>';
       container.appendChild(div);
     });
   } catch (err) {
@@ -697,7 +697,7 @@ async function loadInvoices() {
 // Delete invoice
 // ============================================================
 async function deleteInvoice(id) {
-  if (!confirm("à¸¥à¸ Invoice " + id + " ?")) return;
+  if (!confirm("Ã Â¸Â¥Ã Â¸Â Invoice " + id + " ?")) return;
   try {
     var res = await fetch(API, {
       method: "POST",
@@ -706,7 +706,7 @@ async function deleteInvoice(id) {
     });
     var data = await res.json();
     if (data.success) {
-      toast("à¸¥à¸ " + id + " à¹à¸¥à¹à¸§");
+      toast("Ã Â¸Â¥Ã Â¸Â " + id + " Ã Â¹ÂÃ Â¸Â¥Ã Â¹ÂÃ Â¸Â§");
       loadInvoices();
     } else {
       toast(data.error || "Error");
@@ -738,7 +738,7 @@ function getISOWeek(d) {
 
 async function loadCashflow() {
   var grid = document.getElementById("cfGrid");
-  grid.innerHTML = '<div class="loading">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</div>';
+  grid.innerHTML = '<div class="loading">Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â...</div>';
 
   try {
     // Fetch payments for aggregation
@@ -800,18 +800,18 @@ async function loadCashflow() {
     // Update year dropdown
     var yearSelect = document.getElementById("cfYear");
     var currentVal = yearSelect.value;
-    yearSelect.innerHTML = '<option value="">à¸à¸¸à¸à¸à¸µ</option>';
+    yearSelect.innerHTML = '<option value="">Ã Â¸ÂÃ Â¸Â¸Ã Â¸ÂÃ Â¸ÂÃ Â¸Âµ</option>';
     Object.keys(yearSet).sort().reverse().forEach(function(y) {
     yearSelect.innerHTML += '<option value="' + y + '"' + (y === currentVal ? ' selected' : '') + '>' + y + '</option>';
     });
 
     var keys = Object.keys(groups).sort();
     if (!keys.length) {
-      grid.innerHTML = '<div class="empty">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µà¸à¹à¸­à¸¡à¸¹à¸¥</div>';
-      document.getElementById("cfIncome").textContent = "à¸¿0";
-      document.getElementById("cfExpense").textContent = "à¸¿0";
-      document.getElementById("cfProfit").textContent = "à¸¿0";
-      document.getElementById("cfUnpaid").textContent = "à¸¿0";
+      grid.innerHTML = '<div class="empty">Ã Â¸Â¢Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸Â¡Ã Â¸ÂµÃ Â¸ÂÃ Â¹ÂÃ Â¸Â­Ã Â¸Â¡Ã Â¸Â¹Ã Â¸Â¥</div>';
+      document.getElementById("cfIncome").textContent = "Ã Â¸Â¿0";
+      document.getElementById("cfExpense").textContent = "Ã Â¸Â¿0";
+      document.getElementById("cfProfit").textContent = "Ã Â¸Â¿0";
+      document.getElementById("cfUnpaid").textContent = "Ã Â¸Â¿0";
       return;
     }
 
@@ -820,14 +820,14 @@ async function loadCashflow() {
     keys.forEach(function(k) { totalIncome += groups[k].income; totalExpense += groups[k].expense; });
     var totalProfit = totalIncome - totalExpense;
 
-    document.getElementById("cfIncome").textContent = "à¸¿" + totalIncome.toLocaleString();
-    document.getElementById("cfExpense").textContent = "à¸¿" + totalExpense.toLocaleString();
-    document.getElementById("cfProfit").textContent = "à¸¿" + totalProfit.toLocaleString();
+    document.getElementById("cfIncome").textContent = "Ã Â¸Â¿" + totalIncome.toLocaleString();
+    document.getElementById("cfExpense").textContent = "Ã Â¸Â¿" + totalExpense.toLocaleString();
+    document.getElementById("cfProfit").textContent = "Ã Â¸Â¿" + totalProfit.toLocaleString();
     document.getElementById("cfProfit").className = "num " + (totalProfit >= 0 ? "green" : "red");
-    document.getElementById("cfUnpaid").textContent = "à¸¿0";
+    document.getElementById("cfUnpaid").textContent = "Ã Â¸Â¿0";
 
     // Render cards
-    var thaiMonths = ["","à¸¡.à¸.","à¸.à¸.","à¸¡à¸µ.à¸.","à¹à¸¡.à¸¢.","à¸.à¸.","à¸¡à¸´.à¸¢.","à¸.à¸.","à¸ª.à¸.","à¸.à¸¢.","à¸.à¸.","à¸.à¸¢.","à¸.à¸."];
+    var thaiMonths = ["","Ã Â¸Â¡.Ã Â¸Â.","Ã Â¸Â.Ã Â¸Â.","Ã Â¸Â¡Ã Â¸Âµ.Ã Â¸Â.","Ã Â¹ÂÃ Â¸Â¡.Ã Â¸Â¢.","Ã Â¸Â.Ã Â¸Â.","Ã Â¸Â¡Ã Â¸Â´.Ã Â¸Â¢.","Ã Â¸Â.Ã Â¸Â.","Ã Â¸Âª.Ã Â¸Â.","Ã Â¸Â.Ã Â¸Â¢.","Ã Â¸Â.Ã Â¸Â.","Ã Â¸Â.Ã Â¸Â¢.","Ã Â¸Â.Ã Â¸Â."];
     grid.innerHTML = "";
     keys.forEach(function(k) {
       var g = groups[k];
@@ -839,16 +839,16 @@ async function loadCashflow() {
         var parts = k.split("-");
         label = thaiMonths[parseInt(parts[1])] + " " + parts[0];
       } else if (cfMode === "week") {
-        label = "à¸ªà¸±à¸à¸à¸²à¸«à¹ " + k;
+        label = "Ã Â¸ÂªÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â²Ã Â¸Â«Ã Â¹Â " + k;
       } else {
-        label = "à¸à¸µ " + k;
+        label = "Ã Â¸ÂÃ Â¸Âµ " + k;
       }
       var card = document.createElement("div");
       card.className = "cf-card";
-      card.innerHTML = '<div class="month">' + label + ' <span style="color:#555;font-size:.7rem">(' + g.count + ' à¸£à¸²à¸¢à¸à¸²à¸£)</span></div>' +
-        '<div class="amount ' + profitColor + '">' + profitSign + "à¸¿" + profit.toLocaleString() + '</div>' +
-        '<div class="detail">à¸£à¸²à¸¢à¸£à¸±à¸ <span class="green">à¸¿' + g.income.toLocaleString() + '</span></div>' +
-        '<div class="detail">à¸£à¸²à¸¢à¸à¹à¸²à¸¢ <span class="red">à¸¿' + g.expense.toLocaleString() + '</span></div>';
+      card.innerHTML = '<div class="month">' + label + ' <span style="color:#555;font-size:.7rem">(' + g.count + ' Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£)</span></div>' +
+        '<div class="amount ' + profitColor + '">' + profitSign + "Ã Â¸Â¿" + profit.toLocaleString() + '</div>' +
+        '<div class="detail">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â <span class="green">Ã Â¸Â¿' + g.income.toLocaleString() + '</span></div>' +
+        '<div class="detail">Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢ <span class="red">Ã Â¸Â¿' + g.expense.toLocaleString() + '</span></div>';
       grid.appendChild(card);
     });
 
@@ -864,7 +864,7 @@ var allPayments = [];
 
 async function loadPayments() {
   var container = document.getElementById("payList");
-  container.innerHTML = '<div class="loading">à¸à¸³à¸¥à¸±à¸à¹à¸«à¸¥à¸...</div>';
+  container.innerHTML = '<div class="loading">Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â«Ã Â¸Â¥Ã Â¸Â...</div>';
 
   try {
     var res = await fetch(API + "?api=listPayments");
@@ -898,17 +898,17 @@ function renderPayments() {
   });
 
   if (!filtered.length) {
-    container.innerHTML = '<div class="empty">à¸¢à¸±à¸à¹à¸¡à¹à¸¡à¸µà¸£à¸²à¸¢à¸à¸²à¸£ â à¸à¸ "+ à¹à¸à¸´à¹à¸¡à¸£à¸²à¸¢à¸à¸²à¸£" à¹à¸à¸·à¹à¸­à¹à¸£à¸´à¹à¸¡à¸à¸±à¸à¸à¸¶à¸</div>';
+    container.innerHTML = '<div class="empty">Ã Â¸Â¢Ã Â¸Â±Ã Â¸ÂÃ Â¹ÂÃ Â¸Â¡Ã Â¹ÂÃ Â¸Â¡Ã Â¸ÂµÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£ Ã¢ÂÂ Ã Â¸ÂÃ Â¸Â "+ Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£" Ã Â¹ÂÃ Â¸ÂÃ Â¸Â·Ã Â¹ÂÃ Â¸Â­Ã Â¹ÂÃ Â¸Â£Ã Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â</div>';
     return;
   }
 
-  var catLabels = { product_sale: "à¸à¸²à¸¢à¸ªà¸´à¸à¸à¹à¸²", service: "à¸à¸£à¸´à¸à¸²à¸£", material: "à¸§à¸±à¸à¸à¸¸à¸à¸´à¸", shipping: "à¸à¹à¸²à¸ªà¹à¸", salary: "à¹à¸à¸´à¸à¹à¸à¸·à¸­à¸", marketing: "à¸à¸²à¸£à¸à¸¥à¸²à¸", utility: "à¸ªà¸²à¸à¸²à¸£à¸à¸¹à¸à¹à¸ à¸", other: "à¸­à¸·à¹à¸à¹" };
+  var catLabels = { product_sale: "Ã Â¸ÂÃ Â¸Â²Ã Â¸Â¢Ã Â¸ÂªÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â²", service: "Ã Â¸ÂÃ Â¸Â£Ã Â¸Â´Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£", material: "Ã Â¸Â§Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¸Ã Â¸ÂÃ Â¸Â´Ã Â¸Â", shipping: "Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸ÂªÃ Â¹ÂÃ Â¸Â", salary: "Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â·Ã Â¸Â­Ã Â¸Â", marketing: "Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂÃ Â¸Â¥Ã Â¸Â²Ã Â¸Â", utility: "Ã Â¸ÂªÃ Â¸Â²Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂÃ Â¸Â¹Ã Â¸ÂÃ Â¹ÂÃ Â¸Â Ã Â¸Â", other: "Ã Â¸Â­Ã Â¸Â·Ã Â¹ÂÃ Â¸ÂÃ Â¹Â" };
 
   container.innerHTML = "";
   filtered.forEach(function(p) {
     var isExp = p.type === "expense";
     var typeClass = isExp ? "badge-expense" : "badge-income";
-    var typeLabel = isExp ? "à¸£à¸²à¸¢à¸à¹à¸²à¸¢" : "à¸£à¸²à¸¢à¸£à¸±à¸";
+    var typeLabel = isExp ? "Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¹ÂÃ Â¸Â²Ã Â¸Â¢" : "Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸Â£Ã Â¸Â±Ã Â¸Â";
     var amtClass = isExp ? "red" : "green";
     var amt = parseFloat(p.amount) || 0;
     var catText = catLabels[p.category] || p.category || "-";
@@ -921,8 +921,8 @@ function renderPayments() {
       '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.productModel ? ' | ' + esc(p.productModel) : '') + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
       '</div>' +
       '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : '$') + amt.toLocaleString() + '</div>' +
-      '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="à¹à¸à¹à¹à¸" style="color:#ffc107">E</button>' +
-      '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="à¸¥à¸">X</button>';
+      '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="Ã Â¹ÂÃ Â¸ÂÃ Â¹ÂÃ Â¹ÂÃ Â¸Â" style="color:#ffc107">E</button>' +
+      '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="Ã Â¸Â¥Ã Â¸Â">X</button>';
     container.appendChild(div);
   });
 }
@@ -931,7 +931,7 @@ function showPaymentForm(editData) {
   document.getElementById("payFormArea").style.display = "";
   onCategoryChange();
   if (editData) {
-    document.getElementById("payFormTitle").textContent = "à¹à¸à¹à¹à¸à¸£à¸²à¸¢à¸à¸²à¸£";
+    document.getElementById("payFormTitle").textContent = "Ã Â¹ÂÃ Â¸ÂÃ Â¹ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£";
     document.getElementById("payEditRow").value = editData.row;
     document.getElementById("payDate").value = editData.date || "";
     document.getElementById("payType").value = editData.type || "expense";
@@ -941,7 +941,7 @@ function showPaymentForm(editData) {
     document.getElementById("paySupplier").value = editData.supplier || "";
     document.getElementById("payNotes").value = editData.notes || "";
   } else {
-    document.getElementById("payFormTitle").textContent = "à¹à¸à¸´à¹à¸¡à¸£à¸²à¸¢à¸à¸²à¸£à¹à¸«à¸¡à¹";
+    document.getElementById("payFormTitle").textContent = "Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¹ÂÃ Â¸Â«Ã Â¸Â¡Ã Â¹Â";
     document.getElementById("payEditRow").value = "";
     document.getElementById("payDate").value = new Date().toISOString().substring(0, 10);
     document.getElementById("payType").value = "expense";
@@ -967,11 +967,11 @@ async function savePayment() {
   var notes = document.getElementById("payNotes").value;
   var editRow = document.getElementById("payEditRow").value;
 
-  if (!date || !amount) { toast("à¸à¸£à¸¸à¸à¸²à¸à¸£à¸­à¸à¸§à¸±à¸à¸à¸µà¹à¹à¸¥à¸°à¸à¸³à¸à¸§à¸à¹à¸à¸´à¸"); return; }
+  if (!date || !amount) { toast("Ã Â¸ÂÃ Â¸Â£Ã Â¸Â¸Ã Â¸ÂÃ Â¸Â²Ã Â¸ÂÃ Â¸Â£Ã Â¸Â­Ã Â¸ÂÃ Â¸Â§Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸ÂµÃ Â¹ÂÃ Â¹ÂÃ Â¸Â¥Ã Â¸Â°Ã Â¸ÂÃ Â¸Â³Ã Â¸ÂÃ Â¸Â§Ã Â¸ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸Â"); return; }
 
   var btn = document.getElementById("btnPaySave");
   btn.disabled = true;
-  btn.textContent = "à¸à¸³à¸¥à¸±à¸à¸à¸±à¸à¸à¸¶à¸...";
+  btn.textContent = "Ã Â¸ÂÃ Â¸Â³Ã Â¸Â¥Ã Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â...";
 
   var params = "date=" + encodeURIComponent(date) +
     "&type=" + encodeURIComponent(type) +
@@ -979,9 +979,8 @@ async function savePayment() {
     "&category=" + encodeURIComponent(category) +
     "&supplier=" + encodeURIComponent(supplier) +
     "&notes=" + encodeURIComponent(notes);
-  if (cat === "product_sale") { url += "&productModel=" + encodeURIComponent(document.getElementById("payProductModel").value); }
-  url += " + "&currency=" + encodeURIComponent(document.getElementById("payCurrency").value);
-
+  if (category === "product_sale") { params += "&productModel=" + encodeURIComponent(document.getElementById("payProductModel").value); }
+  params += "&currency=" + encodeURIComponent(document.getElementById("payCurrency").value);
   var apiName = editRow ? "editPayment" : "recordPayment";
   if (editRow) params += "&row=" + editRow;
 
@@ -989,18 +988,18 @@ async function savePayment() {
     var res = await fetch(API + "?api=" + apiName + "&" + params);
     var data = await res.json();
     if (data.success) {
-      toast(editRow ? "à¹à¸à¹à¹à¸à¸ªà¸³à¹à¸£à¹à¸" : "à¹à¸à¸´à¹à¸¡à¸£à¸²à¸¢à¸à¸²à¸£à¸ªà¸³à¹à¸£à¹à¸");
+      toast(editRow ? "Ã Â¹ÂÃ Â¸ÂÃ Â¹ÂÃ Â¹ÂÃ Â¸ÂÃ Â¸ÂªÃ Â¸Â³Ã Â¹ÂÃ Â¸Â£Ã Â¹ÂÃ Â¸Â" : "Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¹ÂÃ Â¸Â¡Ã Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂªÃ Â¸Â³Ã Â¹ÂÃ Â¸Â£Ã Â¹ÂÃ Â¸Â");
       hidePaymentForm();
       loadPayments();
     } else {
-      toast(data.error || "à¹à¸à¸´à¸à¸à¹à¸­à¸à¸´à¸à¸à¸¥à¸²à¸");
+      toast(data.error || "Ã Â¹ÂÃ Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¹ÂÃ Â¸Â­Ã Â¸ÂÃ Â¸Â´Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¥Ã Â¸Â²Ã Â¸Â");
     }
   } catch (err) {
     toast(err.message);
   }
 
   btn.disabled = false;
-  btn.textContent = "à¸à¸±à¸à¸à¸¶à¸";
+  btn.textContent = "Ã Â¸ÂÃ Â¸Â±Ã Â¸ÂÃ Â¸ÂÃ Â¸Â¶Ã Â¸Â";
 }
 
 function editPaymentRow(row) {
@@ -1009,12 +1008,12 @@ function editPaymentRow(row) {
 }
 
 async function deletePaymentRow(row) {
-  if (!confirm("à¸¥à¸à¸£à¸²à¸¢à¸à¸²à¸£à¸à¸µà¹?")) return;
+  if (!confirm("Ã Â¸Â¥Ã Â¸ÂÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¸ÂÃ Â¸ÂµÃ Â¹Â?")) return;
   try {
     var res = await fetch(API + "?api=deletePayment&row=" + row);
     var data = await res.json();
     if (data.success) {
-      toast("à¸¥à¸à¸£à¸²à¸¢à¸à¸²à¸£à¹à¸¥à¹à¸§");
+      toast("Ã Â¸Â¥Ã Â¸ÂÃ Â¸Â£Ã Â¸Â²Ã Â¸Â¢Ã Â¸ÂÃ Â¸Â²Ã Â¸Â£Ã Â¹ÂÃ Â¸Â¥Ã Â¹ÂÃ Â¸Â§");
       loadPayments();
     } else {
       toast(data.error || "Error");
@@ -1036,7 +1035,7 @@ function toast(msg) {
 }
 
 // ============================================================
-// Init â load exchange rate first, then cashflow
+// Init Ã¢ÂÂ load exchange rate first, then cashflow
 // ============================================================
 (async function() {
   await loadExchangeRate();
