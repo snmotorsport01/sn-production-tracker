@@ -163,6 +163,12 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
           <option value="utility">ค่าสาธารณูปโภค</option>
           <option value="other">อื่นๆ</option>
     </div>
+<div id="payModelDiv" style="display:none;margin-bottom:12px">
+      <label style="color:#888;font-size:12px;margin-bottom:4px">รุ่นสินค้า</label>
+      <select id="payProductModel" class="select-box">
+        <option value="">เลือกรุ่น...</option>
+      </select>
+    </div>
     <div style="margin-bottom:10px">
       <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">ผู้จ่าย/ผู้รับ</label>
       <input type="text" id="paySupplier" placeholder="ชื่อลูกค้า / Supplier" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
@@ -193,13 +199,7 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
     </select>
     <input type="month" id="invMonthFilter" onchange="loadInvoices()">
   </div>
-    <div id="payModelDiv" style="display:none;margin-bottom:12px">
-      <label style="color:#888;font-size:12px;margin-bottom:4px">รุ่นสินค้า</label>
-      <select id="payProductModel" class="select-box">
-        <option value="">เลือกรุ่น...</option>
-      </select>
-    </div>
-  <div id="invList">
+      <div id="invList">
     <div class="loading">กำลังโหลด...</div>
   </div>
 </div>
