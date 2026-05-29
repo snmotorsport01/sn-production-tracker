@@ -920,7 +920,7 @@ function onCategoryChange() {
   if (div) div.style.display = (cat === "product_sale" || cat === "material") ? "" : "none";
 }
 
-function savePayment() {
+async function savePayment() {
   var date = document.getElementById("payDate").value;
   var type = document.getElementById("payType").value;
   var amount = document.getElementById("payAmount").value;
@@ -1001,6 +1001,7 @@ function toast(msg) {
 (async function() {
   await loadExchangeRate();
   loadCashflow();
+ loadProductList();
 })();
 </script>
 </body>
