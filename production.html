@@ -293,18 +293,20 @@ function toast(msg, type) {
       productList = d.products;
       populateProductDropdowns();
     }
-  });
+  }).catch(function(e) { console.warn("loadProducts error:", e); });
 }
 
     function populateProductDropdowns() {
       ["f-product-sel","e-product-sel"].forEach(function(id) {
         var sel = document.getElementById(id);
         if (!sel) return;
+        Array.from(sel.querySelectorAll('option.dynamic')).forEach(function(o){ o.remove(); });
         var otherOpt = sel.querySelector('option[value="_other"]');
         productList.forEach(function(p) {
           var opt = document.createElement("option");
           opt.value = p.name;
           opt.textContent = p.name;
+          opt.className = "dynamic";
           sel.insertBefore(opt, otherOpt);
         });
       });
@@ -316,7 +318,7 @@ function toast(msg, type) {
     if (d.success && d.data) {
       costData = d.data;
     }
-  });
+  }).catch(function(e) { console.warn("loadCostData error:", e); });
 }
 
     function showBOM(prefix, productName) {
@@ -888,6 +890,8 @@ if (urlTab && allTabs.indexOf(urlTab) >= 0) {
 }
 
 // ── Init ──
+loadProducts();
+loadCostData();
 loadData();
 </script>
 </body>
