@@ -288,13 +288,13 @@ function toast(msg, type) {
 
 // ── Load products from API ──
     function loadProducts() {
-      callAPI("getProducts", function(d) {
-        if (d.success && d.products) {
-          productList = d.products;
-          populateProductDropdowns();
-        }
-      });
+  callAPI({ api: "getProducts" }).then(function(d) {
+    if (d.success && d.products) {
+      productList = d.products;
+      populateProductDropdowns();
     }
+  });
+}
 
     function populateProductDropdowns() {
       ["f-product-sel","e-product-sel"].forEach(function(id) {
@@ -312,12 +312,12 @@ function toast(msg, type) {
 
     // ── Load cost/BOM data ──
     function loadCostData() {
-      callAPI("getCostData", function(d) {
-        if (d.success && d.data) {
-          costData = d.data;
-        }
-      });
+  callAPI({ api: "getCostData" }).then(function(d) {
+    if (d.success && d.data) {
+      costData = d.data;
     }
+  });
+}
 
     function showBOM(prefix, productName) {
       var area = document.getElementById(prefix + "-bom-area");
