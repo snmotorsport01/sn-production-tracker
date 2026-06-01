@@ -298,8 +298,8 @@ callAPI({api:'getProducts'}).then(function(data){
 if(!data||!data.success)return;
 var products=data.products||[];
 document.getElementById('cs-variants').textContent=products.length;
-if(products.length&&products[0].sell_price){
-document.getElementById('cs-price').textContent='฿'+fmt(products[0].sell_price);
+if(products.length&&products[0].sellPrice){
+document.getElementById('cs-price').textContent='฿'+fmt(products[0].sellPrice);
 }
 }).catch(function(){});
 
