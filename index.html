@@ -109,143 +109,146 @@ window.location.href='login.html';
 
 <!-- ── Header ── -->
 <div class="header">
-  <div class="logo-text">SN ERP</div>
-  <div class="logo-sub">Production &amp; Operations</div>
+<div class="logo-text">SN ERP</div>
+<div class="logo-sub">Production &amp; Operations</div>
 </div>
 <div class="divider"></div>
 
 <!-- ══════════════════════════════════════ -->
-<!-- SECTION 1: Production                 -->
+<!-- SECTION 1: Production -->
 <!-- ══════════════════════════════════════ -->
 <div class="section">
-  <a href="production.html" class="section-head">
-    <div class="section-icon prod"></div>
-    <div class="section-info">
-      <div class="section-title">Production</div>
-      <div class="section-desc">จัดการ Batch การผลิต ติดตามสถานะ</div>
-    </div>
-    <div class="section-arrow">›</div>
-  </a>
-  <!-- Flow -->
-  <div class="flow-row">
-    <span class="flow-step">สร้าง Batch</span><span class="flow-sep">→</span>
-    <span class="flow-step">สถานะ Batch</span><span class="flow-sep">→</span>
-    <span class="flow-step">อัพเดท Phase</span>
-  </div>
-  <!-- Stats -->
-  <div class="section-stats" id="prod-stats">
-    <div class="stat-item"><div class="stat-val red" id="ps-active">—</div><div class="stat-lbl">กำลังผลิต</div></div>
-    <div class="stat-item"><div class="stat-val green" id="ps-done">—</div><div class="stat-lbl">เสร็จแล้ว</div></div>
-    <div class="stat-item"><div class="stat-val amber" id="ps-total">—</div><div class="stat-lbl">ทั้งหมด</div></div>
-  </div>
-  <!-- Sub-links -->
-  <div class="sub-links">
-    <a href="production.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-    <a href="production.html?action=create" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สร้าง Batch</span><span class="sl-arrow">›</span></a>
-    <a href="qr.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สถานะ / QR</span><span class="sl-arrow">›</span></a>
-  </div>
+<a href="production.html" class="section-head">
+<div class="section-icon prod"></div>
+<div class="section-info">
+<div class="section-title">Production</div>
+<div class="section-desc">จัดการ Batch การผลิต ติดตามสถานะ</div>
+</div>
+<div class="section-arrow">›</div>
+</a>
+<!-- Flow -->
+<div class="flow-row">
+<span class="flow-step">สร้าง Batch</span><span class="flow-sep">→</span>
+<span class="flow-step">สถานะ Batch</span><span class="flow-sep">→</span>
+<span class="flow-step">อัพเดท Phase</span>
+</div>
+<!-- Stats -->
+<div class="section-stats" id="prod-stats">
+<div class="stat-item"><div class="stat-val red" id="ps-active">—</div><div class="stat-lbl">กำลังผลิต</div></div>
+<div class="stat-item"><div class="stat-val green" id="ps-done">—</div><div class="stat-lbl">เสร็จแล้ว</div></div>
+<div class="stat-item"><div class="stat-val amber" id="ps-total">—</div><div class="stat-lbl">ทั้งหมด</div></div>
+</div>
+<!-- Sub-links -->
+<div class="sub-links">
+<a href="production.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
+<a href="production.html?action=create" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สร้าง Batch</span><span class="sl-arrow">›</span></a>
+<a href="qr.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สถานะ / QR</span><span class="sl-arrow">›</span></a>
+</div>
 </div>
 
 <!-- ══════════════════════════════════════ -->
-<!-- SECTION 2: Inventory                  -->
+<!-- SECTION 2: Inventory -->
 <!-- ══════════════════════════════════════ -->
 <div class="section">
-  <a href="inventory.html" class="section-head">
-    <div class="section-icon inv"></div>
-    <div class="section-info">
-      <div class="section-title">Inventory</div>
-      <div class="section-desc">สต็อกวัตถุดิบ จัดการ PO</div>
-    </div>
-    <div class="section-arrow">›</div>
-  </a>
-  <!-- Flow -->
-  <div class="flow-row">
-    <span class="flow-step">รายการสต็อก</span><span class="flow-sep">→</span>
-    <span class="flow-step">แก้ไขสต็อก</span>
-  </div>
-  <!-- Stats -->
-  <div class="section-stats" id="inv-stats">
-    <div class="stat-item"><div class="stat-val green" id="is-ok">—</div><div class="stat-lbl">OK</div></div>
-    <div class="stat-item"><div class="stat-val amber" id="is-low">—</div><div class="stat-lbl">ต่ำ</div></div>
-    <div class="stat-item"><div class="stat-val red" id="is-crit">—</div><div class="stat-lbl">วิกฤต</div></div>
-  </div>
-  <!-- Sub-links -->
-  <div class="sub-links">
-    <a href="inventory.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-    <a href="inventory.html?tab=list" class="sub-link"><span class="sl-icon"></span><span class="sl-text">รายการสต็อก</span><span class="sl-arrow">›</span></a>
-    <a href="inventory.html?tab=po" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สร้าง PO</span><span class="sl-arrow">›</span></a>
-  </div>
+<a href="inventory.html" class="section-head">
+<div class="section-icon inv"></div>
+<div class="section-info">
+<div class="section-title">Inventory</div>
+<div class="section-desc">สต็อกวัตถุดิบ จัดการ PO</div>
+</div>
+<div class="section-arrow">›</div>
+</a>
+<!-- Flow -->
+<div class="flow-row">
+<span class="flow-step">รายการสต็อก</span><span class="flow-sep">→</span>
+<span class="flow-step">แก้ไขสต็อก</span>
+</div>
+<!-- Stats -->
+<div class="section-stats" id="inv-stats">
+<div class="stat-item"><div class="stat-val green" id="is-ok">—</div><div class="stat-lbl">OK</div></div>
+<div class="stat-item"><div class="stat-val amber" id="is-low">—</div><div class="stat-lbl">ต่ำ</div></div>
+<div class="stat-item"><div class="stat-val red" id="is-crit">—</div><div class="stat-lbl">วิกฤต</div></div>
+</div>
+<!-- Sub-links -->
+<div class="sub-links">
+<a href="inventory.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
+<a href="inventory.html?tab=list" class="sub-link"><span class="sl-icon"></span><span class="sl-text">รายการสต็อก</span><span class="sl-arrow">›</span></a>
+<a href="inventory.html?tab=po" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สร้าง PO</span><span class="sl-arrow">›</span></a>
+</div>
 </div>
 
 <!-- ══════════════════════════════════════ -->
-<!-- SECTION 3: Finance                    -->
+<!-- SECTION 3: Finance -->
 <!-- ══════════════════════════════════════ -->
 <div class="section">
-  <a href="finance.html" class="section-head">
-    <div class="section-icon fin"></div>
-    <div class="section-info">
-      <div class="section-title">Financial</div>
-      <div class="section-desc">รายรับ-รายจ่าย Cash Flow</div>
-    </div>
-    <div class="section-arrow">›</div>
-  </a>
-  <!-- Flow -->
-  <div class="flow-row">
-    <span class="flow-step">อัพโหลด Invoice</span><span class="flow-sep">→</span>
-    <span class="flow-step">Cash Flow</span>
-  </div>
-  <!-- Stats -->
-  <div class="section-stats" id="fin-stats">
-    <div class="stat-item"><div class="stat-val green" id="fs-in">—</div><div class="stat-lbl">รายรับ</div></div>
-    <div class="stat-item"><div class="stat-val red" id="fs-out">—</div><div class="stat-lbl">รายจ่าย</div></div>
-    <div class="stat-item"><div class="stat-val amber" id="fs-net">—</div><div class="stat-lbl">คงเหลือ</div></div>
-  </div>
-  <!-- Sub-links -->
-  <div class="sub-links">
-    <a href="finance.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-    <a href="finance.html?tab=upload" class="sub-link"><span class="sl-icon"></span><span class="sl-text">อัพโหลด</span><span class="sl-arrow">›</span></a>
-    <a href="finance.html?tab=cashflow" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Cash Flow</span><span class="sl-arrow">›</span></a>
-  </div>
+<a href="finance.html" class="section-head">
+<div class="section-icon fin"></div>
+<div class="section-info">
+<div class="section-title">Financial</div>
+<div class="section-desc">รายรับ-รายจ่าย Cash Flow</div>
+</div>
+<div class="section-arrow">›</div>
+</a>
+<!-- Flow -->
+<div class="flow-row">
+<span class="flow-step">อัพโหลด Invoice</span><span class="flow-sep">→</span>
+<span class="flow-step">Cash Flow</span>
+</div>
+<!-- Stats -->
+<div class="section-stats" id="fin-stats">
+<div class="stat-item"><div class="stat-val green" id="fs-in">—</div><div class="stat-lbl">รายรับ</div></div>
+<div class="stat-item"><div class="stat-val red" id="fs-out">—</div><div class="stat-lbl">รายจ่าย</div></div>
+<div class="stat-item"><div class="stat-val amber" id="fs-net">—</div><div class="stat-lbl">คงเหลือ</div></div>
+</div>
+<!-- Sub-links -->
+<div class="sub-links">
+<a href="finance.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
+<a href="finance.html?tab=upload" class="sub-link"><span class="sl-icon"></span><span class="sl-text">อัพโหลด</span><span class="sl-arrow">›</span></a>
+<a href="finance.html?tab=cashflow" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Cash Flow</span><span class="sl-arrow">›</span></a>
+</div>
 </div>
 
-    <div class="section">
-      <a href="cost.html" class="section-head">
-        <div class="section-icon" style="background:rgba(156,39,176,.12)"></div>
-        <div class="section-info">
-          <div class="section-title">Cost Analysis</div>
-          <div class="section-desc">วิเคราะห์ต้นทุน AURA</div>
-        </div>
-        <div class="section-arrow">›</div>
-      </a>
-      <!-- Flow -->
-      <div class="flow-row">
-        <span class="flow-step">Stream vs Beam</span><span class="flow-sep">→</span>
-        <span class="flow-step">เปรียบเทียบ Variant</span>
-      </div>
-      <!-- Stats -->
-      <div class="section-stats" id="cost-stats">
-        <div class="stat-item"><div class="stat-val green" id="cs-margin">~39%</div><div class="stat-lbl">กำไรเฉลี่ย</div></div>
-        <div class="stat-item"><div class="stat-val" id="cs-variants">6</div><div class="stat-lbl">Variants</div></div>
-        <div class="stat-item"><div class="stat-val red" id="cs-price">฿25,900</div><div class="stat-lbl">ราคาขาย</div></div>
-      </div>
-      <!-- Sub-links -->
-      <div class="sub-links">
-        <a href="cost.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-        <a href="cost.html#stream" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Stream</span><span class="sl-arrow">›</span></a>
-        <a href="cost.html#beam" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Beam</span><span class="sl-arrow">›</span></a>
-      </div>
-    </div>
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 4: Cost Analysis -->
+<!-- ══════════════════════════════════════ -->
+<div class="section">
+<a href="cost.html" class="section-head">
+<div class="section-icon" style="background:rgba(156,39,176,.12)"></div>
+<div class="section-info">
+<div class="section-title">Cost Analysis</div>
+<div class="section-desc">วิเคราะห์ต้นทุน AURA</div>
+</div>
+<div class="section-arrow">›</div>
+</a>
+<!-- Flow -->
+<div class="flow-row">
+<span class="flow-step">Stream vs Beam</span><span class="flow-sep">→</span>
+<span class="flow-step">เปรียบเทียบ Variant</span>
+</div>
+<!-- Stats — dynamic from API -->
+<div class="section-stats" id="cost-stats">
+<div class="stat-item"><div class="stat-val green" id="cs-margin">—</div><div class="stat-lbl">กำไรเฉลี่ย</div></div>
+<div class="stat-item"><div class="stat-val" id="cs-variants">—</div><div class="stat-lbl">Variants</div></div>
+<div class="stat-item"><div class="stat-val red" id="cs-price">—</div><div class="stat-lbl">ราคาขาย</div></div>
+</div>
+<!-- Sub-links -->
+<div class="sub-links">
+<a href="cost.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
+<a href="cost.html#stream" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Stream</span><span class="sl-arrow">›</span></a>
+<a href="cost.html#beam" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Beam</span><span class="sl-arrow">›</span></a>
+</div>
+</div>
 
 <div class="footer">SN Motorsports — ERP v3.0</div>
 
 <!-- ── Bottom Navigation ── -->
 <div class="bottom-nav">
-  <a href="index.html" class="active">Hub</a>
-  <a href="production.html">Production</a>
-  <a href="inventory.html">Inventory</a>
-  <a href="finance.html">Finance</a>
-  <a href="cost.html">Cost</a>
-  <a href="qr.html">QR</a>
+<a href="index.html" class="active">Hub</a>
+<a href="production.html">Production</a>
+<a href="inventory.html">Inventory</a>
+<a href="finance.html">Finance</a>
+<a href="cost.html">Cost</a>
+<a href="qr.html">QR</a>
 </div>
 
 <script>
@@ -255,48 +258,72 @@ function fmt(n){if(n===undefined||n===null||isNaN(n))return'—';return Number(n
 
 /* Load Production stats */
 callAPI({api:'listBatches'}).then(function(data){
-  var list=Array.isArray(data)?data:(data&&data.batches?data.batches:[]);
-  var active=0,done=0;
-  list.forEach(function(b){
-    if(b.status==='Shipped'||b.status==='QC Pass')done++;else if(b.status!=='Created')active++;
-  });
-  document.getElementById('ps-active').textContent=active;
-  document.getElementById('ps-done').textContent=done;
-  document.getElementById('ps-total').textContent=list.length;
+var list=Array.isArray(data)?data:(data&&data.batches?data.batches:[]);
+var active=0,done=0;
+list.forEach(function(b){
+if(b.status==='Shipped'||b.status==='QC Pass')done++;else if(b.status!=='Created')active++;
+});
+document.getElementById('ps-active').textContent=active;
+document.getElementById('ps-done').textContent=done;
+document.getElementById('ps-total').textContent=list.length;
 }).catch(function(){});
 
 /* Load Inventory stats */
 callAPI({api:'listInventory'}).then(function(data){
-  var items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
-  if(!items.length) return;
-  var ok=0,low=0,crit=0;
-  items.forEach(function(item){
-    var qty=Number(item.stock)||0,min=Number(item.min)||0;
-    if(qty<=0)crit++;else if(qty<min)crit++;else if(qty<min*1.5)low++;else ok++;
-  });
-  document.getElementById('is-ok').textContent=ok;
-  document.getElementById('is-low').textContent=low;
-  document.getElementById('is-crit').textContent=crit;
+var items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+if(!items.length) return;
+var ok=0,low=0,crit=0;
+items.forEach(function(item){
+var qty=Number(item.stock)||0,min=Number(item.min)||0;
+if(qty<=0)crit++;else if(qty<min)crit++;else if(qty<min*1.5)low++;else ok++;
+});
+document.getElementById('is-ok').textContent=ok;
+document.getElementById('is-low').textContent=low;
+document.getElementById('is-crit').textContent=crit;
 }).catch(function(){});
 
 /* Load Finance stats */
 callAPI({api:'listCashflow'}).then(function(data){
-  if(!data)return;
-  document.getElementById('fs-in').textContent='฿'+fmt(data.totalIncome||0);
-  document.getElementById('fs-out').textContent='฿'+fmt(data.totalExpense||0);
-  var net=(data.totalIncome||0)-(data.totalExpense||0);
-  var el=document.getElementById('fs-net');
-  el.textContent='฿'+fmt(net);
-  el.className='stat-val '+(net>=0?'green':'red');
+if(!data)return;
+document.getElementById('fs-in').textContent='฿'+fmt(data.totalIncome||0);
+document.getElementById('fs-out').textContent='฿'+fmt(data.totalExpense||0);
+var net=(data.totalIncome||0)-(data.totalExpense||0);
+var el=document.getElementById('fs-net');
+el.textContent='฿'+fmt(net);
+el.className='stat-val '+(net>=0?'green':'red');
+}).catch(function(){});
+
+/* Load Cost Analysis stats — dynamic from getProducts + getCostData */
+callAPI({api:'getProducts'}).then(function(data){
+if(!data||!data.success)return;
+var products=data.products||[];
+document.getElementById('cs-variants').textContent=products.length;
+if(products.length&&products[0].sell_price){
+document.getElementById('cs-price').textContent='฿'+fmt(products[0].sell_price);
+}
+}).catch(function(){});
+
+callAPI({api:'getCostData'}).then(function(data){
+if(!data||!data.success)return;
+var keys=Object.keys(data.data||{});
+var totalMargin=0,count=0;
+keys.forEach(function(k){
+var items=data.data[k].items||[];
+var cost=items.reduce(function(s,i){return s+(i.cost||0)},0);
+if(cost>0){totalMargin+=((25900-cost)/25900)*100;count++;}
+});
+if(count>0){
+document.getElementById('cs-margin').textContent=(totalMargin/count).toFixed(1)+'%';
+}
 }).catch(function(){});
 
 /* Admin FAB */
 (function(){
-  var u=JSON.parse(sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user')||'{}');
-  if(u.role==='admin'){
-    var a=document.createElement('a');a.href='admin.html';a.className='admin-fab';a.textContent=' Admin';
-    document.body.appendChild(a);
-  }
+var u=JSON.parse(sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user')||'{}');
+if(u.role==='admin'){
+var a=document.createElement('a');a.href='admin.html';a.className='admin-fab';a.textContent=' Admin';
+document.body.appendChild(a);
+}
 })();
 </script>
 </body>
