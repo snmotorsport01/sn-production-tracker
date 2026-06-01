@@ -139,7 +139,7 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
       </div>
       <div>
         <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">ประเภท</label>
-        <select id="payType" class="select-box">
+        <select id="payType" class="select-box" onchange="onPayTypeChange()">
           <option value="income">รายรับ</option>
           <option value="expense">รายจ่าย</option>
         </select>
@@ -166,7 +166,7 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
     </div>
 <div id="payModelDiv" style="display:none;margin-bottom:12px">
       <label style="color:#888;font-size:12px;margin-bottom:4px">รุ่นสินค้า</label>
-      <select id="payProductModel" class="select-box">
+      <select id="payProductModel" class="select-box" onchange="onProductModelChange()">
         <option value="">เลือกรุ่น...</option>
       </select>
     </div>
@@ -897,10 +897,26 @@ function hidePaymentForm() {
 async function loadProductList() {
   fetch(API + "?api=getProducts").then(function(r){ return r.json(); }).then(function(d) {
     if (d.success && d.products) {
-      productList = d.products.map(function(p){ return { name: p.name, type: p.type, tab: p.tabName }; });
+      productList = d.products.map(function(p){ return { name: p.name, type: p.type, tab: p.tabName, sellPrice: p.sellPrice }; });
       populateProductDropdown();
     }
   }).catch(function(e){ console.warn("loadProductList error", e); });
+}
+
+function onProductModelChange() {
+  var type = document.getElementById("payType").value;
+  var cat = document.getElementById("payCategory").value;
+  var model = document.getElementById("payProductModel").value;
+  if (type === "income" && cat === "product_sale" && model) {
+    var prod = productList.find(function(p){ return p.name === model; });
+    if (prod && prod.sellPrice) {
+      document.getElementById("payAmount").value = prod.sellPrice;
+    }
+  }
+}
+
+function onPayTypeChange() {
+  onProductModelChange();
 }
 
 function populateProductDropdown() {
@@ -919,6 +935,8 @@ function onCategoryChange() {
   var cat = document.getElementById("payCategory").value;
   var div = document.getElementById("payModelDiv");
   if (div) div.style.display = (cat === "product_sale" || cat === "material") ? "" : "none";
+
+  onProductModelChange();
 }
 
 async function savePayment() {
