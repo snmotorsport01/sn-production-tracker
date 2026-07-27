@@ -36,20 +36,20 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .b-startprod{background:#2d1010;color:#f87171}
 .b-printfinish{background:#0c1e3d;color:#60a5fa}
 .b-outsource{background:#1e103d;color:#a78bfa}
-.b-qcpass{background:#0a2a1a;color:#4ade80}
-.b-shipped{background:#052e16;color:#22c55e}
+.b-qcpass{background:#0a2a1a;color:#8fd3bf}
+.b-shipped{background:#052e16;color:#68b09b}
 
 .btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
   text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
 .btn:active{transform:scale(.97);opacity:.8}
-.btn-p{background:#DC2626;color:#fff}
-.btn-g{background:#22c55e;color:#000}
+.btn-p{background:#cea24a;color:#fff}
+.btn-g{background:#68b09b;color:#000}
 .btn-r{background:#7f1d1d;color:#f87171;border:1px solid #991b1b}
 .btn-o{background:transparent;color:#aaa;border:1px solid #333}
 
 input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #262626;
   background:#0d0d0d;color:#fff;font-size:15px;margin-bottom:8px;-webkit-appearance:none}
-input:focus,select:focus,textarea:focus{border-color:#DC2626;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#cea24a;outline:none}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
 
@@ -58,8 +58,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .tl-i{position:relative;padding-bottom:18px}
 .tl-i:last-child{padding-bottom:0}
 .tl-d{position:absolute;left:-23px;top:3px;width:12px;height:12px;border-radius:50%;background:#151515;border:2px solid #333}
-.tl-d.done{background:#22c55e;border-color:#22c55e}
-.tl-d.now{background:#DC2626;border-color:#DC2626;box-shadow:0 0 10px #DC262655}
+.tl-d.done{background:#68b09b;border-color:#68b09b}
+.tl-d.now{background:#cea24a;border-color:#cea24a;box-shadow:0 0 10px #cea24a55}
 
 #qr-reader{width:100%;max-width:400px;margin:0 auto;border-radius:12px;overflow:hidden}
 #qr-reader video{border-radius:12px}
@@ -68,7 +68,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .stat{background:#151515;border-radius:12px;padding:14px;border:1px solid #1e1e1e;text-align:center}
 .stat .n{font-size:28px;font-weight:800}
 
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#cea24a;
   border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{text-align:center;padding:40px;color:#555}
@@ -80,7 +80,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
   z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast-ok{background:#22c55e;color:#000}
+.toast-ok{background:#68b09b;color:#000}
 .toast-err{background:#ef4444;color:#fff}
 
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;display:flex;
@@ -98,18 +98,19 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .auth-bar .role-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;margin-left:8px;text-transform:uppercase;font-weight:600}
 .auth-bar .role-admin{background:rgba(231,76,60,.2);color:#e74c3c}
 .auth-bar .role-manager{background:rgba(243,156,18,.2);color:#f39c12}
-.auth-bar .role-operator{background:rgba(46,204,113,.2);color:#2ecc71}
+.auth-bar .role-operator{background:rgba(46,204,113,.2);color:#68b09b}
 .auth-bar .logout-btn{background:transparent;border:1px solid #555;color:#aaa;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.75rem}
 .auth-bar .logout-btn:hover{border-color:#e74c3c;color:#e74c3c}
 
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;justify-content:center;max-width:600px;margin:0 auto;z-index:100}
 .bottom-nav a{flex:1;text-align:center;padding:12px 4px;text-decoration:none;color:#555;font-size:11px;font-weight:600;transition:.12s;max-width:100px}
-.bottom-nav a.active{color:#DC2626}
+.bottom-nav a.active{color:#cea24a}
 </style>
 <!--sn-perf-->
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+<link rel="stylesheet" href="axis.css">
 </head>
 <body><script>
 (function(){
@@ -251,7 +252,7 @@ var PHASES = [
   {num:2, status:"Print Finish",    prev:"Start Producing",   color:"#2563EB", label:"ปริ้นเสร็จ"},
   {num:3, status:"Outsource",       prev:"Print Finish",      color:"#7C3AED", label:"ส่ง Outsource"},
   {num:4, status:"QC Pass",         prev:"Outsource",         color:"#059669", label:"QC ผ่าน"},
-  {num:5, status:"Shipped",         prev:"QC Pass",           color:"#DC2626", label:"จัดส่งแล้ว"}
+  {num:5, status:"Shipped",         prev:"QC Pass",           color:"#cea24a", label:"จัดส่งแล้ว"}
 ];
 
 var STATUSES = ["Created","Start Producing","Print Finish","Outsource","QC Pass","Shipped"];
@@ -742,7 +743,7 @@ function printStationQR() {
     '@page{margin:8mm}' +
     '.grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}' +
     '.label{width:180px;border:1.5px solid #ccc;border-radius:10px;padding:14px;text-align:center;page-break-inside:avoid}' +
-    '.brand{font-size:8px;letter-spacing:2.5px;color:#DC2626;font-weight:700}' +
+    '.brand{font-size:8px;letter-spacing:2.5px;color:#cea24a;font-weight:700}' +
     '.qr{margin:8px auto;width:120px;height:120px}' +
     '.phase{display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;margin-top:4px}' +
     '.sub{font-size:9px;color:#aaa;margin-top:6px}' +

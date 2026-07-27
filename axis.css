@@ -1,0 +1,131 @@
+/* ═══════════════════════════════════════════════════════════════════
+   SN ERP — AXIS skin
+   Shared design system that reskins every page to the AXIS instrument
+   language: night-cockpit ground + carbon weave, gold (#cea24a) accent,
+   teal (#68b09b) for "good", Psionic on Latin legends/nav/numerals.
+   Loaded LAST in each <head> so it overrides the per-page inline CSS.
+   Thai body text intentionally keeps the system font (Psionic is Latin-only).
+   ═══════════════════════════════════════════════════════════════════ */
+@font-face{
+  font-family:'Psionic';
+  src:url('fonts/psionic.otf') format('opentype');
+  font-weight:normal;font-style:normal;font-display:swap;
+}
+:root{
+  --ground:#08090b; --panel:#14171c; --panel2:#1a1e24; --panelhi:#20242b;
+  --hair:rgba(238,240,244,.08); --hair2:rgba(238,240,244,.16);
+  --gold:#cea24a; --goldhi:#e0b85a; --golddim:#7a6128; --goldglow:rgba(206,162,74,.16);
+  --ink:#eef0f4; --ink2:#8b9199; --ink3:#565c64;
+  --live:#68b09b; --amber:#f59e0b; --red:#e0554e;
+  --psi:'Psionic','SF Mono',ui-monospace,Menlo,monospace;
+}
+
+/* ── Ground: deep cockpit + fine carbon-fibre weave ── */
+body{
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.014) 0 1.5px, transparent 1.5px 3px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.014) 0 1.5px, transparent 1.5px 3px),
+    radial-gradient(135% 90% at 50% -8%, #101318 0%, #08090b 58%) fixed !important;
+  color:var(--ink);
+}
+
+/* ── Auth bar → frosted dark w/ gold hairline ── */
+.auth-bar{
+  background:rgba(18,21,27,.72) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);
+  border-bottom:1px solid rgba(206,162,74,.14) !important;
+}
+.auth-bar .user-info strong{color:var(--gold) !important}
+.auth-bar .role-badge{font-family:var(--psi);letter-spacing:.1em}
+.auth-bar .role-admin{background:var(--goldglow) !important;color:var(--gold) !important}
+.auth-bar .logout-btn{border-color:var(--hair2) !important;color:var(--ink2) !important;font-family:var(--psi);letter-spacing:.06em}
+.auth-bar .logout-btn:hover{border-color:var(--gold) !important;color:var(--gold) !important}
+
+/* ── Wordmark / header ── */
+.logo-text{font-family:var(--psi) !important;letter-spacing:.22em !important;color:var(--ink) !important;font-weight:400 !important}
+.logo-sub{font-family:var(--psi) !important;color:var(--ink3) !important;letter-spacing:.42em !important}
+.divider{background:linear-gradient(90deg,var(--golddim),var(--gold)) !important;box-shadow:0 0 12px -2px var(--goldglow)}
+
+/* ── Panels: section cards / generic cards ── */
+.section,.card,.phase-card,.stat,.stcard,.heat{
+  background:linear-gradient(180deg,var(--panel2),var(--panel)) !important;
+  border:1px solid var(--hair) !important;
+}
+.section{border-radius:16px !important}
+
+/* ── Section icons (Hub) → gold-tinted, gold glyph ── */
+.section-icon{color:var(--gold)}
+.section-icon.prod,.section-icon.inv,.section-icon.fin{background:var(--goldglow) !important}
+.section-title{letter-spacing:.01em}
+.section-desc,.stat-lbl,.flow-step,.hdr{color:var(--ink3) !important}
+
+/* ── Stat values: instrument numerals ── */
+.stat-val,.stat .n,.big,.val{font-family:var(--psi) !important;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.stat-val.red{color:var(--gold) !important}     /* "active / in-progress" reads as the accent */
+.stat-val.green{color:var(--live) !important}
+.stat-val.amber{color:var(--amber) !important}
+
+/* ── Flow / active step ── */
+.flow-step.active{color:var(--ink) !important;font-weight:600}
+.flow-sep{color:var(--golddim) !important}
+
+/* ── Buttons ── */
+.btn-p,.btn-g{
+  background:var(--gold) !important;color:#161003 !important;font-weight:700;
+  box-shadow:0 8px 22px -10px var(--goldglow);
+}
+.btn-o{background:transparent !important;border:1px solid var(--hair2) !important;color:var(--ink2) !important}
+.btn-o:active{border-color:var(--gold) !important;color:var(--gold) !important}
+
+/* ── Bottom nav → gold active, Psionic ── */
+.bottom-nav{background:rgba(15,17,21,.94) !important;border-top:1px solid rgba(206,162,74,.14) !important}
+.bottom-nav a{font-family:var(--psi) !important;letter-spacing:.08em;color:var(--ink3) !important;text-transform:uppercase;font-size:9.5px !important}
+.bottom-nav a.active{color:var(--gold) !important}
+
+/* ── Sub-links (Hub) ── */
+.sub-link{color:var(--ink2) !important;border-color:var(--hair) !important}
+.sub-link:active{background:var(--panelhi) !important}
+.sub-link .sl-arrow,.section-arrow{color:var(--golddim) !important}
+
+/* ── Inputs ── */
+input,select,textarea{background:var(--panelhi) !important;border:1px solid var(--hair2) !important;color:var(--ink) !important}
+input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outline:none}
+
+/* ── Spinners / accents ── */
+.spinner,.loading-spinner{border-top-color:var(--gold) !important}
+
+/* ── Toast (keep semantic ok/err, refine ok→gold) ── */
+.toast-ok{background:var(--gold) !important;color:#161003 !important}
+
+/* ── Admin FAB → gold pill ── */
+.admin-fab{background:var(--gold) !important;color:#161003 !important;font-family:var(--psi);letter-spacing:.06em;
+  box-shadow:0 8px 22px -8px var(--goldglow) !important}
+
+/* ── Footer ── */
+.footer{color:var(--ink3) !important;font-family:var(--psi);letter-spacing:.14em}
+
+/* ── Timeline dots (QR) → gold "now" ── */
+.tl-d.now{background:var(--gold) !important;border-color:var(--gold) !important;box-shadow:0 0 10px var(--goldglow) !important}
+.tl-d.done{background:var(--live) !important;border-color:var(--live) !important}
+
+/* ── Bespoke brand classes (finance / cost tabs & buttons) → gold, danger stays red ── */
+.tab.active{background:var(--gold) !important;color:#161003 !important;border-color:var(--gold) !important}
+.tab-bar{background:var(--panelhi) !important}
+.tab-bar button.active{background:var(--gold) !important;color:#161003 !important}
+.btn-primary{background:var(--gold) !important;color:#161003 !important}
+.btn-primary:hover{background:var(--goldhi) !important}
+.btn-secondary{background:var(--panelhi) !important;color:var(--ink) !important;border:1px solid var(--hair2) !important}
+.upload-zone{border-color:var(--hair2) !important}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold) !important;background:rgba(206,162,74,.06) !important}
+.badge-income{background:rgba(104,176,155,.14) !important;color:var(--live) !important}
+.status-step.done{background:var(--gold) !important}
+.status-step.current{background:var(--amber) !important}
+.filter-btn.active{color:var(--gold) !important;border-color:var(--gold) !important}
+/* finance / generic cards + panels that use their own class names */
+.cf-card,.summary-box,.preview-card,.inv-item,.sum-item,.modal,.confirm-box,.batch-card,.tab{
+  background:linear-gradient(180deg,var(--panel2),var(--panel)) !important;border-color:var(--hair) !important;
+}
+/* numeric headline values → instrument face */
+.summary-box .num,.cf-card .amount,.sum-item .n,.batch-id{font-family:var(--psi) !important;font-variant-numeric:tabular-nums}
+/* page sub-heads / muted text alignment with AXIS ink scale */
+.subtitle,.batch-meta,.inv-meta,.preview-row .label,.hdr{color:var(--ink3) !important}

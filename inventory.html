@@ -14,17 +14,17 @@ padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
 .btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
 text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
 .btn:active{transform:scale(.97);opacity:.8}
-.btn-p{background:#DC2626;color:#fff}
-.btn-g{background:#22c55e;color:#000}
+.btn-p{background:#cea24a;color:#fff}
+.btn-g{background:#68b09b;color:#000}
 .btn-o{background:transparent;color:#aaa;border:1px solid #333}
 .btn-w{background:#f59e0b;color:#000}
 .btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin:0}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#cea24a;
 border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{text-align:center;padding:40px;color:#555}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-.b-ok{background:#0a2a1a;color:#4ade80}
+.b-ok{background:#0a2a1a;color:#8fd3bf}
 .b-low{background:#2a1a00;color:#f59e0b}
 .b-crit{background:#2d1010;color:#f87171}
 .b-out{background:#1a1a1a;color:#666}
@@ -64,12 +64,12 @@ border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;-webkit-appea
 .tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
 white-space:nowrap;border:1px solid #333;background:transparent;color:#888;transition:.15s}
-.tab.active{background:#DC2626;color:#fff;border-color:#DC2626}
+.tab.active{background:#cea24a;color:#fff;border-color:#cea24a}
 
 /* Toast */
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
 padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
-z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
+z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#68b09b;color:#000}
 .toast.err{background:#ef4444;color:#fff}
 .toast.warn{background:#f59e0b;color:#000}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -91,6 +91,7 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+<link rel="stylesheet" href="axis.css">
 </head>
 <body>
 
@@ -152,7 +153,7 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 <div style="text-align:center;margin:12px 0 20px">
 <div style="font-size:16px;font-weight:700;color:#fff">Inventory Management</div>
 <div style="font-size:12px;color:#666;margin-top:2px">SN Motorsports — Material Tracking</div>
-<div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
+<div style="width:40px;height:3px;background:#cea24a;margin:8px auto 0;border-radius:2px"></div>
 </div>
 
 <!-- Tabs -->
@@ -238,7 +239,7 @@ function getStockStatus(stock, min) {
   if (stock <= 0) return { label: 'Out', cls: 'b-out', color: '#666' };
   if (stock <= min * 0.5) return { label: 'Critical', cls: 'b-crit', color: '#f87171' };
   if (stock <= min) return { label: 'Low', cls: 'b-low', color: '#f59e0b' };
-  return { label: 'OK', cls: 'b-ok', color: '#4ade80' };
+  return { label: 'OK', cls: 'b-ok', color: '#8fd3bf' };
 }
 
 function renderStock(items) {
@@ -259,7 +260,7 @@ function renderStock(items) {
 
   var html = '<div class="card">';
   html += '<div class="sum-grid">';
-  html += '<div class="sum-item"><div class="n" style="color:#4ade80">' + ok + '</div><div class="hdr">OK</div></div>';
+  html += '<div class="sum-item"><div class="n" style="color:#8fd3bf">' + ok + '</div><div class="hdr">OK</div></div>';
   html += '<div class="sum-item"><div class="n" style="color:#f59e0b">' + low + '</div><div class="hdr">Low</div></div>';
   html += '<div class="sum-item"><div class="n" style="color:#f87171">' + crit + '</div><div class="hdr">Critical</div></div>';
   html += '</div></div>';
@@ -333,7 +334,7 @@ function submitRestock() {
   if (!qty || qty <= 0) { toast('Enter a valid quantity', 'err'); return; }
 
   var btn = document.getElementById('restockBtn');
-  btn.innerHTML = '<div class="spinner" style="border-top-color:#22c55e"></div> Updating...';
+  btn.innerHTML = '<div class="spinner" style="border-top-color:#68b09b"></div> Updating...';
   btn.disabled = true;
 
   callAPI({
@@ -379,7 +380,7 @@ function renderAlerts(items) {
 
   if (!alerts.length) {
     document.getElementById('alerts-content').innerHTML =
-      '<div class="card" style="text-align:center;padding:24px"><div style="font-size:28px;margin-bottom:8px">✓</div><div style="color:#4ade80;font-weight:600">All stock levels OK</div></div>';
+      '<div class="card" style="text-align:center;padding:24px"><div style="font-size:28px;margin-bottom:8px">✓</div><div style="color:#8fd3bf;font-weight:600">All stock levels OK</div></div>';
     return;
   }
 
@@ -457,7 +458,7 @@ function renderPOs(pos) {
 
   var html = '';
   pos.forEach(function(po) {
-    var urgColor = po.urgency === 'High' ? '#f87171' : po.urgency === 'Medium' ? '#f59e0b' : '#4ade80';
+    var urgColor = po.urgency === 'High' ? '#f87171' : po.urgency === 'Medium' ? '#f59e0b' : '#8fd3bf';
     html += '<div class="card">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
     html += '<div style="font-weight:600;font-size:14px">' + (po.date || '-') + '</div>';
@@ -505,7 +506,7 @@ function renderBOM(items) {
 
   html += '<div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-weight:700;font-size:14px;border-top:2px solid #333;margin-top:4px">';
   html += '<div>Total per unit</div>';
-  html += '<div style="color:#DC2626">฿' + totalCost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
+  html += '<div style="color:#cea24a">฿' + totalCost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
   html += '</div>';
   html += '</div>';
 
@@ -531,7 +532,7 @@ function calcBOM() {
     var enough = stock >= need;
     html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #111">';
     html += '<div>' + it.item + '</div>';
-    html += '<div style="color:' + (enough ? '#4ade80' : '#f87171') + '">';
+    html += '<div style="color:' + (enough ? '#8fd3bf' : '#f87171') + '">';
     html += need + ' needed / ' + stock + ' in stock';
     html += (enough ? ' ✓' : ' ✗') + '</div>';
     html += '</div>';
@@ -551,7 +552,7 @@ loadInventory();
       if (!qty || isNaN(qty) || Number(qty) <= 0) return;
       var newStock = Math.max(0, item.stock - Number(qty));
       callAPI({api:"updateInventoryItem", item:item.item, stock:newStock}).then(function(r) {
-        if (r.success) { toast(item.item + " ลดเหลือ " + newStock,"#4CAF50"); loadInventory(); }
+        if (r.success) { toast(item.item + " ลดเหลือ " + newStock,"#68b09b"); loadInventory(); }
         else { toast("Error: " + (r.error||"Unknown"),"#f44"); }
       }).catch(function(e) { toast("Error: "+e.message,"#f44"); });
     }
@@ -586,7 +587,7 @@ loadInventory();
         supplier: document.getElementById("editSupplier").value
       };
       callAPI(params).then(function(r) {
-        if (r.success) { toast(item.item + " อัปเดตแล้ว","#4CAF50"); closeEditModal(); loadInventory(); }
+        if (r.success) { toast(item.item + " อัปเดตแล้ว","#68b09b"); closeEditModal(); loadInventory(); }
         else { toast("Error: "+(r.error||"Unknown"),"#f44"); }
       }).catch(function(e) { toast("Error: "+e.message,"#f44"); });
     }
@@ -596,7 +597,7 @@ loadInventory();
       var item = allInventory[currentEditIdx];
       if (!confirm("ลบ " + item.item + " ออกจากระบบถาวร?")) return;
       callAPI({api:"deleteInventoryItem", item:item.item}).then(function(r) {
-        if (r.success) { toast(item.item + " ถูกลบแล้ว","#4CAF50"); closeEditModal(); loadInventory(); }
+        if (r.success) { toast(item.item + " ถูกลบแล้ว","#68b09b"); closeEditModal(); loadInventory(); }
         else { toast("Error: "+(r.error||"Unknown"),"#f44"); }
       }).catch(function(e) { toast("Error: "+e.message,"#f44"); });
     }

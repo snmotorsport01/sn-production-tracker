@@ -16,7 +16,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .logo{text-align:center;margin:24px 0 8px}
 .logo-text{font-size:28px;font-weight:800;letter-spacing:2px;color:#fff}
 .logo-sub{font-size:12px;color:#666;letter-spacing:4px;text-transform:uppercase;margin-top:4px}
-.divider{width:40px;height:3px;background:#DC2626;border-radius:2px;margin:12px auto 32px}
+.divider{width:40px;height:3px;background:#cea24a;border-radius:2px;margin:12px auto 32px}
 
 .hub-grid{display:flex;flex-direction:column;gap:12px}
 
@@ -24,12 +24,12 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .hub-card:active{transform:scale(.97);opacity:.85}
 .hub-card::after{content:'';position:absolute;top:0;right:0;width:120px;height:100%;opacity:.06;border-radius:50%;filter:blur(30px)}
 
-.hub-card.prod{border-left:3px solid #DC2626}
-.hub-card.prod::after{background:#DC2626}
+.hub-card.prod{border-left:3px solid #cea24a}
+.hub-card.prod::after{background:#cea24a}
 .hub-card.inv{border-left:3px solid #f59e0b}
 .hub-card.inv::after{background:#f59e0b}
-.hub-card.fin{border-left:3px solid #22c55e}
-.hub-card.fin::after{background:#22c55e}
+.hub-card.fin{border-left:3px solid #68b09b}
+.hub-card.fin::after{background:#68b09b}
 
 .hub-icon{font-size:28px;margin-bottom:8px}
 .hub-title{font-size:18px;font-weight:700;margin-bottom:4px}
@@ -39,9 +39,9 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .hub-stat .n{font-size:20px;font-weight:800}
 .hub-stat .l{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
-.hub-stat .n.red{color:#DC2626}
+.hub-stat .n.red{color:#cea24a}
 .hub-stat .n.amber{color:#f59e0b}
-.hub-stat .n.green{color:#22c55e}
+.hub-stat .n.green{color:#68b09b}
 
 .quick-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}
 .qlink{background:#151515;border-radius:12px;padding:14px;text-align:center;border:1px solid #1e1e1e;cursor:pointer;transition:.12s;text-decoration:none;color:#888;font-size:12px;font-weight:600}
@@ -51,7 +51,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .footer{text-align:center;margin-top:40px;padding:20px 0;color:#333;font-size:11px;letter-spacing:1px}
 
 .loading{text-align:center;padding:20px;color:#555}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;border-radius:50%;animation:spin .6s linear infinite}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#cea24a;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* N8N Status Panel */
@@ -60,7 +60,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .n8n-icon{font-size:20px;}
 .n8n-title{font-size:15px;font-weight:600;color:#e5e5e5;flex:1;}
 .n8n-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
-.n8n-badge.healthy{background:#0d3320;color:#4ade80;}
+.n8n-badge.healthy{background:#0d3320;color:#8fd3bf;}
 .n8n-badge.warning{background:#3d2e08;color:#fbbf24;}
 .n8n-badge.error,.n8n-badge.no_data{background:#1a1a2e;color:#818cf8;}
 .n8n-badge.loading{background:#1a1a2e;color:#888;}
@@ -79,7 +79,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 .auth-bar .role-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;margin-left:8px;text-transform:uppercase;font-weight:600}
 .auth-bar .role-admin{background:rgba(231,76,60,.2);color:#e74c3c}
 .auth-bar .role-manager{background:rgba(243,156,18,.2);color:#f39c12}
-.auth-bar .role-operator{background:rgba(46,204,113,.2);color:#2ecc71}
+.auth-bar .role-operator{background:rgba(46,204,113,.2);color:#68b09b}
 .auth-bar .logout-btn{background:transparent;border:1px solid #555;color:#aaa;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.75rem}
 .auth-bar .logout-btn:hover{border-color:#e74c3c;color:#e74c3c}
 </style>
@@ -87,6 +87,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+<link rel="stylesheet" href="axis.css">
 </head>
 <body><script>
 (function(){

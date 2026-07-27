@@ -16,8 +16,8 @@ padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
 .btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
 text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
 .btn:active{transform:scale(.97);opacity:.8}
-.btn-p{background:#DC2626;color:#fff}
-.btn-g{background:#22c55e;color:#000}
+.btn-p{background:#cea24a;color:#fff}
+.btn-g{background:#68b09b;color:#000}
 .btn-o{background:transparent;color:#aaa;border:1px solid #333}
 .btn-w{background:#f59e0b;color:#000}
 .btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin:0}
@@ -28,7 +28,7 @@ width:auto;display:inline-block;margin:0;border-radius:8px;cursor:pointer}
 .btn-edit{background:transparent;color:#60a5fa;border:1px solid #60a5fa44;padding:4px 10px;font-size:12px;
 width:auto;display:inline-block;margin:0;border-radius:8px;cursor:pointer}
 .btn-edit:active{background:#60a5fa22}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#DC2626;
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #333;border-top-color:#cea24a;
 border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{text-align:center;padding:40px;color:#555}
@@ -37,8 +37,8 @@ border-radius:50%;animation:spin .6s linear infinite}
 .b-startprod{background:#2d1010;color:#f87171}
 .b-printfinish{background:#0c1e3d;color:#60a5fa}
 .b-outsource{background:#1e103d;color:#a78bfa}
-.b-qcpass{background:#0a2a1a;color:#4ade80}
-.b-shipped{background:#052e16;color:#22c55e}
+.b-qcpass{background:#0a2a1a;color:#8fd3bf}
+.b-shipped{background:#052e16;color:#68b09b}
 .sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
 .sum-item{background:#0d0d0d;border-radius:10px;padding:12px;text-align:center;border:1px solid #1e1e1e}
 .sum-item .n{font-size:24px;font-weight:800}
@@ -48,7 +48,7 @@ border-radius:50%;animation:spin .6s linear infinite}
 .tab{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
 white-space:nowrap;color:#666;background:#151515;border:1px solid #1e1e1e;transition:.12s;flex-shrink:0}
 .tab:active{transform:scale(.95)}
-.tab.active{background:#DC2626;color:#fff;border-color:#DC2626}
+.tab.active{background:#cea24a;color:#fff;border-color:#cea24a}
 
 /* Batch card */
 .batch-card{background:#151515;border-radius:14px;padding:14px 16px;margin-bottom:8px;border:1px solid #1e1e1e;transition:.12s}
@@ -66,7 +66,7 @@ td{padding:8px 6px;border-bottom:1px solid #1a1a1a}
 /* Status progress bar */
 .status-bar{display:flex;gap:2px;margin-top:8px}
 .status-step{flex:1;height:4px;border-radius:2px;background:#1a1a1a}
-.status-step.done{background:#DC2626}
+.status-step.done{background:#cea24a}
 .status-step.current{background:#f59e0b}
 
 /* Filter */
@@ -74,11 +74,11 @@ td{padding:8px 6px;border-bottom:1px solid #1a1a1a}
 .filter-btn{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
 background:#151515;color:#666;border:1px solid #1e1e1e;transition:.12s}
 .filter-btn:active{transform:scale(.95)}
-.filter-btn.active{background:#DC262633;color:#DC2626;border-color:#DC2626}
+.filter-btn.active{background:#cea24a33;color:#cea24a;border-color:#cea24a}
 
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
 padding:12px 24px;border-radius:12px;font-weight:600;font-size:14px;
-z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#22c55e;color:#000}
+z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;background:#68b09b;color:#000}
 .toast.err{background:#f87171;color:#fff}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
@@ -94,7 +94,7 @@ transform:translateY(100%);transition:.3s;max-height:90vh;overflow-y:auto}
 .field label{display:block;font-size:12px;color:#888;margin-bottom:4px;font-weight:600}
 .field input,.field textarea,.field select{width:100%;padding:12px;border-radius:10px;border:1px solid #333;
 background:#0d0d0d;color:#fff;font-size:15px;outline:none;-webkit-appearance:none}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:#DC2626}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#cea24a}
 .field textarea{resize:vertical;min-height:60px}
 
 /* Custom select with other */
@@ -117,21 +117,22 @@ justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 /* Bottom nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;display:flex;justify-content:center;max-width:600px;margin:0 auto;z-index:100}
 .bottom-nav a{flex:1;text-align:center;padding:12px 4px;text-decoration:none;color:#555;font-size:11px;font-weight:600;transition:.12s;max-width:100px}
-.bottom-nav a.active{color:#DC2626}
+.bottom-nav a.active{color:#cea24a}
 </style>
 <!--sn-perf-->
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+<link rel="stylesheet" href="axis.css">
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
 
 <div style="text-align:center;margin:12px 0 4px">
-  <div style="font-size:11px;color:#DC2626;font-weight:700;letter-spacing:3px">SN ERP</div>
+  <div style="font-size:11px;color:#cea24a;font-weight:700;letter-spacing:3px">SN ERP</div>
   <div style="font-size:18px;font-weight:800;margin-top:2px;color:#fff">Production Dashboard</div>
-  <div style="width:40px;height:3px;background:#DC2626;margin:8px auto 0;border-radius:2px"></div>
+  <div style="width:40px;height:3px;background:#cea24a;margin:8px auto 0;border-radius:2px"></div>
 </div>
 
 <!-- Quick Actions -->
@@ -257,7 +258,7 @@ var pendingDeleteId = '';
 
 var STATUSES = ['Created','Start Producing','Print Finish','Outsource','QC Pass','Shipped'];
 var STATUS_COLORS = {'Created':'#888','Start Producing':'#f87171','Print Finish':'#60a5fa',
-'Outsource':'#a78bfa','QC Pass':'#4ade80','Shipped':'#22c55e'};
+'Outsource':'#a78bfa','QC Pass':'#8fd3bf','Shipped':'#68b09b'};
 var STATUS_TH = {'Created':'สร้างแล้ว','Start Producing':'กำลังผลิต','Print Finish':'พิมพ์เสร็จ',
 'Outsource':'ส่งนอก','QC Pass':'QC ผ่าน','Shipped':'จัดส่งแล้ว'};
 
@@ -466,7 +467,7 @@ function renderOverview() {
   html += '<div style="font-weight:700;margin-bottom:8px">สถานะการผลิต</div>';
   html += '<div class="sum-grid">';
   html += '<div class="sum-item"><div class="n" style="color:#f87171">' + active + '</div><div class="hdr">กำลังผลิต</div></div>';
-  html += '<div class="sum-item"><div class="n" style="color:#4ade80">' + done + '</div><div class="hdr">เสร็จแล้ว</div></div>';
+  html += '<div class="sum-item"><div class="n" style="color:#8fd3bf">' + done + '</div><div class="hdr">เสร็จแล้ว</div></div>';
   html += '<div class="sum-item"><div class="n" style="color:#f59e0b">' + allBatches.length + '</div><div class="hdr">ทั้งหมด</div></div>';
   html += '</div></div>';
 

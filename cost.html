@@ -19,11 +19,11 @@ h2{font-size:1.2rem;margin-bottom:4px}
 .summary-box .num{font-size:1.25rem;font-weight:700;margin-bottom:2px}
 .summary-box .lbl{color:#888;font-size:.73rem}
 .nav-back{color:#888;text-decoration:none;font-size:.85rem;display:inline-block;margin-bottom:12px}
-.green{color:#4caf50!important}
+.green{color:#68b09b!important}
 .red{color:#e53935!important}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
 .badge-stream{background:rgba(229,57,53,.15);color:#e53935}
-.badge-beam{background:rgba(76,175,80,.15);color:#4caf50}
+.badge-beam{background:rgba(76,175,80,.15);color:#68b09b}
 .cost-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:10px}
 .cost-table th{text-align:left;color:#888;font-weight:500;padding:8px 4px;border-bottom:1px solid #333}
 .cost-table td{padding:7px 4px;border-bottom:1px solid #1a1a1a}
@@ -54,6 +54,7 @@ select.select-box{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
+<link rel="stylesheet" href="axis.css">
 </head>
 <body>
 
@@ -80,7 +81,7 @@ select.select-box{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-
 <div class="section-title">เปรียบเทียบกำไร (%)</div>
 <div class="legend">
 <div class="legend-item"><span class="legend-dot" style="background:#e53935"></span> Stream</div>
-<div class="legend-item"><span class="legend-dot" style="background:#4caf50"></span> Beam</div>
+<div class="legend-item"><span class="legend-dot" style="background:#68b09b"></span> Beam</div>
 </div>
 <div class="chart-wrap"><canvas id="chartBar" height="200"></canvas></div>
 </div>
@@ -383,7 +384,7 @@ var x = pad + i*cw + cw/2 - barW/2;
 var ratio = Math.max(0, Math.min(1, (v.profit-minP)/(maxP-minP)));
 var barH = ratio*(h-top-bot);
 var y = h-bot-barH;
-var color = v.type==='stream'?'#e53935':'#4caf50';
+var color = v.type==='stream'?'#e53935':'#68b09b';
 
 ctx.fillStyle = color;
 roundRect(ctx, x, y, barW, barH, 4);
@@ -492,7 +493,7 @@ function renderVariants(){
 var list = filtered();
 var html = '';
 list.forEach(function(v){
-var color = v.type==='stream'?'#e53935':'#4caf50';
+var color = v.type==='stream'?'#e53935':'#68b09b';
 var badge = v.type==='stream'?'badge-stream':'badge-beam';
 var label = v.type==='stream'?'Stream':'Beam';
 var profitAmt = SELL - v.total;
