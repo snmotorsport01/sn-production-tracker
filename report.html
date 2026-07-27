@@ -49,6 +49,10 @@ z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;backgroun
 .role-operator{background:rgba(46,204,113,.2);color:#2ecc71}
 .logout-btn{background:#333;border:none;color:#aaa;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:.75rem}
 </style>
+<!--sn-perf-->
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </head>
 <body>
 
@@ -62,7 +66,7 @@ z-index:200;transition:.3s;opacity:0;pointer-events:none;max-width:90%;backgroun
 
 <div id="report-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">Loading...</div></div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- xlsx is lazy-loaded on Excel download (see snLoadScript) -->
 <script>
 var API_URL = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
 var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1qX2ghgY9JW0EesBnRaaA5GUEEMdLCashKdHWTpa7cbM/edit';
@@ -164,8 +168,21 @@ html += '<a href="index.html" class="btn btn-o" style="text-decoration:none;disp
 document.getElementById('report-content').innerHTML = html;
 }
 
-function downloadXLSX() {
+var _snScripts = {};
+function snLoadScript(src) {
+if (_snScripts[src]) return _snScripts[src];
+_snScripts[src] = new Promise(function (res, rej) {
+var s = document.createElement('script');
+s.src = src; s.onload = res; s.onerror = rej;
+document.head.appendChild(s);
+});
+return _snScripts[src];
+}
+
+async function downloadXLSX() {
 if (!allBatches.length) { toast('No data'); return; }
+
+await snLoadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
 
 var wb = XLSX.utils.book_new();
 

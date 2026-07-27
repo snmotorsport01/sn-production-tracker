@@ -119,6 +119,10 @@ justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 .bottom-nav a{flex:1;text-align:center;padding:12px 4px;text-decoration:none;color:#555;font-size:11px;font-weight:600;transition:.12s;max-width:100px}
 .bottom-nav a.active{color:#DC2626}
 </style>
+<!--sn-perf-->
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </head>
 <body>
 
@@ -241,7 +245,7 @@ justify-content:center;opacity:0;pointer-events:none;transition:.25s}
   <a href="qr.html">QR</a>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- xlsx is lazy-loaded on Excel download (see snLoadScript) -->
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbxO6U1vMy2gSOj_1CgZjkzftZh6Vdl9apsbhwQ5TqAub6gfh6EhDQrUKegxI0Mz8Woh/exec';
 var SHEET_URL = 'https://docs.google.com/spreadsheets/d/1qX2ghgY9JW0EesBnRaaA5GUEEMdLCashKdHWTpa7cbM/edit';
@@ -653,9 +657,23 @@ function renderReport() {
   document.getElementById('report-content').innerHTML = html;
 }
 
+// ── Lazy script loader (memoized) ──
+var _snScripts = {};
+function snLoadScript(src) {
+  if (_snScripts[src]) return _snScripts[src];
+  _snScripts[src] = new Promise(function (res, rej) {
+    var s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  return _snScripts[src];
+}
+
 // ── Excel Download ──
-function downloadXLSX() {
+async function downloadXLSX() {
   if (!allBatches.length) { toast('ไม่มีข้อมูล', 'err'); return; }
+
+  await snLoadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
 
   var wb = XLSX.utils.book_new();
 

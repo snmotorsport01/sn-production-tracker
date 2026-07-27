@@ -6,7 +6,7 @@
 <title>SN ERP — Finance</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0a">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- pdf.js is lazy-loaded on first invoice upload (see snLoadPdf) -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px;max-width:800px;margin:0 auto}
@@ -69,6 +69,10 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 .badge-income{background:#1b5e20;color:#4caf50}
 .badge-expense{background:#b71c1c33;color:#e53935}
 </style>
+<!--sn-perf-->
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </head>
 <body>
 
@@ -324,9 +328,23 @@ function fmtDual(usd) {
 }
 
 // ============================================================
-// PDF.js setup
+// PDF.js setup — lazy-loaded on first use (keeps ~350KB off initial load)
 // ============================================================
-pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+var _pdfPromise;
+function snLoadPdf() {
+  if (_pdfPromise) return _pdfPromise;
+  _pdfPromise = new Promise(function (res, rej) {
+    var s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    s.onload = function () {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      res();
+    };
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  return _pdfPromise;
+}
 
 // ============================================================
 // Tab switching
@@ -375,6 +393,7 @@ function handleFile(file) {
 
 async function parsePDF(data) {
   try {
+    await snLoadPdf();
     var pdf = await pdfjsLib.getDocument({ data: data }).promise;
     var page = await pdf.getPage(1);
     var content = await page.getTextContent();
