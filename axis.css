@@ -126,6 +126,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
   background:linear-gradient(180deg,var(--panel2),var(--panel)) !important;border-color:var(--hair) !important;
 }
 /* numeric headline values → instrument face */
-.summary-box .num,.cf-card .amount,.sum-item .n,.batch-id{font-family:var(--psi) !important;font-variant-numeric:tabular-nums}
+.sum-item .n,.batch-id{font-family:var(--psi) !important;font-variant-numeric:tabular-nums}
+/* finance currency values can be large (฿ hundreds-of-thousands) → narrower tabular
+   mono instead of the wide Psionic so they never overflow the card */
+.summary-box .num,.cf-card .amount{font-family:ui-monospace,'SF Mono',Menlo,monospace !important;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
+.summary-box .num{font-size:1.2rem !important}
+.cf-card .amount{font-size:1.1rem !important}
 /* page sub-heads / muted text alignment with AXIS ink scale */
 .subtitle,.batch-meta,.inv-meta,.preview-row .label,.hdr{color:var(--ink3) !important}

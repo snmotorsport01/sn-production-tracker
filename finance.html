@@ -322,11 +322,20 @@ function toTHB(usd) {
   return (usd * usdThbRate).toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-function fmtDual(usd) {
-  var s = "$" + usd.toFixed(2);
-  if (rateLoaded) s += " (" + toTHB(usd) + " THB)";
-  return s;
+// Currency-aware formatter. THB shows ฿ directly (NO rate conversion — a baht
+// invoice must not be inflated ×33). USD keeps the dual "$x (฿y)" display.
+function fmtMoney(amount, currency) {
+  amount = Number(amount) || 0;
+  var cur = currency || (parsedInvoice && parsedInvoice.currency) || "THB";
+  if (cur === "USD") {
+    var s = "$" + amount.toFixed(2);
+    if (rateLoaded) s += " (฿" + toTHB(amount) + ")";
+    return s;
+  }
+  return "฿" + amount.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
+// Back-compat: old call sites assumed USD input
+function fmtDual(usd) { return fmtMoney(usd, "USD"); }
 
 // ============================================================
 // PDF.js setup — lazy-loaded on first use (keeps ~350KB off initial load)
@@ -426,6 +435,12 @@ async function parsePDF(data) {
     // Flatten all text for regex matching
     var allText = items.map(function(i) { return i.text; }).join(" ");
 
+    // Detect currency — Thai-business invoices are usually THB; Invoice Fly = USD.
+    // Default THB so a baht invoice is never mis-read (and mis-converted) as USD.
+    invoice.currency = /฿|THB|บาท/i.test(allText) ? "THB"
+                     : /\bUSD\b|US\$/i.test(allText) ? "USD"
+                     : "THB";
+
     // Extract Invoice Number
     var numMatch = allText.match(/NUMBER:\s*(\S+)/i);
     if (numMatch) invoice.invoiceId = numMatch[1];
@@ -439,16 +454,16 @@ async function parsePDF(data) {
     if (billMatch) invoice.customer = billMatch[1].trim();
 
     // Extract amounts
-    var subtotalMatch = allText.match(/SUBTOTAL:\s*\$?([\d,]+\.?\d*)/i);
+    var subtotalMatch = allText.match(/SUBTOTAL:\s*[฿$]?\s*([\d,]+\.?\d*)/i);
     if (subtotalMatch) invoice.subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
 
-    var totalMatch = allText.match(/TOTAL:\s*\$?([\d,]+\.?\d*)/i);
+    var totalMatch = allText.match(/TOTAL:\s*[฿$]?\s*([\d,]+\.?\d*)/i);
     if (totalMatch) invoice.total = parseFloat(totalMatch[1].replace(/,/g, ""));
 
-    var paidMatch = allText.match(/PAID:\s*\$?([\d,]+\.?\d*)/i);
+    var paidMatch = allText.match(/PAID:\s*[฿$]?\s*([\d,]+\.?\d*)/i);
     if (paidMatch) invoice.paid = parseFloat(paidMatch[1].replace(/,/g, ""));
 
-    var balanceMatch = allText.match(/BALANCE\s*DUE\s*\$?([\d,]+\.?\d*)/i);
+    var balanceMatch = allText.match(/BALANCE\s*DUE\s*[฿$]?\s*([\d,]+\.?\d*)/i);
     if (balanceMatch) invoice.balanceDue = parseFloat(balanceMatch[1].replace(/,/g, ""));
 
     // Extract line items — find text between the header row and SUBTOTAL
@@ -492,7 +507,7 @@ async function parsePDF(data) {
         var amounts = [];
         var descParts = [];
         for (var t = 0; t < texts.length; t++) {
-          var cleaned = texts[t].replace(/[$,]/g, "");
+          var cleaned = texts[t].replace(/[฿$,]/g, "");
           if (/^\d+(\.\d+)?$/.test(cleaned) && parseFloat(cleaned) > 0) {
             amounts.push(parseFloat(cleaned));
           } else {
@@ -531,17 +546,17 @@ function showPreview(inv) {
   document.getElementById("pvId").textContent = inv.invoiceId || "-";
   document.getElementById("pvDate").textContent = inv.date || "-";
   document.getElementById("pvCustomer").textContent = inv.customer || "-";
-  document.getElementById("pvSubtotal").innerHTML = fmtDual(inv.subtotal || 0);
-  document.getElementById("pvTotal").innerHTML = fmtDual(inv.total || 0);
-  document.getElementById("pvPaid").innerHTML = fmtDual(inv.paid || 0);
-  document.getElementById("pvBalance").innerHTML = fmtDual(inv.balanceDue || 0);
+  var cur = inv.currency || "THB";
+  document.getElementById("pvSubtotal").innerHTML = fmtMoney(inv.subtotal || 0, cur);
+  document.getElementById("pvTotal").innerHTML = fmtMoney(inv.total || 0, cur);
+  document.getElementById("pvPaid").innerHTML = fmtMoney(inv.paid || 0, cur);
+  document.getElementById("pvBalance").innerHTML = fmtMoney(inv.balanceDue || 0, cur);
 
   var tbody = document.querySelector("#pvItems tbody");
   tbody.innerHTML = "";
   (inv.items || []).forEach(function(item) {
     var tr = document.createElement("tr");
-    var thbAmt = rateLoaded ? " <span style='color:#888;font-size:.7rem'>(" + toTHB(item.amount) + ")</span>" : "";
-    tr.innerHTML = "<td>" + esc(item.description) + "</td><td style='text-align:center'>" + item.quantity + "</td><td style='text-align:right'>$" + item.unitPrice.toFixed(2) + "</td><td style='text-align:right'>$" + item.amount.toFixed(2) + thbAmt + "</td>";
+    tr.innerHTML = "<td>" + esc(item.description) + "</td><td style='text-align:center'>" + item.quantity + "</td><td style='text-align:right'>" + fmtMoney(item.unitPrice, cur) + "</td><td style='text-align:right'>" + fmtMoney(item.amount, cur) + "</td>";
     tbody.appendChild(tr);
   });
 
@@ -579,6 +594,7 @@ async function saveInvoice() {
     total: parsedInvoice.total,
     paid: parsedInvoice.paid,
     balanceDue: parsedInvoice.balanceDue,
+    currency: parsedInvoice.currency || "THB",
     type: document.getElementById("pvType").value,
     category: document.getElementById("pvCategory").value,
     notes: document.getElementById("pvNotes").value
@@ -638,7 +654,7 @@ async function loadInvoices() {
         '<div class="inv-id">' + esc(inv.invoiceId) + ' <span class="badge ' + typeClass + '">' + typeLabel + '</span></div>' +
         '<div class="inv-meta">' + esc(inv.date) + ' &bull; ' + esc(inv.customer) + '</div>' +
         '</div>' +
-        '<div class="inv-amount ' + amountClass + '">$' + (inv.total || 0).toFixed(2) + (rateLoaded ? '<div style="font-size:.7rem;color:#888">' + toTHB(inv.total || 0) + ' THB</div>' : '') + '</div>' +
+        '<div class="inv-amount ' + amountClass + '">' + fmtMoney(inv.total || 0, inv.currency || "THB") + '</div>' +
         '<button class="del-btn" onclick="deleteInvoice(\'' + esc(inv.invoiceId) + '\')" title="ลบ">X</button>';
       container.appendChild(div);
     });
