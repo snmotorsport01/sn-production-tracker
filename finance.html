@@ -239,6 +239,13 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
       </div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <label style="font-size:.82rem;color:#888">สกุลเงิน:</label>
+        <select id="pvCurrency" class="select-box" style="width:auto;flex:1" onchange="renderPreviewAmounts()">
+          <option value="THB">บาท (THB ฿)</option>
+          <option value="USD">ดอลลาร์ (USD $)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
         <label style="font-size:.82rem;color:#888">ประเภท:</label>
         <select id="pvType" class="select-box" style="width:auto;flex:1">
           <option value="income">รายรับ (Income)</option>
@@ -435,22 +442,27 @@ async function parsePDF(data) {
     // Flatten all text for regex matching
     var allText = items.map(function(i) { return i.text; }).join(" ");
 
-    // Detect currency — Thai-business invoices are usually THB; Invoice Fly = USD.
-    // Default THB so a baht invoice is never mis-read (and mis-converted) as USD.
-    invoice.currency = /฿|THB|บาท/i.test(allText) ? "THB"
+    // Detect currency. The ฿ glyph on prices is the reliable signal — the SN
+    // template's boilerplate footer always says "THB", so don't key off that word.
+    // A Thai business defaults to THB; only a clear USD invoice (no ฿) is USD.
+    invoice.currency = /฿/.test(allText) ? "THB"
                      : /\bUSD\b|US\$/i.test(allText) ? "USD"
                      : "THB";
 
-    // Extract Invoice Number
-    var numMatch = allText.match(/NUMBER:\s*(\S+)/i);
+    // Extract Invoice Number — "NUMBER: IN001" (Invoice Fly) or "Number  IN001" (SN)
+    var numMatch = allText.match(/NUMBER:\s*([A-Za-z0-9\-\/]+)/i)
+                || allText.match(/\bNumber\b\s*:?\s+([A-Za-z][A-Za-z0-9\-\/]*)/i);
     if (numMatch) invoice.invoiceId = numMatch[1];
 
-    // Extract Date
-    var dateMatch = allText.match(/DATE:\s*([A-Za-z]+\s+\d{1,2},?\s*\d{4})/i);
+    // Extract Date — "DATE: July 22, 2026" (Fly) or "Date 22/07/2026" (SN)
+    var dateMatch = allText.match(/DATE:\s*([A-Za-z]+\s+\d{1,2},?\s*\d{4})/i)
+                 || allText.match(/\bDate\b\s*:?\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
     if (dateMatch) invoice.date = dateMatch[1].replace(",", ", ");
 
-    // Extract Customer (BILL TO:)
-    var billMatch = allText.match(/BILL\s*TO:\s*([^\s]+(?:\s+[^\s]+)*?)(?:\s+NUMBER:)/i);
+    // Extract Customer — "BILL TO: X ... NUMBER:" (Fly) or "To. Name  <addr>" (SN);
+    // stop at "Number" or the first digit (address/invoice-no follows in the flow)
+    var billMatch = allText.match(/BILL\s*TO:\s*([^\s]+(?:\s+[^\s]+)*?)(?:\s+NUMBER:)/i)
+                 || allText.match(/\bTo\.\s+(.+?)(?:\s+Number\b|\s+\d)/i);
     if (billMatch) invoice.customer = billMatch[1].trim();
 
     // Extract amounts
@@ -507,20 +519,27 @@ async function parsePDF(data) {
         var amounts = [];
         var descParts = [];
         for (var t = 0; t < texts.length; t++) {
-          var cleaned = texts[t].replace(/[฿$,]/g, "");
-          if (/^\d+(\.\d+)?$/.test(cleaned) && parseFloat(cleaned) > 0) {
+          var raw = texts[t];
+          var cleaned = raw.replace(/[฿$,]/g, "");
+          // Treat as a money/qty value only if it has a currency symbol, a thousands
+          // comma, or a decimal — so a bare integer inside the description
+          // (e.g. "type 1") is NOT mistaken for a price. Zero values are kept.
+          var looksNumeric = /^\d+(\.\d+)?$/.test(cleaned) &&
+            (/[฿$]/.test(raw) || /\d,\d/.test(raw) || /\.\d/.test(cleaned));
+          if (looksNumeric) {
             amounts.push(parseFloat(cleaned));
           } else {
-            descParts.push(texts[t]);
+            descParts.push(raw);
           }
         }
 
         if (amounts.length >= 3) {
+          // amount = last column (a Discount column may sit between unit price and amount)
           invoice.items.push({
             description: descParts.join(" "),
             quantity: amounts[0],
             unitPrice: amounts[1],
-            amount: amounts[2]
+            amount: amounts[amounts.length - 1]
           });
         } else if (amounts.length === 0 && descParts.length > 0 && invoice.items.length > 0) {
           // Sub-description line
@@ -546,7 +565,17 @@ function showPreview(inv) {
   document.getElementById("pvId").textContent = inv.invoiceId || "-";
   document.getElementById("pvDate").textContent = inv.date || "-";
   document.getElementById("pvCustomer").textContent = inv.customer || "-";
-  var cur = inv.currency || "THB";
+  // seed the currency selector with what we detected; the user can override it
+  document.getElementById("pvCurrency").value = inv.currency || "THB";
+  renderPreviewAmounts();
+}
+
+// Render totals + line items in the currency currently chosen in the selector.
+// Called on first preview and whenever the user switches THB/USD.
+function renderPreviewAmounts() {
+  var inv = parsedInvoice;
+  if (!inv) return;
+  var cur = document.getElementById("pvCurrency").value || "THB";
   document.getElementById("pvSubtotal").innerHTML = fmtMoney(inv.subtotal || 0, cur);
   document.getElementById("pvTotal").innerHTML = fmtMoney(inv.total || 0, cur);
   document.getElementById("pvPaid").innerHTML = fmtMoney(inv.paid || 0, cur);
@@ -594,7 +623,7 @@ async function saveInvoice() {
     total: parsedInvoice.total,
     paid: parsedInvoice.paid,
     balanceDue: parsedInvoice.balanceDue,
-    currency: parsedInvoice.currency || "THB",
+    currency: document.getElementById("pvCurrency").value || "THB",
     type: document.getElementById("pvType").value,
     category: document.getElementById("pvCategory").value,
     notes: document.getElementById("pvNotes").value
