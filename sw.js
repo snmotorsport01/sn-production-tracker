@@ -5,7 +5,7 @@
    - Apps Script API (script.google.com): network-first with cache fallback → always fresh when online, still works offline.
    Only GET requests are cached; POST (auth, uploads, mutations) always hits the network.
    Bump VERSION to force a refresh of all cached assets. */
-var VERSION = 'v5';
+var VERSION = 'v6';
 var SHELL   = 'sn-shell-' + VERSION;
 var RUNTIME = 'sn-runtime-' + VERSION;
 
@@ -89,9 +89,15 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
-  // Same-origin app shell & assets: stale-while-revalidate
+  // Same-origin code (HTML/CSS/JS): network-first so a fresh deploy lands on the
+  // very next load (with cache fallback for offline). Prevents a stale cached
+  // page from pinning the app to an old backend URL.
   if (url.origin === self.location.origin) {
-    e.respondWith(staleWhileRevalidate(req, SHELL));
+    if (req.mode === 'navigate' || /\.(html|css|js)$/i.test(url.pathname) || url.pathname.endsWith('/')) {
+      e.respondWith(networkFirst(req, SHELL));
+    } else {
+      e.respondWith(staleWhileRevalidate(req, SHELL)); // icons/svg/manifest
+    }
     return;
   }
   // everything else: default network
