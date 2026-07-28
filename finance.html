@@ -246,6 +246,18 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
         </select>
       </div>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <label style="font-size:.82rem;color:#888">การชำระ:</label>
+        <select id="pvPayStatus" class="select-box" style="width:auto;flex:1" onchange="onPayChange()">
+          <option value="unpaid">ยังไม่จ่าย (0%)</option>
+          <option value="deposit">มัดจำ 50%</option>
+          <option value="paid">จ่ายครบ (100%)</option>
+          <option value="custom">กำหนด % เอง</option>
+        </select>
+        <input id="pvPayPct" type="number" min="0" max="100" step="5" value="0"
+          style="width:64px;text-align:right;display:none" oninput="onPayChange()">
+        <span id="pvPayPctSign" style="font-size:.9rem;color:#888;display:none">%</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
         <label style="font-size:.82rem;color:#888">ประเภท:</label>
         <select id="pvType" class="select-box" style="width:auto;flex:1">
           <option value="income">รายรับ (Income)</option>
@@ -567,6 +579,32 @@ function showPreview(inv) {
   document.getElementById("pvCustomer").textContent = inv.customer || "-";
   // seed the currency selector with what we detected; the user can override it
   document.getElementById("pvCurrency").value = inv.currency || "THB";
+  // seed payment status from any parsed "Paid" value (else unpaid)
+  var pct = (inv.total > 0 && inv.paid > 0) ? Math.round((inv.paid / inv.total) * 100) : 0;
+  document.getElementById("pvPayStatus").value =
+    pct >= 100 ? "paid" : pct === 50 ? "deposit" : pct === 0 ? "unpaid" : "custom";
+  document.getElementById("pvPayPct").value = pct;
+  onPayChange();
+}
+
+// Payment status / percent → compute paid + balance due from the total.
+function onPayChange() {
+  var inv = parsedInvoice;
+  var st = document.getElementById("pvPayStatus").value;
+  var pctInput = document.getElementById("pvPayPct");
+  var sign = document.getElementById("pvPayPctSign");
+  var custom = st === "custom";
+  pctInput.style.display = custom ? "" : "none";
+  sign.style.display = custom ? "" : "none";
+  var pct = st === "paid" ? 100 : st === "deposit" ? 50 : st === "unpaid" ? 0
+          : Math.max(0, Math.min(100, Number(pctInput.value) || 0));
+  if (inv) {
+    var total = Number(inv.total) || 0;
+    inv.paid = Math.round(total * pct) / 100;
+    inv.balanceDue = Math.round((total - inv.paid) * 100) / 100;
+    inv.paidPct = pct;
+    inv.paymentStatus = pct >= 100 ? "paid" : pct <= 0 ? "unpaid" : "partial";
+  }
   renderPreviewAmounts();
 }
 
@@ -624,6 +662,8 @@ async function saveInvoice() {
     paid: parsedInvoice.paid,
     balanceDue: parsedInvoice.balanceDue,
     currency: document.getElementById("pvCurrency").value || "THB",
+    paymentStatus: parsedInvoice.paymentStatus || "unpaid",
+    paidPct: parsedInvoice.paidPct || 0,
     type: document.getElementById("pvType").value,
     category: document.getElementById("pvCategory").value,
     notes: document.getElementById("pvNotes").value
