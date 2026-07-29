@@ -193,3 +193,6 @@ body::before{
 @media (prefers-reduced-motion: reduce){
   body::before{animation:none}
 }
+
+/* admin primary action button → gold (was racing red) */
+.btn-save{background:var(--gold) !important;color:#161003 !important;font-weight:700}

@@ -683,7 +683,19 @@ async function saveInvoice() {
     });
     var data = await res.json();
     if (data.success) {
-      toast("บันทึก " + parsedInvoice.invoiceId + " สำเร็จ!");
+      // Also record it in the รายรับ-รายจ่าย ledger (Payments) so it shows up
+      // in cashflow — the invoice's total, as income/expense, dated + currency.
+      try {
+        var pp = "date=" + encodeURIComponent(toIsoDate(parsedInvoice.date)) +
+          "&type=" + encodeURIComponent(payload.type) +
+          "&amount=" + encodeURIComponent(parsedInvoice.total || 0) +
+          "&category=" + encodeURIComponent(payload.category) +
+          "&supplier=" + encodeURIComponent(parsedInvoice.customer || "") +
+          "&notes=" + encodeURIComponent("Invoice " + (parsedInvoice.invoiceId || "") + (payload.notes ? (" · " + payload.notes) : "")) +
+          "&currency=" + encodeURIComponent(payload.currency);
+        await fetch(API + "?api=recordPayment&" + pp);
+      } catch (e) { /* ledger add is best-effort; invoice is already saved */ }
+      toast("บันทึก " + parsedInvoice.invoiceId + " + ลงรายรับรายจ่ายแล้ว!");
       clearPreview();
     } else {
       toast(data.error || "เกิดข้อผิดพลาด");
@@ -694,6 +706,14 @@ async function saveInvoice() {
 
   btn.disabled = false;
   btn.textContent = "บันทึก";
+}
+
+// dd/mm/yyyy → yyyy-mm-dd (so ledger dates group correctly in cashflow)
+function toIsoDate(d) {
+  if (!d) return "";
+  var m = String(d).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return m[3] + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[1]).slice(-2);
+  return d;
 }
 
 // ============================================================
@@ -723,19 +743,52 @@ async function loadInvoices() {
       var typeLabel = inv.type === "expense" ? "รายจ่าย" : "รายรับ";
       var amountClass = inv.type === "expense" ? "red" : "green";
 
+      var cur = inv.currency || "THB";
+      var pct = Number(inv.paidPct) || 0;
+      var payColor = pct >= 100 ? "green" : pct > 0 ? "yellow" : "red";
+      var payLabel = pct >= 100 ? "จ่ายครบ" : pct > 0 ? ("จ่าย " + pct + "%") : "ยังไม่จ่าย";
+      var balTxt = pct >= 100 ? "" : " · คงเหลือ " + fmtMoney(inv.balanceDue || 0, cur);
+      var idJs = esc(inv.invoiceId).replace(/'/g, "\\'");
+
       var div = document.createElement("div");
       div.className = "inv-item";
       div.innerHTML = '<div class="inv-left">' +
         '<div class="inv-id">' + esc(inv.invoiceId) + ' <span class="badge ' + typeClass + '">' + typeLabel + '</span></div>' +
         '<div class="inv-meta">' + esc(inv.date) + ' &bull; ' + esc(inv.customer) + '</div>' +
+        '<div class="inv-meta"><span class="' + payColor + '">' + payLabel + '</span>' + balTxt + '</div>' +
         '</div>' +
-        '<div class="inv-amount ' + amountClass + '">' + fmtMoney(inv.total || 0, inv.currency || "THB") + '</div>' +
-        '<button class="del-btn" onclick="deleteInvoice(\'' + esc(inv.invoiceId) + '\')" title="ลบ">X</button>';
+        '<div class="inv-amount ' + amountClass + '">' + fmtMoney(inv.total || 0, cur) + '</div>' +
+        '<button class="del-btn" onclick="editInvoicePayment(\'' + idJs + '\',' + (Number(inv.total) || 0) + ',\'' + cur + '\',' + pct + ')" title="แก้การชำระ" style="color:#f59e0b">✎</button>' +
+        '<button class="del-btn" onclick="deleteInvoice(\'' + idJs + '\')" title="ลบ">X</button>';
       container.appendChild(div);
     });
   } catch (err) {
     container.innerHTML = '<div class="empty">' + err.message + '</div>';
   }
+}
+
+// ============================================================
+// Edit an invoice's payment % (จ่ายแล้วกี่ %) — recomputes paid + balance
+// ============================================================
+async function editInvoicePayment(id, total, currency, curPct) {
+  var v = prompt("Invoice " + id + "\nจ่ายแล้วกี่ % ? (0-100)", curPct);
+  if (v === null) return;
+  var pct = Math.max(0, Math.min(100, Math.round(Number(v) || 0)));
+  var paid = Math.round((Number(total) || 0) * pct) / 100;
+  var balanceDue = Math.round(((Number(total) || 0) - paid) * 100) / 100;
+  var status = pct >= 100 ? "paid" : pct <= 0 ? "unpaid" : "partial";
+  try {
+    var res = await fetch(API, {
+      method: "POST", headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({
+        action: "update_invoice", token: sessionStorage.getItem("sn_token"),
+        invoiceId: id, paid: paid, balanceDue: balanceDue, paidPct: pct, paymentStatus: status
+      })
+    });
+    var d = await res.json();
+    if (d.success) { toast("อัปเดตการชำระ " + id + " → " + pct + "%"); loadInvoices(); }
+    else toast(d.error || "เกิดข้อผิดพลาด");
+  } catch (e) { toast(e.message); }
 }
 
 // ============================================================

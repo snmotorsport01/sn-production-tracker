@@ -74,6 +74,25 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFo
     <div class="stat-card"><div class="num" id="totalOperator">-</div><div class="label">Operator</div></div>
   </div>
   
+  <div style="display:flex;justify-content:flex-end;margin:0 0 12px">
+    <button class="btn-sm btn-save" onclick="toggleAddUser()">+ เพิ่มผู้ใช้</button>
+  </div>
+  <div id="addUserForm" style="display:none;background:#151515;border:1px solid #222;border-radius:12px;padding:14px;margin-bottom:14px">
+    <div style="font-weight:700;margin-bottom:10px">เพิ่มผู้ใช้ใหม่</div>
+    <input id="nuUser" placeholder="username (a-z, 0-9, _)" autocapitalize="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#0d0d0d;color:#fff;margin-bottom:8px">
+    <input id="nuName" placeholder="ชื่อแสดง" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#0d0d0d;color:#fff;margin-bottom:8px">
+    <input id="nuPin" placeholder="PIN 4 หลัก" maxlength="4" inputmode="numeric" style="width:100%;padding:10px;border-radius:8px;border:1px solid #333;background:#0d0d0d;color:#fff;margin-bottom:8px">
+    <select id="nuRole" class="role-select" style="width:100%;margin-bottom:12px">
+      <option value="operator">Operator</option>
+      <option value="manager">Manager</option>
+      <option value="admin">Admin</option>
+    </select>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn-sm btn-reset" onclick="toggleAddUser()">ยกเลิก</button>
+      <button class="btn-sm btn-save" onclick="addUser()">สร้างผู้ใช้</button>
+    </div>
+  </div>
+
   <div id="userList"><div class="loading">Loading users...</div></div>
 </div>
 
@@ -101,6 +120,37 @@ function snLogout(){
   if(t)fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})});
   sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');
   window.location.href='login.html';
+}
+
+// ===== Add User =====
+function toggleAddUser(){
+  var f=document.getElementById('addUserForm');
+  f.style.display = (f.style.display==='none'||!f.style.display) ? 'block' : 'none';
+}
+function addUser(){
+  var u=document.getElementById('nuUser').value.trim();
+  var n=document.getElementById('nuName').value.trim();
+  var p=document.getElementById('nuPin').value;
+  var role=document.getElementById('nuRole').value;
+  if(!/^[a-zA-Z0-9_]+$/.test(u)){showToast('username ต้องเป็น a-z, 0-9, _ เท่านั้น','error');return;}
+  if(!n){showToast('กรุณาระบุชื่อแสดง','error');return;}
+  if(!/^\d{4}$/.test(p)){showToast('PIN ต้องเป็นตัวเลข 4 หลัก','error');return;}
+  apiPost({action:'auth_register',username:u,name:n,pin:p,role:role},function(d){
+    if(d.success){
+      // ensure the chosen role sticks even if register defaults to operator
+      if(role!=='operator'){
+        apiPost({action:'auth_update_user',token:window._snToken,target_username:u,updates:{role:role}},function(){loadUsers();});
+      }
+      showToast('สร้างผู้ใช้ '+u+' ('+role+') แล้ว');
+      document.getElementById('nuUser').value='';
+      document.getElementById('nuName').value='';
+      document.getElementById('nuPin').value='';
+      toggleAddUser();
+      loadUsers();
+    } else {
+      showToast(d.error||'สร้างผู้ใช้ไม่สำเร็จ','error');
+    }
+  });
 }
 
 // ===== Load Users =====
