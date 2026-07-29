@@ -347,6 +347,13 @@ function toTHB(usd) {
   return (usd * usdThbRate).toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
+// Numeric: normalise any amount to THB for cashflow aggregation (USD → ×rate).
+function amtThb(amount, currency) {
+  amount = Number(amount) || 0;
+  if ((currency || "THB") === "USD" && rateLoaded && usdThbRate) return amount * usdThbRate;
+  return amount;
+}
+
 // Currency-aware formatter. THB shows ฿ directly (NO rate conversion — a baht
 // invoice must not be inflated ×33). USD keeps the dual "$x (฿y)" display.
 function fmtMoney(amount, currency) {
@@ -837,6 +844,7 @@ function getISOWeek(d) {
 async function loadCashflow() {
   var grid = document.getElementById("cfGrid");
   grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+  if (!rateLoaded) { try { await loadExchangeRate(); } catch (e) {} }  // ensure USD→THB rate ready
 
   try {
     // Fetch payments for aggregation
@@ -855,9 +863,19 @@ async function loadCashflow() {
       if (d2.success && d2.months) invoiceData = d2.months;
     } catch(e) {}
 
-    // ค้างชำระ = ผลรวม balanceDue ของ invoice ที่ยังจ่ายไม่ครบ 100% (จาก cashflowSummary)
+    // ค้างชำระ = ผลรวม balanceDue ของ invoice ที่ยังจ่ายไม่ครบ (แปลง USD→THB ด้วยเรตปัจจุบัน)
+    var yfUnpaid = document.getElementById("cfYear").value;
     var totalUnpaid = 0;
-    invoiceData.forEach(function(m) { totalUnpaid += Number(m.unpaidTotal) || 0; });
+    try {
+      var invRes = await fetch(API + "?api=listInvoices&token=" + sessionStorage.getItem("sn_token"));
+      var invJson = await invRes.json();
+      (invJson.invoices || []).forEach(function(inv) {
+        var bal = Number(inv.balanceDue) || 0;
+        if (bal <= 0) return;
+        if (yfUnpaid) { var ym = String(inv.date || "").match(/(\d{4})/); if (!ym || ym[1] !== yfUnpaid) return; }
+        totalUnpaid += amtThb(bal, inv.currency);
+      });
+    } catch (e) {}
 
     // Group payments by period
     var groups = {};
@@ -875,7 +893,7 @@ async function loadCashflow() {
       }
       yearSet[p.date.substring(0, 4)] = true;
       if (!groups[key]) groups[key] = { income: 0, expense: 0, count: 0 };
-      var amt = parseFloat(p.amount) || 0;
+      var amt = amtThb(p.amount, p.currency);
       if (p.type === "income") groups[key].income += amt;
       else groups[key].expense += amt;
       groups[key].count++;
@@ -913,7 +931,7 @@ async function loadCashflow() {
       document.getElementById("cfIncome").textContent = "฿0";
       document.getElementById("cfExpense").textContent = "฿0";
       document.getElementById("cfProfit").textContent = "฿0";
-      document.getElementById("cfUnpaid").textContent = "฿" + totalUnpaid.toLocaleString();
+      document.getElementById("cfUnpaid").textContent = "฿" + Math.round(totalUnpaid).toLocaleString();
       return;
     }
 
@@ -922,11 +940,11 @@ async function loadCashflow() {
     keys.forEach(function(k) { totalIncome += groups[k].income; totalExpense += groups[k].expense; });
     var totalProfit = totalIncome - totalExpense;
 
-    document.getElementById("cfIncome").textContent = "฿" + totalIncome.toLocaleString();
-    document.getElementById("cfExpense").textContent = "฿" + totalExpense.toLocaleString();
-    document.getElementById("cfProfit").textContent = "฿" + totalProfit.toLocaleString();
+    document.getElementById("cfIncome").textContent = "฿" + Math.round(totalIncome).toLocaleString();
+    document.getElementById("cfExpense").textContent = "฿" + Math.round(totalExpense).toLocaleString();
+    document.getElementById("cfProfit").textContent = "฿" + Math.round(totalProfit).toLocaleString();
     document.getElementById("cfProfit").className = "num " + (totalProfit >= 0 ? "green" : "red");
-    document.getElementById("cfUnpaid").textContent = "฿" + totalUnpaid.toLocaleString();
+    document.getElementById("cfUnpaid").textContent = "฿" + Math.round(totalUnpaid).toLocaleString();
 
     // Render cards
     var thaiMonths = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
@@ -948,9 +966,9 @@ async function loadCashflow() {
       var card = document.createElement("div");
       card.className = "cf-card";
       card.innerHTML = '<div class="month">' + label + ' <span style="color:#555;font-size:.7rem">(' + g.count + ' รายการ)</span></div>' +
-        '<div class="amount ' + profitColor + '">' + profitSign + "฿" + profit.toLocaleString() + '</div>' +
-        '<div class="detail">รายรับ <span class="green">฿' + g.income.toLocaleString() + '</span></div>' +
-        '<div class="detail">รายจ่าย <span class="red">฿' + g.expense.toLocaleString() + '</span></div>';
+        '<div class="amount ' + profitColor + '">' + profitSign + "฿" + Math.round(profit).toLocaleString() + '</div>' +
+        '<div class="detail">รายรับ <span class="green">฿' + Math.round(g.income).toLocaleString() + '</span></div>' +
+        '<div class="detail">รายจ่าย <span class="red">฿' + Math.round(g.expense).toLocaleString() + '</span></div>';
       grid.appendChild(card);
     });
 
