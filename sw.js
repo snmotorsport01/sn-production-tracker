@@ -5,7 +5,7 @@
    - Apps Script API (script.google.com): network-first with cache fallback → always fresh when online, still works offline.
    Only GET requests are cached; POST (auth, uploads, mutations) always hits the network.
    Bump VERSION to force a refresh of all cached assets. */
-var VERSION = 'v11';
+var VERSION = 'v12';
 var SHELL   = 'sn-shell-' + VERSION;
 var RUNTIME = 'sn-runtime-' + VERSION;
 
