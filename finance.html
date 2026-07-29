@@ -855,6 +855,10 @@ async function loadCashflow() {
       if (d2.success && d2.months) invoiceData = d2.months;
     } catch(e) {}
 
+    // ค้างชำระ = ผลรวม balanceDue ของ invoice ที่ยังจ่ายไม่ครบ 100% (จาก cashflowSummary)
+    var totalUnpaid = 0;
+    invoiceData.forEach(function(m) { totalUnpaid += Number(m.unpaidTotal) || 0; });
+
     // Group payments by period
     var groups = {};
     var yearSet = {};
@@ -909,7 +913,7 @@ async function loadCashflow() {
       document.getElementById("cfIncome").textContent = "฿0";
       document.getElementById("cfExpense").textContent = "฿0";
       document.getElementById("cfProfit").textContent = "฿0";
-      document.getElementById("cfUnpaid").textContent = "฿0";
+      document.getElementById("cfUnpaid").textContent = "฿" + totalUnpaid.toLocaleString();
       return;
     }
 
@@ -922,7 +926,7 @@ async function loadCashflow() {
     document.getElementById("cfExpense").textContent = "฿" + totalExpense.toLocaleString();
     document.getElementById("cfProfit").textContent = "฿" + totalProfit.toLocaleString();
     document.getElementById("cfProfit").className = "num " + (totalProfit >= 0 ? "green" : "red");
-    document.getElementById("cfUnpaid").textContent = "฿0";
+    document.getElementById("cfUnpaid").textContent = "฿" + totalUnpaid.toLocaleString();
 
     // Render cards
     var thaiMonths = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
