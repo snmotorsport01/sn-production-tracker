@@ -187,6 +187,17 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 </div>
 
 <div id="tab-po" style="display:none">
+<div class="card" style="margin-bottom:12px;border-color:#7a6128">
+  <div style="font-weight:700;margin-bottom:4px">เปิดค่าวัตถุดิบ → ส่งการเงิน</div>
+  <div style="color:#888;font-size:12px;margin-bottom:10px">สร้างรายการ <b style="color:#f59e0b">รายจ่าย · รอจ่าย</b> ให้ฝ่ายการเงินกดจ่าย (เห็นในหน้า Finance → รายการ Invoice)</div>
+  <input id="mcSupplier" placeholder="ซัพพลายเออร์ / รายการวัตถุดิบ">
+  <div style="display:flex;gap:8px">
+    <input id="mcAmount" type="number" inputmode="decimal" placeholder="ยอดเงิน" style="flex:1">
+    <select id="mcCurrency" style="width:110px"><option value="THB">THB ฿</option><option value="USD">USD $</option></select>
+  </div>
+  <textarea id="mcNotes" rows="2" placeholder="หมายเหตุ (ไม่บังคับ)"></textarea>
+  <button class="btn btn-p" onclick="sendMaterialCost()" id="mcBtn">ส่งการเงิน (รอจ่าย)</button>
+</div>
 <div id="po-content"><div class="loading"><div class="spinner"></div><div style="margin-top:8px">Loading PO drafts...</div></div></div>
 </div>
 
@@ -448,6 +459,32 @@ function createPOFromAlerts() {
   }).catch(function(err) {
     toast('Error: ' + err, 'err');
   });
+}
+
+// ── Send material cost to Finance (creates a pending expense invoice) ──
+function sendMaterialCost() {
+  var sup = document.getElementById('mcSupplier').value.trim();
+  var amt = parseFloat(document.getElementById('mcAmount').value) || 0;
+  var cur = document.getElementById('mcCurrency').value;
+  var notes = document.getElementById('mcNotes').value.trim();
+  if (!sup) { toast('กรุณาระบุซัพพลายเออร์/รายการ'); return; }
+  if (amt <= 0) { toast('กรุณาระบุยอดเงิน'); return; }
+  var btn = document.getElementById('mcBtn'); btn.disabled = true; btn.textContent = 'กำลังส่ง...';
+  var d = new Date(), p2 = function(n){return ('0'+n).slice(-2);};
+  var iso = d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+  var id = 'PO-'+d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'-'+p2(d.getHours())+p2(d.getMinutes())+p2(d.getSeconds());
+  fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({
+    action:'add_invoice', token:(sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token')),
+    invoiceId:id, date:iso, customer:sup, items:[], subtotal:amt, total:amt, paid:0, balanceDue:amt,
+    currency:cur, paymentStatus:'unpaid', paidPct:0, type:'expense', category:'material',
+    notes:('ค่าวัตถุดิบ'+(notes?(' · '+notes):''))
+  })}).then(function(r){return r.json()}).then(function(res){
+    btn.disabled=false; btn.textContent='ส่งการเงิน (รอจ่าย)';
+    if (res && res.success) {
+      toast('ส่งการเงินแล้ว: '+id+' (รอจ่าย)');
+      document.getElementById('mcSupplier').value=''; document.getElementById('mcAmount').value=''; document.getElementById('mcNotes').value='';
+    } else { toast('ไม่สำเร็จ: '+((res&&res.error)||'')); }
+  }).catch(function(){ btn.disabled=false; btn.textContent='ส่งการเงิน (รอจ่าย)'; toast('เชื่อมต่อไม่ได้'); });
 }
 
 // ── PO Drafts Tab ──
