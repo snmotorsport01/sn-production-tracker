@@ -85,6 +85,12 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 
 /* ── Admin FAB ── */
 .admin-fab{position:fixed;bottom:70px;right:16px;background:#e74c3c;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:.8rem;font-weight:600;z-index:998;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+/* My Profile card */
+#profileBody input{width:100%;padding:12px;border-radius:10px;border:1px solid #262626;background:#0d0d0d;color:#fff;font-size:15px;margin-bottom:8px}
+#profileBody .btn{display:block;width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer}
+#profileBody .btn-p{background:#cea24a;color:#161003}
+#profileBody .btn-o{background:transparent;color:#cea24a;border:1px solid #7a6128}
 </style>
 <!--sn-perf-->
 <link rel="preconnect" href="https://script.google.com" crossorigin>
@@ -251,6 +257,30 @@ window.location.href='login.html';
 </div>
 </div>
 
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION: My Profile (self-edit) -->
+<!-- ══════════════════════════════════════ -->
+<div class="section">
+<div class="section-head" onclick="toggleProfile()" style="cursor:pointer">
+<div class="section-icon" style="background:rgba(206,162,74,.16)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+<div class="section-info">
+<div class="section-title">โปรไฟล์ของฉัน</div>
+<div class="section-desc">แก้ไขชื่อแสดง · เปลี่ยน PIN</div>
+</div>
+<div class="section-arrow">›</div>
+</div>
+<div id="profileBody" style="display:none;padding:4px 16px 16px">
+  <div class="hdr" style="margin-bottom:4px">ชื่อแสดง</div>
+  <input id="pfName" type="text" placeholder="ชื่อของคุณ">
+  <button class="btn btn-p" onclick="saveProfileName()" id="pfNameBtn" style="margin-top:2px">บันทึกชื่อ</button>
+  <div style="height:1px;background:var(--hair,#222);margin:16px 0"></div>
+  <div class="hdr" style="margin-bottom:4px">เปลี่ยน PIN</div>
+  <input id="pfOldPin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN เดิม">
+  <input id="pfNewPin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN ใหม่ (4 หลัก)">
+  <button class="btn btn-o" onclick="saveProfilePin()" id="pfPinBtn" style="margin-top:2px">เปลี่ยน PIN</button>
+</div>
+</div>
+
 <div class="footer">SN Motorsports — ERP v3.0</div>
 
 <!-- ── Bottom Navigation ── -->
@@ -337,6 +367,44 @@ var a=document.createElement('a');a.href='admin.html';a.className='admin-fab';a.
 document.body.appendChild(a);
 }
 })();
+
+/* ── My Profile (self-edit) ── */
+function snMe(){try{return JSON.parse(sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user')||'{}');}catch(e){return {};}}
+function snTok(){return sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token')||'';}
+function toggleProfile(){
+  var b=document.getElementById('profileBody');
+  var open=b.style.display==='none'||!b.style.display;
+  b.style.display=open?'block':'none';
+  if(open){document.getElementById('pfName').value=snMe().name||'';}
+}
+function selfPost(payload,onOk,btn,label){
+  if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
+  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d&&d.success){onOk(d);}else{alert((d&&d.error)||'ไม่สำเร็จ');}
+    }).catch(function(e){alert('เชื่อมต่อไม่ได้: '+e.message);})
+    .then(function(){if(btn){btn.disabled=false;btn.textContent=label;}});
+}
+function saveProfileName(){
+  var name=document.getElementById('pfName').value.trim();
+  if(!name){alert('กรุณาระบุชื่อ');return;}
+  selfPost({action:'auth_update_self',token:snTok(),newName:name},function(){
+    var u=snMe();u.name=name;
+    sessionStorage.setItem('sn_user',JSON.stringify(u));
+    if(localStorage.getItem('sn_user'))localStorage.setItem('sn_user',JSON.stringify(u));
+    var strong=document.querySelector('.auth-bar .user-info strong');if(strong)strong.textContent=name;
+    alert('บันทึกชื่อแล้ว');
+  },document.getElementById('pfNameBtn'),'บันทึกชื่อ');
+}
+function saveProfilePin(){
+  var oldPin=document.getElementById('pfOldPin').value;
+  var newPin=document.getElementById('pfNewPin').value;
+  if(!/^\d{4}$/.test(newPin)){alert('PIN ใหม่ต้องเป็นตัวเลข 4 หลัก');return;}
+  selfPost({action:'auth_update_self',token:snTok(),oldPin:oldPin,newPin:newPin},function(){
+    document.getElementById('pfOldPin').value='';document.getElementById('pfNewPin').value='';
+    alert('เปลี่ยน PIN แล้ว');
+  },document.getElementById('pfPinBtn'),'เปลี่ยน PIN');
+}
 </script>
 </body>
 </html>
