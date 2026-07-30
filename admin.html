@@ -155,11 +155,12 @@ function addUser(){
   if(!/^[a-zA-Z0-9_]+$/.test(u)){showToast('username ต้องเป็น a-z, 0-9, _ เท่านั้น','error');return;}
   if(!n){showToast('กรุณาระบุชื่อแสดง','error');return;}
   if(!/^\d{4}$/.test(p)){showToast('PIN ต้องเป็นตัวเลข 4 หลัก','error');return;}
-  apiPost({action:'auth_register',username:u,name:n,pin:p,role:role},function(d){
+  // register as operator first (backend only allows admin/manager/operator on register),
+  // then promote to the chosen department role via auth_update_user
+  apiPost({action:'auth_register',username:u,name:n,pin:p,role:'operator'},function(d){
     if(d.success){
-      // ensure the chosen role sticks even if register defaults to operator
       if(role!=='operator'){
-        apiPost({action:'auth_update_user',token:window._snToken,target_username:u,updates:{role:role}},function(){loadUsers();});
+        apiPost({action:'auth_update_user',token:window._snToken,targetUsername:u,newRole:role},function(){loadUsers();});
       }
       showToast('สร้างผู้ใช้ '+u+' ('+role+') แล้ว');
       document.getElementById('nuUser').value='';
@@ -234,7 +235,7 @@ function changeRole(username){
   if(newRole === orig){showToast('Role is already '+newRole);return;}
   if(!confirm('Change '+username+' role to '+newRole+'?'))return;
   
-  apiPost({action:'auth_update_user',token:window._snToken,target_username:username,updates:{role:newRole}},function(d){
+  apiPost({action:'auth_update_user',token:window._snToken,targetUsername:username,newRole:newRole},function(d){
     if(d.success){showToast(username+' role changed to '+newRole);sel.setAttribute('data-original',newRole);loadUsers();}
     else showToast(d.error||'Failed','error');
   });
@@ -244,18 +245,17 @@ function resetPin(username){
   var newPin = prompt('New 4-digit PIN for '+username+':');
   if(!newPin||newPin.length!==4||!/^\d{4}$/.test(newPin)){showToast('PIN must be 4 digits','error');return;}
   
-  apiPost({action:'auth_change_pin',token:window._snToken,target_username:username,new_pin:newPin},function(d){
+  apiPost({action:'auth_update_user',token:window._snToken,targetUsername:username,newPin:newPin},function(d){
     if(d.success) showToast('PIN reset for '+username);
     else showToast(d.error||'Failed','error');
   });
 }
 
 function deleteUser(username){
-  if(!confirm('Delete user '+username+'? This cannot be undone.'))return;
-  if(!confirm('Are you SURE? Type the username to confirm.'))return;
-  
-  apiPost({action:'auth_update_user',token:window._snToken,target_username:username,updates:{status:'deleted'}},function(d){
-    if(d.success){showToast(username+' deleted');loadUsers();}
+  if(!confirm('ปิดการใช้งาน '+username+' ? (ผู้ใช้จะเข้าระบบไม่ได้)'))return;
+  // backend has no hard-delete; disabling (active:false) blocks login
+  apiPost({action:'auth_update_user',token:window._snToken,targetUsername:username,active:false},function(d){
+    if(d.success){showToast(username+' ถูกปิดการใช้งานแล้ว');loadUsers();}
     else showToast(d.error||'Failed','error');
   });
 }
