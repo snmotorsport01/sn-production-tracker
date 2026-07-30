@@ -112,12 +112,14 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
     <button class="tab active" id="cfModeMonth" onclick="setCfMode('month')" style="padding:6px 12px;font-size:.8rem">รายเดือน</button>
     <button class="tab" id="cfModeYear" onclick="setCfMode('year')" style="padding:6px 12px;font-size:.8rem">รายปี</button>
   </div>
-  <div class="filter-row" style="justify-content:space-between">
-    <select id="cfYear" onchange="loadCashflow()">
+  <div class="filter-row" style="gap:8px;flex-wrap:wrap">
+    <select id="cfYear" onchange="loadCashflow()" style="flex:1;min-width:90px">
       <option value="">ทุกปี</option>
     </select>
-    <button class="btn btn-secondary" onclick="exportCashflow()" id="cfExportBtn" style="padding:6px 14px;font-size:.82rem;white-space:nowrap">⬇ ดาวน์โหลดรายงาน</button>
+    <input type="month" id="rpMonth" title="เลือกเดือนสำหรับงบ P&L" style="flex:1;min-width:120px">
+    <button class="btn btn-secondary" onclick="exportReport()" id="cfExportBtn" style="padding:6px 14px;font-size:.82rem;white-space:nowrap">⬇ ดาวน์โหลดงบ (P&L)</button>
   </div>
+  <div style="color:#666;font-size:.72rem;margin:-8px 0 12px">งบกำไรขาดทุน — เลือกเดือน (ช่องขวา) หรือปี (ช่องซ้าย) แล้วกดดาวน์โหลด</div>
 
   <div class="summary-row" id="cfSummary">
     <div class="summary-box"><div class="num green" id="cfIncome">฿0</div><div class="lbl">รายรับรวม</div></div>
@@ -866,32 +868,84 @@ function snLoadScript(src){
   return window._snS[src];
 }
 
-// Download the current cashflow view (respects mode + year) as an Excel report:
-// Sheet "สรุป" = period breakdown, Sheet "รายการ" = all payments (newest first).
-async function exportCashflow(){
-  if (!_cfRows.length) { toast("ยังไม่มีข้อมูลให้ดาวน์โหลด"); return; }
+var _plCat = { product_sale:"ขายสินค้า", service:"บริการ", material:"วัตถุดิบ", shipping:"ค่าส่ง", salary:"เงินเดือน", marketing:"การตลาด", utility:"สาธารณูปโภค", other:"อื่นๆ" };
+var _plThaiMonths = ["","มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+// Profit & Loss report (งบกำไรขาดทุน) for a chosen month or year — cash/accrual
+// per how transactions are recorded; amounts normalised to THB. For tax filing.
+async function exportReport(){
   var btn = document.getElementById("cfExportBtn");
   if (btn) { btn.disabled = true; btn.textContent = "กำลังสร้าง..."; }
   try {
+    if (!rateLoaded) { try { await loadExchangeRate(); } catch(e){} }
     await snLoadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
-    var modeLabel = cfMode === "week" ? "รายสัปดาห์" : cfMode === "year" ? "รายปี" : "รายเดือน";
-    var yearF = document.getElementById("cfYear").value || "ทุกปี";
-    var sum = [["SN Motorsports — รายงานการเงิน ("+modeLabel+")"], ["ปี: "+yearF], [""], ["ช่วงเวลา","รายรับ","รายจ่าย","กำไร/ขาดทุน","จำนวนรายการ"]];
-    var tI=0, tE=0;
-    _cfRows.forEach(function(r){ sum.push([r.period, r.income, r.expense, r.profit, r.count]); tI+=r.income; tE+=r.expense; });
-    sum.push(["รวม", tI, tE, tI-tE, ""]);
+
+    var mSel = document.getElementById("rpMonth").value;   // "YYYY-MM" or ""
+    var ySel = document.getElementById("cfYear").value;    // "YYYY" or ""
+    var scope = mSel ? "month" : (ySel ? "year" : "all");
+    var periodLabel = mSel ? (_plThaiMonths[parseInt(mSel.split("-")[1])] + " " + mSel.split("-")[0])
+                    : (ySel ? ("ปี " + ySel) : "ทั้งหมด");
+    function inPeriod(dateStr){
+      var t = payTime(dateStr); if (!t) return false;
+      var d = new Date(t), y = d.getFullYear(), m = ("0"+(d.getMonth()+1)).slice(-2);
+      if (scope === "month") return (y+"-"+m) === mSel;
+      if (scope === "year")  return String(y) === ySel;
+      return true;
+    }
+
+    // pull the ledger + invoices fresh (report may run without visiting other tabs)
+    var pr = await fetch(API + "?api=listPayments"); var pj = await pr.json();
+    var pays = Array.isArray(pj) ? pj : (pj.payments || []);
+    var ir = await fetch(API + "?api=listInvoices&token=" + sessionStorage.getItem("sn_token")); var ij = await ir.json();
+    var invs = (ij && ij.invoices) || [];
+
+    var incCat = {}, expCat = {}, tInc = 0, tExp = 0;
+    pays.forEach(function(p){
+      if (!inPeriod(p.date)) return;
+      var amt = amtThb(p.amount, p.currency), c = p.category || "other";
+      if (p.type === "expense") { expCat[c] = (expCat[c]||0) + amt; tExp += amt; }
+      else { incCat[c] = (incCat[c]||0) + amt; tInc += amt; }
+    });
+    var arRecv = 0, arPay = 0;
+    invs.forEach(function(iv){
+      if (!inPeriod(iv.date)) return;
+      var bal = amtThb(iv.balanceDue, iv.currency);
+      if (bal > 0) { if (iv.type === "expense") arPay += bal; else arRecv += bal; }
+    });
+
+    var A = [
+      ["SN Motorsports"], ["งบกำไรขาดทุน (Profit & Loss)"], ["ช่วงเวลา: " + periodLabel],
+      ["หน่วย: บาท (THB) · แปลงจากสกุลอื่นตามเรตปัจจุบัน"], [""],
+      ["รายได้ (Revenue)", ""]
+    ];
+    Object.keys(incCat).forEach(function(c){ A.push(["   " + (_plCat[c]||c), Math.round(incCat[c])]); });
+    if (!Object.keys(incCat).length) A.push(["   (ไม่มี)", 0]);
+    A.push(["รวมรายได้", Math.round(tInc)], [""]);
+    A.push(["ค่าใช้จ่าย (Expenses)", ""]);
+    Object.keys(expCat).forEach(function(c){ A.push(["   " + (_plCat[c]||c), Math.round(expCat[c])]); });
+    if (!Object.keys(expCat).length) A.push(["   (ไม่มี)", 0]);
+    A.push(["รวมค่าใช้จ่าย", Math.round(tExp)], [""]);
+    A.push(["กำไร (ขาดทุน) สุทธิ", Math.round(tInc - tExp)], [""]);
+    A.push(["— หมายเหตุ (ยังไม่รวมในกำไรสุทธิ) —"]);
+    A.push(["ค้างรับ / ลูกหนี้", Math.round(arRecv)]);
+    A.push(["ค้างจ่าย / เจ้าหนี้", Math.round(arPay)]);
+
     var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum), "สรุป");
-    var cat = { product_sale:"ขายสินค้า", service:"บริการ", material:"วัตถุดิบ", shipping:"ค่าส่ง", salary:"เงินเดือน", marketing:"การตลาด", utility:"สาธารณูปโภค", other:"อื่นๆ" };
-    var det = [["วันที่","ประเภท","จำนวน","สกุลเงิน","หมวด","คู่ค้า/ลูกค้า","รุ่น","หมายเหตุ"]];
-    allPayments.slice().sort(function(a,b){ return payTime(b.date)-payTime(a.date); }).forEach(function(p){
-      det.push([p.date||"", p.type==="expense"?"รายจ่าย":"รายรับ", Number(p.amount)||0, p.currency||"THB", cat[p.category]||p.category||"", p.supplier||"", p.productModel||"", p.notes||""]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(A), "งบกำไรขาดทุน");
+
+    var det = [["วันที่","ประเภท","จำนวน (บาท)","สกุลเดิม","ยอดเดิม","หมวด","คู่ค้า/ลูกค้า","หมายเหตุ"]];
+    pays.filter(function(p){ return inPeriod(p.date); })
+        .sort(function(a,b){ return payTime(a.date) - payTime(b.date); })
+        .forEach(function(p){
+      det.push([p.date||"", p.type==="expense"?"รายจ่าย":"รายรับ", Math.round(amtThb(p.amount,p.currency)),
+        p.currency||"THB", Number(p.amount)||0, _plCat[p.category]||p.category||"", p.supplier||"", p.notes||""]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(det), "รายการ");
-    XLSX.writeFile(wb, "SN_Finance_"+modeLabel+"_"+(yearF==="ทุกปี"?"all":yearF)+".xlsx");
-    toast("ดาวน์โหลดรายงานแล้ว");
-  } catch(e) { toast("สร้างรายงานไม่สำเร็จ: "+e.message); }
-  if (btn) { btn.disabled = false; btn.textContent = "⬇ ดาวน์โหลดรายงาน"; }
+
+    XLSX.writeFile(wb, "SN_งบกำไรขาดทุน_" + (mSel || ySel || "all") + ".xlsx");
+    toast("ดาวน์โหลดงบแล้ว");
+  } catch(e) { toast("สร้างงบไม่สำเร็จ: " + e.message); }
+  if (btn) { btn.disabled = false; btn.textContent = "⬇ ดาวน์โหลดงบ (P&L)"; }
 }
 
 async function loadCashflow() {

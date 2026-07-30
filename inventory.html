@@ -481,6 +481,11 @@ function sendMaterialCost() {
   })}).then(function(r){return r.json()}).then(function(res){
     btn.disabled=false; btn.textContent='ส่งการเงิน (รอจ่าย)';
     if (res && res.success) {
+      // also record it in the finance ledger (expense) so it appears in cashflow / P&L
+      var pp="date="+encodeURIComponent(iso)+"&type=expense&amount="+encodeURIComponent(amt)+
+        "&category=material&supplier="+encodeURIComponent(sup)+
+        "&notes="+encodeURIComponent("PO "+id+(notes?(" · "+notes):""))+"&currency="+encodeURIComponent(cur);
+      fetch(API_URL+"?api=recordPayment&"+pp).catch(function(){});
       toast('ส่งการเงินแล้ว: '+id+' (รอจ่าย)');
       document.getElementById('mcSupplier').value=''; document.getElementById('mcAmount').value=''; document.getElementById('mcNotes').value='';
     } else { toast('ไม่สำเร็จ: '+((res&&res.error)||'')); }
