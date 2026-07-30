@@ -44,7 +44,7 @@ git add -A && git commit -m "fix: update backend exec URL" && git push
 
 **exec URL ปัจจุบัน:**
 ```
-https://script.google.com/macros/s/AKfycbymkLFVRpXlyCxjF-TWTqUPCjNQylJt0iQc44RoZi4yt0Rsu7K5t-Guhw_MhzqGFp6z/exec
+https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec
 ```
 
 ---
