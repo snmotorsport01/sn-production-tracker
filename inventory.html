@@ -190,11 +190,16 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
 <div class="card" style="margin-bottom:12px;border-color:#7a6128">
   <div style="font-weight:700;margin-bottom:4px">เปิดค่าวัตถุดิบ → ส่งการเงิน</div>
   <div style="color:#888;font-size:12px;margin-bottom:10px">สร้างรายการ <b style="color:#f59e0b">รายจ่าย · รอจ่าย</b> ให้ฝ่ายการเงินกดจ่าย (เห็นในหน้า Finance → รายการ Invoice)</div>
-  <input id="mcSupplier" placeholder="ซัพพลายเออร์ / รายการวัตถุดิบ">
-  <div style="display:flex;gap:8px">
-    <input id="mcAmount" type="number" inputmode="decimal" placeholder="ยอดเงิน" style="flex:1">
-    <select id="mcCurrency" style="width:110px"><option value="THB">THB ฿</option><option value="USD">USD $</option></select>
+  <div style="display:flex;gap:6px;font-size:11px;color:#666;margin-bottom:4px">
+    <span style="flex:2">วัตถุดิบ</span><span style="width:52px;text-align:center">จำนวน</span><span style="width:78px;text-align:center">ราคา/หน่วย</span><span style="width:24px"></span>
   </div>
+  <div id="mcRows"></div>
+  <button class="btn btn-o" onclick="addMcRow()" style="padding:8px;font-size:13px;margin-bottom:10px">+ เพิ่มวัตถุดิบ</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span style="color:#888;font-size:13px">รวมทั้งหมด</span>
+    <span id="mcTotal" style="font-weight:800;font-size:18px;color:#cea24a">฿0</span>
+  </div>
+  <select id="mcCurrency" onchange="mcRecalc()" style="margin-bottom:8px"><option value="THB">THB ฿</option><option value="USD">USD $</option></select>
   <textarea id="mcNotes" rows="2" placeholder="หมายเหตุ (ไม่บังคับ)"></textarea>
   <button class="btn btn-p" onclick="sendMaterialCost()" id="mcBtn">ส่งการเงิน (รอจ่าย)</button>
 </div>
@@ -241,7 +246,7 @@ function switchTab(tab) {
     el.className = 'tab' + (tabs[i] === tab ? ' active' : '');
   });
   if (tab === 'alerts') loadAlerts();
-  if (tab === 'po') loadPOs();
+  if (tab === 'po') { loadPOs(); if (!document.querySelectorAll('#mcRows .mc-row').length) { addMcRow(); mcRecalc(); } }
   if (tab === 'bom') loadBOM();
 }
 
@@ -462,32 +467,87 @@ function createPOFromAlerts() {
 }
 
 // ── Send material cost to Finance (creates a pending expense invoice) ──
+// Add a material line row (item dropdown from inventory + qty + unit price)
+function addMcRow(){
+  var wrap = document.getElementById('mcRows');
+  var row = document.createElement('div');
+  row.className = 'mc-row';
+  row.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px';
+  var sel = document.createElement('select');
+  sel.className = 'mc-item'; sel.style.flex = '2'; sel.style.minWidth = '0';
+  var o0 = document.createElement('option'); o0.value=''; o0.textContent='— เลือก —'; sel.appendChild(o0);
+  (allInventory || []).forEach(function(it){
+    if (!it.item) return;
+    var o = document.createElement('option');
+    o.value = it.item; o.textContent = it.item;
+    o.setAttribute('data-cost', Number(it.unitCost) || 0);
+    o.setAttribute('data-sup', it.supplier || '');
+    sel.appendChild(o);
+  });
+  sel.onchange = function(){ mcItemPick(sel); };
+  var qty = document.createElement('input');
+  qty.type='number'; qty.min='0'; qty.step='1'; qty.value='1'; qty.className='mc-qty';
+  qty.style.cssText='width:52px;text-align:center'; qty.oninput=mcRecalc;
+  var price = document.createElement('input');
+  price.type='number'; price.min='0'; price.step='0.01'; price.className='mc-price'; price.placeholder='0';
+  price.style.cssText='width:78px;text-align:right'; price.oninput=mcRecalc;
+  var del = document.createElement('button');
+  del.className='del-btn'; del.textContent='✕'; del.style.width='24px';
+  del.onclick=function(){ row.remove(); mcRecalc(); };
+  row.appendChild(sel); row.appendChild(qty); row.appendChild(price); row.appendChild(del);
+  wrap.appendChild(row);
+}
+function mcItemPick(sel){
+  var opt = sel.options[sel.selectedIndex];
+  var price = sel.parentNode.querySelector('.mc-price');
+  if (opt && opt.getAttribute('data-cost') && !price.value) price.value = opt.getAttribute('data-cost');
+  mcRecalc();
+}
+function mcRecalc(){
+  var cur = document.getElementById('mcCurrency').value;
+  var total = 0;
+  document.querySelectorAll('#mcRows .mc-row').forEach(function(r){
+    var q = parseFloat(r.querySelector('.mc-qty').value) || 0;
+    var p = parseFloat(r.querySelector('.mc-price').value) || 0;
+    total += q * p;
+  });
+  document.getElementById('mcTotal').textContent = (cur === 'USD' ? '$' : '฿') + Math.round(total * 100) / 100;
+}
 function sendMaterialCost() {
-  var sup = document.getElementById('mcSupplier').value.trim();
-  var amt = parseFloat(document.getElementById('mcAmount').value) || 0;
   var cur = document.getElementById('mcCurrency').value;
   var notes = document.getElementById('mcNotes').value.trim();
-  if (!sup) { toast('กรุณาระบุซัพพลายเออร์/รายการ'); return; }
-  if (amt <= 0) { toast('กรุณาระบุยอดเงิน'); return; }
+  var items = [], total = 0, sups = [];
+  document.querySelectorAll('#mcRows .mc-row').forEach(function(r){
+    var sel = r.querySelector('.mc-item');
+    var name = sel.value;
+    var q = parseFloat(r.querySelector('.mc-qty').value) || 0;
+    var p = parseFloat(r.querySelector('.mc-price').value) || 0;
+    if (!name || q <= 0 || p <= 0) return;
+    var amt = q * p; total += amt;
+    items.push({ description: name, quantity: q, unitPrice: p, amount: amt });
+    var opt = sel.options[sel.selectedIndex]; var s = opt && opt.getAttribute('data-sup');
+    if (s && sups.indexOf(s) < 0) sups.push(s);
+  });
+  if (!items.length) { toast('เลือกวัตถุดิบอย่างน้อย 1 รายการ + ใส่จำนวน/ราคา'); return; }
+  var supplier = sups.length === 1 ? sups[0] : (sups.length > 1 ? 'หลายผู้ขาย' : ('วัตถุดิบ ' + items.length + ' รายการ'));
   var btn = document.getElementById('mcBtn'); btn.disabled = true; btn.textContent = 'กำลังส่ง...';
   var d = new Date(), p2 = function(n){return ('0'+n).slice(-2);};
   var iso = d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
   var id = 'PO-'+d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+'-'+p2(d.getHours())+p2(d.getMinutes())+p2(d.getSeconds());
   fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({
     action:'add_invoice', token:(sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token')),
-    invoiceId:id, date:iso, customer:sup, items:[], subtotal:amt, total:amt, paid:0, balanceDue:amt,
+    invoiceId:id, date:iso, customer:supplier, items:items, subtotal:total, total:total, paid:0, balanceDue:total,
     currency:cur, paymentStatus:'unpaid', paidPct:0, type:'expense', category:'material',
-    notes:('ค่าวัตถุดิบ'+(notes?(' · '+notes):''))
+    notes:('ค่าวัตถุดิบ '+items.length+' รายการ'+(notes?(' · '+notes):''))
   })}).then(function(r){return r.json()}).then(function(res){
     btn.disabled=false; btn.textContent='ส่งการเงิน (รอจ่าย)';
     if (res && res.success) {
-      // also record it in the finance ledger (expense) so it appears in cashflow / P&L
-      var pp="date="+encodeURIComponent(iso)+"&type=expense&amount="+encodeURIComponent(amt)+
-        "&category=material&supplier="+encodeURIComponent(sup)+
-        "&notes="+encodeURIComponent("PO "+id+(notes?(" · "+notes):""))+"&currency="+encodeURIComponent(cur);
+      var pp="date="+encodeURIComponent(iso)+"&type=expense&amount="+encodeURIComponent(total)+
+        "&category=material&supplier="+encodeURIComponent(supplier)+
+        "&notes="+encodeURIComponent("PO "+id+" ("+items.length+" รายการ)")+"&currency="+encodeURIComponent(cur);
       fetch(API_URL+"?api=recordPayment&"+pp).catch(function(){});
-      toast('ส่งการเงินแล้ว: '+id+' (รอจ่าย)');
-      document.getElementById('mcSupplier').value=''; document.getElementById('mcAmount').value=''; document.getElementById('mcNotes').value='';
+      toast('ส่งการเงินแล้ว: '+id+' ('+items.length+' รายการ, รอจ่าย)');
+      document.getElementById('mcRows').innerHTML=''; document.getElementById('mcNotes').value=''; addMcRow(); mcRecalc();
     } else { toast('ไม่สำเร็จ: '+((res&&res.error)||'')); }
   }).catch(function(){ btn.disabled=false; btn.textContent='ส่งการเงิน (รอจ่าย)'; toast('เชื่อมต่อไม่ได้'); });
 }
