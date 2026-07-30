@@ -112,10 +112,11 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
     <button class="tab active" id="cfModeMonth" onclick="setCfMode('month')" style="padding:6px 12px;font-size:.8rem">รายเดือน</button>
     <button class="tab" id="cfModeYear" onclick="setCfMode('year')" style="padding:6px 12px;font-size:.8rem">รายปี</button>
   </div>
-  <div class="filter-row">
+  <div class="filter-row" style="justify-content:space-between">
     <select id="cfYear" onchange="loadCashflow()">
       <option value="">ทุกปี</option>
     </select>
+    <button class="btn btn-secondary" onclick="exportCashflow()" id="cfExportBtn" style="padding:6px 14px;font-size:.82rem;white-space:nowrap">⬇ ดาวน์โหลดรายงาน</button>
   </div>
 
   <div class="summary-row" id="cfSummary">
@@ -351,6 +352,16 @@ async function loadExchangeRate() {
 function toTHB(usd) {
   if (!rateLoaded || !usdThbRate) return "";
   return (usd * usdThbRate).toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+// Parse a payment date (yyyy-mm-dd, dd/mm/yyyy, or Date string) to a sortable time.
+function payTime(d) {
+  if (!d) return 0;
+  d = String(d);
+  var m = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[2] - 1, +m[1]).getTime();
+  var t = new Date(d).getTime();
+  return isNaN(t) ? 0 : t;
 }
 
 // Numeric: normalise any amount to THB for cashflow aggregation (USD → ×rate).
@@ -839,12 +850,48 @@ function setCfMode(mode) {
   loadCashflow();
 }
 
+// Week-of-month key: "YYYY-MM-Wn" (n = 1..5, week within that month — not week-of-year)
 function getISOWeek(d) {
-  var date = new Date(d.getTime());
-  date.setHours(0,0,0,0);
-  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-  var week1 = new Date(date.getFullYear(), 0, 4);
-  return date.getFullYear() + "-W" + String(1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)).padStart(2, "0");
+  var y = d.getFullYear();
+  var mo = ("0" + (d.getMonth() + 1)).slice(-2);
+  var wk = Math.ceil(d.getDate() / 7);
+  return y + "-" + mo + "-W" + wk;
+}
+
+// lazy-load a script once (memoized)
+function snLoadScript(src){
+  window._snS = window._snS || {};
+  if (window._snS[src]) return window._snS[src];
+  window._snS[src] = new Promise(function(res, rej){ var s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+  return window._snS[src];
+}
+
+// Download the current cashflow view (respects mode + year) as an Excel report:
+// Sheet "สรุป" = period breakdown, Sheet "รายการ" = all payments (newest first).
+async function exportCashflow(){
+  if (!_cfRows.length) { toast("ยังไม่มีข้อมูลให้ดาวน์โหลด"); return; }
+  var btn = document.getElementById("cfExportBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "กำลังสร้าง..."; }
+  try {
+    await snLoadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    var modeLabel = cfMode === "week" ? "รายสัปดาห์" : cfMode === "year" ? "รายปี" : "รายเดือน";
+    var yearF = document.getElementById("cfYear").value || "ทุกปี";
+    var sum = [["SN Motorsports — รายงานการเงิน ("+modeLabel+")"], ["ปี: "+yearF], [""], ["ช่วงเวลา","รายรับ","รายจ่าย","กำไร/ขาดทุน","จำนวนรายการ"]];
+    var tI=0, tE=0;
+    _cfRows.forEach(function(r){ sum.push([r.period, r.income, r.expense, r.profit, r.count]); tI+=r.income; tE+=r.expense; });
+    sum.push(["รวม", tI, tE, tI-tE, ""]);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sum), "สรุป");
+    var cat = { product_sale:"ขายสินค้า", service:"บริการ", material:"วัตถุดิบ", shipping:"ค่าส่ง", salary:"เงินเดือน", marketing:"การตลาด", utility:"สาธารณูปโภค", other:"อื่นๆ" };
+    var det = [["วันที่","ประเภท","จำนวน","สกุลเงิน","หมวด","คู่ค้า/ลูกค้า","รุ่น","หมายเหตุ"]];
+    allPayments.slice().sort(function(a,b){ return payTime(b.date)-payTime(a.date); }).forEach(function(p){
+      det.push([p.date||"", p.type==="expense"?"รายจ่าย":"รายรับ", Number(p.amount)||0, p.currency||"THB", cat[p.category]||p.category||"", p.supplier||"", p.productModel||"", p.notes||""]);
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(det), "รายการ");
+    XLSX.writeFile(wb, "SN_Finance_"+modeLabel+"_"+(yearF==="ทุกปี"?"all":yearF)+".xlsx");
+    toast("ดาวน์โหลดรายงานแล้ว");
+  } catch(e) { toast("สร้างรายงานไม่สำเร็จ: "+e.message); }
+  if (btn) { btn.disabled = false; btn.textContent = "⬇ ดาวน์โหลดรายงาน"; }
 }
 
 async function loadCashflow() {
@@ -955,6 +1002,7 @@ async function loadCashflow() {
     // Render cards
     var thaiMonths = ["","ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
     grid.innerHTML = "";
+    _cfRows = [];
     keys.forEach(function(k) {
       var g = groups[k];
       var profit = g.income - g.expense;
@@ -965,10 +1013,13 @@ async function loadCashflow() {
         var parts = k.split("-");
         label = thaiMonths[parseInt(parts[1])] + " " + parts[0];
       } else if (cfMode === "week") {
-        label = "สัปดาห์ " + k;
+        var wp = k.split("-");   // YYYY-MM-Wn
+        var wn = (wp[2] || "W1").replace("W", "");
+        label = "สัปดาห์ที่ " + wn + " " + (thaiMonths[parseInt(wp[1])] || "") + " " + wp[0];
       } else {
         label = "ปี " + k;
       }
+      _cfRows.push({ period: label, income: Math.round(g.income), expense: Math.round(g.expense), profit: Math.round(profit), count: g.count });
       var card = document.createElement("div");
       card.className = "cf-card";
       card.innerHTML = '<div class="month">' + label + ' <span style="color:#555;font-size:.7rem">(' + g.count + ' รายการ)</span></div>' +
@@ -987,6 +1038,7 @@ async function loadCashflow() {
 // Payments CRUD (Expenses sheet)
 // ============================================================
 var allPayments = [];
+var _cfRows = [];  // last cashflow summary rows (for report export)
 
 async function loadPayments() {
   var container = document.getElementById("payList");
@@ -1022,6 +1074,9 @@ function renderPayments() {
     }
     return true;
   });
+
+  // newest → oldest
+  filtered.sort(function(a, b) { return payTime(b.date) - payTime(a.date); });
 
   if (!filtered.length) {
     container.innerHTML = '<div class="empty">ยังไม่มีรายการ — กด "+ เพิ่มรายการ" เพื่อเริ่มบันทึก</div>';
