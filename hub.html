@@ -119,7 +119,7 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
  window.snUser=u;window.snToken=token;
 })();
 function snLogout(){
- var API='https://script.google.com/macros/s/AKfycbwHbD-PbyjFyexXWNl5pgxAY6UWIG4gbw3mrTEhKAsaPcnqtmRzFdxQ42jrvLZx2lYh/exec';
+ var API='https://script.google.com/macros/s/AKfycbymkLFVRpXlyCxjF-TWTqUPCjNQylJt0iQc44RoZi4yt0Rsu7K5t-Guhw_MhzqGFp6z/exec';
  var t=sessionStorage.getItem('sn_token');
  fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:t})}).catch(function(){});
  sessionStorage.removeItem('sn_token');sessionStorage.removeItem('sn_user');
@@ -195,7 +195,7 @@ function snLogout(){
 <div class="footer">SN Motorsports — ERP v2.0</div>
 
 <script>
-var API = 'https://script.google.com/macros/s/AKfycbwHbD-PbyjFyexXWNl5pgxAY6UWIG4gbw3mrTEhKAsaPcnqtmRzFdxQ42jrvLZx2lYh/exec';
+var API = 'https://script.google.com/macros/s/AKfycbymkLFVRpXlyCxjF-TWTqUPCjNQylJt0iQc44RoZi4yt0Rsu7K5t-Guhw_MhzqGFp6z/exec';
 
 function callAPI(params) {
  var url = API + '?' + Object.keys(params).map(function(k){return k+'='+encodeURIComponent(params[k])}).join('&');
