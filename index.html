@@ -405,6 +405,25 @@ function saveProfilePin(){
     alert('เปลี่ยน PIN แล้ว');
   },document.getElementById('pfPinBtn'),'เปลี่ยน PIN');
 }
+
+/* ── Show only the Hub cards this role may open (admin sees all) ── */
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    var u=snMe(); if(!u||u.role==='admin')return;              // admin: all cards
+    var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}
+    if(!P||!P[u.role])return;                                   // no matrix → show all (fail-open)
+    var allow=P[u.role];
+    document.querySelectorAll('.section').forEach(function(sec){
+      var a=sec.querySelector('a[href$=".html"]'); if(!a)return;   // profile card has no page link → keep
+      var pg=(a.getAttribute('href')||'').split('#')[0].split('?')[0].split('/').pop();
+      if(pg&&pg!=='index.html'&&pg!=='hub.html'&&allow.indexOf(pg)===-1) sec.style.display='none';
+    });
+    document.querySelectorAll('.bottom-nav a').forEach(function(a){
+      var h=(a.getAttribute('href')||'').split('/').pop();
+      if(h&&/\.html$/.test(h)&&h!=='index.html'&&h!=='hub.html'&&allow.indexOf(h)===-1) a.style.display='none';
+    });
+  }catch(e){}
+});
 </script>
 </body>
 </html>
