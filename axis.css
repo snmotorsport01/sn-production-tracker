@@ -196,3 +196,8 @@ body::before{
 
 /* admin primary action button → gold (was racing red) */
 .btn-save{background:var(--gold) !important;color:#161003 !important;font-weight:700}
+
+/* department role badges (auth-bar + admin) */
+.role-production{background:rgba(96,165,250,.18) !important;color:#60a5fa !important}
+.role-finance{background:rgba(104,176,155,.18) !important;color:#68b09b !important}
+.role-marketing{background:rgba(167,139,250,.18) !important;color:#a78bfa !important}
