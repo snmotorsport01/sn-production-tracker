@@ -1244,11 +1244,15 @@ function onSlipPick(file) {
   reader.onload = function(e) {
     var img = new Image();
     img.onload = function() {
-      var max = 1400, w = img.width, h = img.height;
+      var max = 1100, w = img.width, h = img.height;
       if (w > max || h > max) { var s = Math.min(max / w, max / h); w = Math.round(w * s); h = Math.round(h * s); }
       var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
       cv.getContext("2d").drawImage(img, 0, 0, w, h);
-      paySlipDataUrl = cv.toDataURL("image/jpeg", 0.72);
+      // Step quality down until the data URL is comfortably small (~<300KB) so the
+      // POST uploads fast/reliably even on a mobile connection (slip = text, stays legible).
+      var q = 0.7, url = cv.toDataURL("image/jpeg", q);
+      while (url.length > 300 * 1024 && q > 0.35) { q -= 0.1; url = cv.toDataURL("image/jpeg", q); }
+      paySlipDataUrl = url;
       document.getElementById("paySlipImg").src = paySlipDataUrl;
       document.getElementById("paySlipPreview").style.display = "";
       document.getElementById("paySlipZone").style.display = "none";
