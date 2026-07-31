@@ -198,6 +198,15 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
       <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">หมายเหตุ</label>
       <input type="text" id="payNotes" placeholder="รายละเอียดเพิ่มเติม" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.85rem">
     </div>
+    <div id="paySlipDiv" style="margin-bottom:10px">
+      <label style="font-size:.75rem;color:#888;display:block;margin-bottom:4px">สลิป / หลักฐานการจ่าย (รูปภาพ)</label>
+      <input type="file" id="paySlipInput" accept="image/*" onchange="onSlipPick(this.files[0])" style="display:none">
+      <div id="paySlipZone" onclick="document.getElementById('paySlipInput').click()" style="border:2px dashed #333;border-radius:8px;padding:16px;text-align:center;cursor:pointer;color:#888;font-size:.82rem">📎 แตะเพื่อถ่ายรูป/เลือกสลิป</div>
+      <div id="paySlipPreview" style="display:none;margin-top:8px;position:relative">
+        <img id="paySlipImg" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid #333">
+        <button type="button" onclick="clearSlip()" style="position:absolute;top:6px;right:6px;background:#000a;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.8rem">✕ ลบรูป</button>
+      </div>
+    </div>
     <div class="btn-row">
       <button class="btn btn-primary" id="btnPaySave" onclick="savePayment()">บันทึก</button>
       <button class="btn btn-secondary" onclick="hidePaymentForm()">ยกเลิก</button>
@@ -1155,6 +1164,7 @@ function renderPayments() {
       '<div style="color:#aaa;font-size:.78rem;margin-top:2px">' + esc(catText) + '</div>' +
       (p.productModel ? '<div style="color:#9c27b0;font-size:.72rem">' + esc(p.productModel) + '</div>' : '') +
       '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
+      (/^https?:/.test(p.imageUrl || '') ? '<a href="' + esc(p.imageUrl) + '" target="_blank" rel="noopener" style="color:#68b09b;font-size:.75rem;text-decoration:none">🧾 ดูสลิป</a>' : '') +
       '</div>' +
       '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : '$') + amt.toLocaleString() + '</div>' +
       '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="แก้ไข" style="color:#f59e0b">E</button>' +
@@ -1165,6 +1175,7 @@ function renderPayments() {
 
 function showPaymentForm(editData) {
   document.getElementById("payFormArea").style.display = "";
+  clearSlip();
   if (editData) {
     document.getElementById("payFormTitle").textContent = "แก้ไขรายการ";
     document.getElementById("payEditRow").value = editData.row;
@@ -1188,6 +1199,7 @@ function showPaymentForm(editData) {
     document.getElementById("paySupplier").value = "";
     document.getElementById("payNotes").value = "";
   }
+  onPayTypeChange();
   document.getElementById("payDate").scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
@@ -1217,7 +1229,39 @@ function onProductModelChange() {
 }
 
 function onPayTypeChange() {
+  // Slip proof is meaningful for expenses (bank transfer slips); hide for income.
+  var slipDiv = document.getElementById("paySlipDiv");
+  if (slipDiv) slipDiv.style.display = document.getElementById("payType").value === "expense" ? "" : "none";
   onProductModelChange();
+}
+
+// ── Payment slip: pick → downscale to a compact JPEG data URL (fast upload,
+// small Drive file). Kept in paySlipDataUrl until save.
+var paySlipDataUrl = "";
+function onSlipPick(file) {
+  if (!file || !/^image\//.test(file.type)) { toast("กรุณาเลือกไฟล์รูปภาพ"); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var max = 1400, w = img.width, h = img.height;
+      if (w > max || h > max) { var s = Math.min(max / w, max / h); w = Math.round(w * s); h = Math.round(h * s); }
+      var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+      cv.getContext("2d").drawImage(img, 0, 0, w, h);
+      paySlipDataUrl = cv.toDataURL("image/jpeg", 0.72);
+      document.getElementById("paySlipImg").src = paySlipDataUrl;
+      document.getElementById("paySlipPreview").style.display = "";
+      document.getElementById("paySlipZone").style.display = "none";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function clearSlip() {
+  paySlipDataUrl = "";
+  document.getElementById("paySlipInput").value = "";
+  document.getElementById("paySlipPreview").style.display = "none";
+  document.getElementById("paySlipZone").style.display = "";
 }
 
 function populateProductDropdown() {
@@ -1254,6 +1298,33 @@ async function savePayment() {
   var btn = document.getElementById("btnPaySave");
   btn.disabled = true;
   btn.textContent = "กำลังบันทึก...";
+
+  // New expense WITH a slip image → POST (carries the image to Drive).
+  if (paySlipDataUrl && !editRow) {
+    try {
+      var res0 = await fetch(API, {
+        method: "POST", headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "add_slip_expense", token: sessionStorage.getItem("sn_token"),
+          date: date, type: type, amount: amount, category: category,
+          supplier: supplier, notes: notes,
+          currency: document.getElementById("payCurrency").value,
+          invoiceImage: paySlipDataUrl
+        })
+      });
+      var d0 = await res0.json();
+      if (d0.success) {
+        toast(d0.imageUrl === "upload_error" ? "บันทึกแล้ว (แต่อัปโหลดสลิปไม่สำเร็จ)" : "เพิ่มรายจ่าย + แนบสลิปแล้ว");
+        clearSlip();
+        hidePaymentForm();
+        loadPayments();
+      } else {
+        toast(d0.error || "เกิดข้อผิดพลาด");
+      }
+    } catch (err) { toast(err.message); }
+    btn.disabled = false; btn.textContent = "บันทึก";
+    return;
+  }
 
   var params = "date=" + encodeURIComponent(date) +
     "&type=" + encodeURIComponent(type) +
