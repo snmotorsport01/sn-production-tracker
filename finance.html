@@ -300,6 +300,16 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
       </div>
       <textarea id="pvNotes" placeholder="หมายเหตุ (ไม่บังคับ)" style="width:100%;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;font-size:.82rem;resize:vertical;min-height:50px;margin-bottom:8px"></textarea>
 
+      <div style="margin-bottom:8px">
+        <label style="font-size:.82rem;color:#888;display:block;margin-bottom:4px">รูปใบแจ้งหนี้ / หลักฐาน (ไม่บังคับ)</label>
+        <input type="file" id="invImgInput" accept="image/*" onchange="onInvImgPick(this.files[0])" style="display:none">
+        <div id="invImgZone" onclick="document.getElementById('invImgInput').click()" style="border:2px dashed #333;border-radius:8px;padding:14px;text-align:center;cursor:pointer;color:#888;font-size:.82rem">📎 แตะเพื่อแนบรูปใบแจ้งหนี้</div>
+        <div id="invImgPreview" style="display:none;margin-top:8px;position:relative">
+          <img id="invImgThumb" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #333">
+          <button type="button" onclick="clearInvImg()" style="position:absolute;top:6px;right:6px;background:#000a;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.8rem">✕ ลบรูป</button>
+        </div>
+      </div>
+
       <div class="btn-row">
         <button class="btn btn-primary" id="btnSave" onclick="saveInvoice()">บันทึก</button>
         <button class="btn btn-secondary" onclick="clearPreview()">ยกเลิก</button>
@@ -679,6 +689,7 @@ function clearPreview() {
   document.getElementById("previewArea").style.display = "none";
   document.getElementById("fileInput").value = "";
   parsedInvoice = null;
+  clearInvImg();
 }
 
 // ============================================================
@@ -707,7 +718,8 @@ async function saveInvoice() {
     paidPct: parsedInvoice.paidPct || 0,
     type: document.getElementById("pvType").value,
     category: document.getElementById("pvCategory").value,
-    notes: document.getElementById("pvNotes").value
+    notes: document.getElementById("pvNotes").value,
+    invoiceImage: invImageDataUrl || ""
   };
 
   try {
@@ -791,6 +803,7 @@ async function loadInvoices() {
         '<div class="inv-id">' + esc(inv.invoiceId) + ' <span class="badge ' + typeClass + '">' + typeLabel + '</span></div>' +
         '<div class="inv-meta">' + esc(inv.date) + ' &bull; ' + esc(inv.customer) + '</div>' +
         '<div class="inv-meta"><span class="' + payColor + '">' + payLabel + '</span>' + balTxt + '</div>' +
+        (/^https?:/.test(inv.imageUrl || '') ? '<a href="' + esc(inv.imageUrl) + '" target="_blank" rel="noopener" title="เปิดรูปใบแจ้งหนี้"><img src="' + driveThumb(inv.imageUrl) + '" style="height:44px;border-radius:6px;border:1px solid #333;margin-top:4px" loading="lazy"></a>' : '') +
         '</div>' +
         '<div class="inv-amount ' + amountClass + '">' + fmtMoney(inv.total || 0, cur) + '</div>' +
         '<button class="del-btn" onclick="editInvoicePayment(\'' + idJs + '\',' + (Number(inv.total) || 0) + ',\'' + cur + '\',' + pct + ')" title="แก้การชำระ" style="color:#f59e0b">✎</button>' +
@@ -942,14 +955,25 @@ async function exportReport(){
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(A), "งบกำไรขาดทุน");
 
-    var det = [["วันที่","ประเภท","จำนวน (บาท)","สกุลเดิม","ยอดเดิม","หมวด","คู่ค้า/ลูกค้า","หมายเหตุ"]];
+    var det = [["วันที่","ประเภท","จำนวน (บาท)","สกุลเดิม","ยอดเดิม","หมวด","คู่ค้า/ลูกค้า","หมายเหตุ","ไฟล์แนบ (ลิงก์)"]];
     pays.filter(function(p){ return inPeriod(p.date); })
         .sort(function(a,b){ return payTime(a.date) - payTime(b.date); })
         .forEach(function(p){
       det.push([p.date||"", p.type==="expense"?"รายจ่าย":"รายรับ", Math.round(amtThb(p.amount,p.currency)),
-        p.currency||"THB", Number(p.amount)||0, _plCat[p.category]||p.category||"", p.supplier||"", p.notes||""]);
+        p.currency||"THB", Number(p.amount)||0, _plCat[p.category]||p.category||"", p.supplier||"", p.notes||"",
+        /^https?:/.test(p.imageUrl||"") ? p.imageUrl : ""]);
     });
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(det), "รายการ");
+
+    // Attachments sheet — every slip/invoice file in the period, with a Drive link
+    // to download and attach when filing (ปิดงบ). Invoices + expense slips combined.
+    var att = [["วันที่","ที่มา","เลขที่/คู่ค้า","จำนวน (บาท)","ลิงก์ไฟล์ (คลิกเพื่อเปิด/ดาวน์โหลด)"]];
+    pays.filter(function(p){ return inPeriod(p.date) && /^https?:/.test(p.imageUrl||""); })
+        .forEach(function(p){ att.push([p.date||"", "สลิปรายจ่าย", p.supplier||"", Math.round(amtThb(p.amount,p.currency)), p.imageUrl]); });
+    invs.filter(function(iv){ return inPeriod(iv.date) && /^https?:/.test(iv.imageUrl||""); })
+        .forEach(function(iv){ att.push([iv.date||"", "ใบแจ้งหนี้", (iv.invoiceId||iv.customer||""), Math.round(amtThb(iv.total,iv.currency)), iv.imageUrl]); });
+    if (att.length === 1) att.push(["—","—","(ยังไม่มีไฟล์แนบในช่วงนี้)","",""]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(att), "หลักฐานแนบ");
 
     XLSX.writeFile(wb, "SN_งบกำไรขาดทุน_" + (mSel || ySel || "all") + ".xlsx");
     toast("ดาวน์โหลดงบแล้ว");
@@ -1164,7 +1188,7 @@ function renderPayments() {
       '<div style="color:#aaa;font-size:.78rem;margin-top:2px">' + esc(catText) + '</div>' +
       (p.productModel ? '<div style="color:#9c27b0;font-size:.72rem">' + esc(p.productModel) + '</div>' : '') +
       '<div class="inv-meta">' + esc(p.date || "-") + ' | ' + esc(p.supplier || "-") + (p.notes ? ' | ' + esc(p.notes) : '') + '</div>' +
-      (/^https?:/.test(p.imageUrl || '') ? '<a href="' + esc(p.imageUrl) + '" target="_blank" rel="noopener" style="color:#68b09b;font-size:.75rem;text-decoration:none">🧾 ดูสลิป</a>' : '') +
+      (/^https?:/.test(p.imageUrl || '') ? '<a href="' + esc(p.imageUrl) + '" target="_blank" rel="noopener" title="เปิดสลิป"><img src="' + driveThumb(p.imageUrl) + '" style="height:44px;border-radius:6px;border:1px solid #333;margin-top:4px" loading="lazy"></a>' : '') +
       '</div>' +
       '<div class="inv-amount ' + amtClass + '">' + ((p.currency||'THB')==='THB' ? '\u0e3f' : '$') + amt.toLocaleString() + '</div>' +
       '<button class="del-btn" onclick="editPaymentRow(' + p.row + ')" title="แก้ไข" style="color:#f59e0b">E</button>' +
@@ -1266,6 +1290,49 @@ function clearSlip() {
   document.getElementById("paySlipInput").value = "";
   document.getElementById("paySlipPreview").style.display = "none";
   document.getElementById("paySlipZone").style.display = "";
+}
+
+// Shared image → compact JPEG data URL (≤1100px, steps quality down to <300KB).
+function compressImage(file, cb) {
+  if (!file || !/^image\//.test(file.type)) { toast("กรุณาเลือกไฟล์รูปภาพ"); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var max = 1100, w = img.width, h = img.height;
+      if (w > max || h > max) { var s = Math.min(max / w, max / h); w = Math.round(w * s); h = Math.round(h * s); }
+      var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+      cv.getContext("2d").drawImage(img, 0, 0, w, h);
+      var q = 0.7, url = cv.toDataURL("image/jpeg", q);
+      while (url.length > 300 * 1024 && q > 0.35) { q -= 0.1; url = cv.toDataURL("image/jpeg", q); }
+      cb(url);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Invoice image (Import tab)
+var invImageDataUrl = "";
+function onInvImgPick(file) {
+  compressImage(file, function(url) {
+    invImageDataUrl = url;
+    document.getElementById("invImgThumb").src = url;
+    document.getElementById("invImgPreview").style.display = "";
+    document.getElementById("invImgZone").style.display = "none";
+  });
+}
+function clearInvImg() {
+  invImageDataUrl = "";
+  document.getElementById("invImgInput").value = "";
+  document.getElementById("invImgPreview").style.display = "none";
+  document.getElementById("invImgZone").style.display = "";
+}
+
+// A Drive share/preview URL → inline thumbnail image URL (renders in <img>).
+function driveThumb(url) {
+  var m = String(url || "").match(/[-\w]{25,}/);
+  return m ? "https://drive.google.com/thumbnail?id=" + m[0] + "&sz=w400" : "";
 }
 
 function populateProductDropdown() {
