@@ -1301,6 +1301,7 @@ async function savePayment() {
 
   // New expense WITH a slip image → POST (carries the image to Drive).
   if (paySlipDataUrl && !editRow) {
+    var slipHandled = false;
     try {
       var res0 = await fetch(API, {
         method: "POST", headers: { "Content-Type": "text/plain" },
@@ -1315,15 +1316,16 @@ async function savePayment() {
       var d0 = await res0.json();
       if (d0.success) {
         toast(d0.imageUrl === "upload_error" ? "บันทึกแล้ว (แต่อัปโหลดสลิปไม่สำเร็จ)" : "เพิ่มรายจ่าย + แนบสลิปแล้ว");
-        clearSlip();
-        hidePaymentForm();
-        loadPayments();
-      } else {
+        clearSlip(); hidePaymentForm(); loadPayments();
+        slipHandled = true;
+      } else if (!/unknown action/i.test(d0.error || "")) {
         toast(d0.error || "เกิดข้อผิดพลาด");
+        slipHandled = true;
       }
-    } catch (err) { toast(err.message); }
-    btn.disabled = false; btn.textContent = "บันทึก";
-    return;
+      // else: backend not updated yet → fall through and record WITHOUT the image
+    } catch (err) { /* fall through to plain save below */ }
+    if (slipHandled) { btn.disabled = false; btn.textContent = "บันทึก"; return; }
+    toast("บันทึกรายจ่ายแล้ว — แต่แนบสลิปยังไม่ได้ (ต้องอัปเดต backend ก่อน)");
   }
 
   var params = "date=" + encodeURIComponent(date) +
