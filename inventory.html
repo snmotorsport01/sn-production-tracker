@@ -257,13 +257,19 @@ function switchTab(tab) {
 }
 
 // ── Stock List ──
+// Stale-while-revalidate paint helpers (show last stock instantly, refresh replaces it)
+function snPaint(id, key) { try { var h = sessionStorage.getItem(key); if (h) { document.getElementById(id).innerHTML = h; return true; } } catch (e) {} return false; }
+function snSave(id, key) { try { sessionStorage.setItem(key, document.getElementById(id).innerHTML); } catch (e) {} }
 function loadInventory() {
+  // instant paint from cache; also restore allInventory so cached rows are clickable
+  try { var cj = sessionStorage.getItem('sn_inv_data'); if (cj) { allInventory = JSON.parse(cj); snPaint('stock-content', 'sn_h_stock'); updateAlertBadge(allInventory); } } catch (e) {}
   callAPI({ api: 'listInventory' }).then(function(data) {
     allInventory = data;
+    try { sessionStorage.setItem('sn_inv_data', JSON.stringify(data)); } catch (e) {}
     renderStock(data);
     updateAlertBadge(data);
   }).catch(function(err) {
-    document.getElementById('stock-content').innerHTML =
+    if (!document.querySelector('#stock-content .stock-row')) document.getElementById('stock-content').innerHTML =
       '<div class="card" style="text-align:center;color:#f87171">Error loading inventory<br><span style="font-size:13px">' + err + '</span></div>' +
       '<button class="btn btn-o" onclick="loadInventory()">Retry</button>';
   });
@@ -319,6 +325,7 @@ function renderStock(items) {
   html += '</div>';
 
   document.getElementById('stock-content').innerHTML = html;
+  snSave('stock-content', 'sn_h_stock');
 }
 
 function filterStock(q) {
@@ -347,6 +354,7 @@ function updateAlertBadge(items) {
 // ── Restock Modal ──
 function openRestock(idx) {
   var it = allInventory[idx];
+  if (!it) return;
   currentRestockItem = it;
   document.getElementById('restockItem').value = it.item;
   document.getElementById('restockCurrent').value = it.stock + ' ' + (it.unit || '');

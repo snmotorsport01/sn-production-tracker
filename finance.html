@@ -768,7 +768,7 @@ function toIsoDate(d) {
 // ============================================================
 async function loadInvoices() {
   var container = document.getElementById("invList");
-  container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+  if (!snPaint("invList", "sn_h_inv")) container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
 
   var params = "api=listInvoices&token=" + sessionStorage.getItem("sn_token");
   var typeF = document.getElementById("invTypeFilter").value;
@@ -810,8 +810,9 @@ async function loadInvoices() {
         '<button class="del-btn" onclick="deleteInvoice(\'' + idJs + '\')" title="ลบ">X</button>';
       container.appendChild(div);
     });
+    snSave("invList", "sn_h_inv");
   } catch (err) {
-    container.innerHTML = '<div class="empty">' + err.message + '</div>';
+    if (!/inv-item/.test(container.innerHTML)) container.innerHTML = '<div class="empty">' + err.message + '</div>';
   }
 }
 
@@ -983,7 +984,9 @@ async function exportReport(){
 
 async function loadCashflow() {
   var grid = document.getElementById("cfGrid");
-  grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+  // Instant paint from cache (SWR); fall back to spinner only on first-ever load.
+  snPaint("cfSummary", "sn_h_cfsum");
+  if (!snPaint("cfGrid", "sn_h_cfgrid")) grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
   if (!rateLoaded) { try { await loadExchangeRate(); } catch (e) {} }  // ensure USD→THB rate ready
 
   try {
@@ -1065,6 +1068,7 @@ async function loadCashflow() {
       document.getElementById("cfExpense").textContent = "฿0";
       document.getElementById("cfProfit").textContent = "฿0";
       document.getElementById("cfUnpaid").textContent = "฿" + Math.round(totalUnpaid).toLocaleString();
+      snSave("cfSummary", "sn_h_cfsum"); snSave("cfGrid", "sn_h_cfgrid");
       return;
     }
 
@@ -1108,9 +1112,10 @@ async function loadCashflow() {
         '<div class="detail">รายจ่าย <span class="red">฿' + Math.round(g.expense).toLocaleString() + '</span></div>';
       grid.appendChild(card);
     });
+    snSave("cfSummary", "sn_h_cfsum"); snSave("cfGrid", "sn_h_cfgrid");
 
   } catch (err) {
-    grid.innerHTML = '<div class="empty">' + err.message + '</div>';
+    if (!/cf-card/.test(grid.innerHTML)) grid.innerHTML = '<div class="empty">' + err.message + '</div>';
   }
 }
 
@@ -1120,9 +1125,14 @@ async function loadCashflow() {
 var allPayments = [];
 var _cfRows = [];  // last cashflow summary rows (for report export)
 
+// Stale-while-revalidate paint: show the LAST rendered HTML instantly (0ms) while
+// the ~3s backend fetch runs, then replace it. Makes repeat loads feel instant.
+function snPaint(id, key) { try { var h = sessionStorage.getItem(key); if (h) { document.getElementById(id).innerHTML = h; return true; } } catch (e) {} return false; }
+function snSave(id, key) { try { sessionStorage.setItem(key, document.getElementById(id).innerHTML); } catch (e) {} }
+
 async function loadPayments() {
   var container = document.getElementById("payList");
-  container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+  if (!snPaint("payList", "sn_h_pay")) container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
 
   try {
     var res = await fetch(API + "?api=listPayments");
@@ -1188,6 +1198,7 @@ function renderPayments() {
       '<button class="del-btn" onclick="deletePaymentRow(' + p.row + ')" title="ลบ">X</button>';
     container.appendChild(div);
   });
+  snSave("payList", "sn_h_pay");
 }
 
 function showPaymentForm(editData) {
