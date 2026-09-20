@@ -287,27 +287,29 @@ function saveProfilePin(){
   },document.getElementById('pfPinBtn'),'เปลี่ยน PIN');
 }
 
-/* ── Show only the Hub cards this role may open (admin sees all) ── */
-document.addEventListener('DOMContentLoaded',function(){
+/* ── Hub menu gating — idempotent + self-correcting (admin sees all) ──
+   Runs on load AND re-runs after a fresh getPermissions, so a stale/late
+   perms state on first login never leaves an allowed menu (e.g. Cost) hidden. */
+function applyHubPerms(){
   try{
-    var u=snMe(); if(!u||u.role==='admin')return;              // admin: all cards
+    var showAll=function(){document.querySelectorAll('[data-page],.section,.bottom-nav a').forEach(function(el){el.style.display='';});};
+    var u=snMe();
+    if(!u||u.role==='admin'){ showAll(); return; }             // admin: everything
     var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}
-    if(!P||!P[u.role])return;                                   // no matrix → show all (fail-open)
+    if(!P||!P[u.role]){ showAll(); return; }                    // no matrix yet → fail-open
     var allow=P[u.role];
-    document.querySelectorAll('[data-page]').forEach(function(el){
-      var pg=(el.getAttribute('data-page')||'');
-      if(pg&&pg!=='index.html'&&pg!=='hub.html'&&allow.indexOf(pg)===-1) el.style.display='none';
-    });
-    document.querySelectorAll('.section').forEach(function(sec){
-      var a=sec.querySelector('a[href$=".html"]'); if(!a)return;   // profile card has no page link → keep
-      var pg=(a.getAttribute('href')||'').split('#')[0].split('?')[0].split('/').pop();
-      if(pg&&pg!=='index.html'&&pg!=='hub.html'&&allow.indexOf(pg)===-1) sec.style.display='none';
-    });
-    document.querySelectorAll('.bottom-nav a').forEach(function(a){
-      var h=(a.getAttribute('href')||'').split('/').pop();
-      if(h&&/\.html$/.test(h)&&h!=='index.html'&&h!=='hub.html'&&allow.indexOf(h)===-1) a.style.display='none';
-    });
+    var ok=function(pg){return !pg||pg==='index.html'||pg==='hub.html'||allow.indexOf(pg)>=0;};
+    document.querySelectorAll('[data-page]').forEach(function(el){el.style.display=ok(el.getAttribute('data-page')||'')?'':'none';});
+    document.querySelectorAll('.bottom-nav a').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop();a.style.display=ok(/\.html$/.test(h)?h:'')?'':'none';});
+    document.querySelectorAll('.section').forEach(function(sec){var a=sec.querySelector('a[href$=".html"]');if(!a)return;var pg=(a.getAttribute('href')||'').split('#')[0].split('?')[0].split('/').pop();sec.style.display=ok(pg)?'':'none';});
   }catch(e){}
+}
+document.addEventListener('DOMContentLoaded',function(){
+  applyHubPerms();
+  cachedAPI({api:'getPermissions'},300000,function(d){
+    if(d&&d.permissions){try{var pj=JSON.stringify(d.permissions);sessionStorage.setItem('sn_perms',pj);if(localStorage.getItem('sn_perms'))localStorage.setItem('sn_perms',pj);}catch(e){}}
+    applyHubPerms();
+  });
 });
 </script>
 </body>
