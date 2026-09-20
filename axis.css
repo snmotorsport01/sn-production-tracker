@@ -103,7 +103,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
 .bottom-nav{background:rgba(12,14,18,.86) !important;
   -webkit-backdrop-filter:blur(20px) saturate(1.2);backdrop-filter:blur(20px) saturate(1.2);
   border-top:1px solid var(--goldline) !important;}
-.bottom-nav a{font-family:var(--mono) !important;letter-spacing:.05em;color:var(--ink3) !important;text-transform:uppercase;font-size:9px !important}
+.bottom-nav a{font-family:var(--disp) !important;letter-spacing:.06em;color:var(--ink3) !important;text-transform:uppercase;font-size:9.5px !important;font-weight:600}
 .bottom-nav a.active{color:var(--goldhi) !important;position:relative}
 .bottom-nav a.active::after{content:'';position:absolute;left:50%;bottom:5px;transform:translateX(-50%);
   width:18px;height:3px;border-radius:2px;background:var(--gold);box-shadow:0 0 8px var(--goldglow)}
@@ -138,8 +138,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
 .cd-sechdr .d{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);flex:none}
 
 /* status chips */
-.cd-chip{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.04em;
-  padding:3px 8px;border-radius:5px;white-space:nowrap;display:inline-block}
+.cd-chip{font-family:var(--disp);font-size:10px;font-weight:600;letter-spacing:.02em;
+  padding:3px 10px;border-radius:999px;white-space:nowrap;display:inline-block}
 .cd-chip.ok{background:rgba(104,176,155,.16);color:#7fd0b6}
 .cd-chip.warn{background:rgba(232,161,60,.16);color:#eab55f}
 .cd-chip.crit{background:rgba(229,85,90,.18);color:#f08a8e}
@@ -195,8 +195,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
 /* every status badge (inventory b-ok/low/crit/out · production b-created/startprod/
    printfinish/outsource/qcpass/shipped · finance income/expense) → mono chip.
    Colour variants keep their own bg/fg; we only restyle the typography+shape. */
-.badge{font-family:var(--mono) !important;letter-spacing:.04em !important;font-size:10px !important;
-  font-weight:600 !important;padding:3px 8px !important;border-radius:5px !important;text-transform:uppercase}
+.badge{font-family:var(--disp) !important;letter-spacing:.02em !important;font-size:10.5px !important;
+  font-weight:600 !important;padding:3px 10px !important;border-radius:999px !important;text-transform:none}
 .badge.role-admin,.badge.role-production,.badge.role-finance,.badge.role-marketing,
 .role-badge{text-transform:none}
 .badge-stream,.badge-beam{font-family:var(--mono) !important;letter-spacing:.04em}
@@ -224,5 +224,5 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
 #cfSummary{display:grid !important;grid-template-columns:1fr 1fr;gap:8px}
 #cfSummary .summary-box{display:flex !important;flex-direction:column-reverse;align-items:flex-start;
   text-align:left;padding:11px 13px !important;gap:3px}
-#cfSummary .summary-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3) !important}
+#cfSummary .summary-box .lbl{font-family:var(--disp);font-size:11px;letter-spacing:.02em;color:var(--ink3) !important}
 #cfSummary .summary-box .num{font-size:1.4rem !important}
