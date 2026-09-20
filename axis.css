@@ -226,3 +226,24 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
   text-align:left;padding:11px 13px !important;gap:3px}
 #cfSummary .summary-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3) !important}
 #cfSummary .summary-box .num{font-size:1.4rem !important}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DESKTOP — use the screen width instead of a narrow phone column.
+   Mobile (<900px) unchanged. Existing auto-fill grids expand naturally.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (min-width:900px){
+  body{max-width:1080px !important;margin-left:auto !important;margin-right:auto !important;
+    padding-left:32px !important;padding-right:32px !important;padding-bottom:90px !important;}
+  /* keep the fixed bottom nav aligned to the same centered width */
+  .bottom-nav{max-width:1080px !important;left:0 !important;right:0 !important;
+    margin-left:auto !important;margin-right:auto !important;border-radius:14px 14px 0 0}
+  /* finance KPI cells 2×2 → 4 across; hub tiles already 3-col */
+  #cfSummary{grid-template-columns:repeat(4,1fr) !important}
+  /* two-up the hub data sections so the width isn't wasted */
+  .cd-hero{max-width:none}
+}
+/* wide desktop: a touch more room */
+@media (min-width:1200px){
+  body{max-width:1200px !important}
+  .bottom-nav{max-width:1200px !important}
+}
