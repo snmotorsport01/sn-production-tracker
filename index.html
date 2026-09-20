@@ -309,7 +309,7 @@ var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13
 function callAPI(p){var url=API+'?'+Object.keys(p).map(function(k){return k+'='+encodeURIComponent(p[k])}).join('&');return fetch(url).then(function(r){return r.json()})}
 /* Cache-first for slow, rarely-changing endpoints: serve cached instantly within
    ttl (ms) and skip the network entirely → fewer Apps Script calls per hub load. */
-function cachedAPI(p,ttl,cb){var key='sn_cache_'+p.api;try{var c=JSON.parse(sessionStorage.getItem(key)||'null');if(c&&(Date.now()-c.t)<ttl){cb(c.d);return Promise.resolve(c.d);}}catch(e){}return callAPI(p).then(function(d){try{sessionStorage.setItem(key,JSON.stringify({t:Date.now(),d:d}));}catch(e){}cb(d);return d;}).catch(function(){});}
+function cachedAPI(p,ttl,cb){var key='sn_cache_'+p.api;try{var c=JSON.parse(sessionStorage.getItem(key)||'null');if(c&&c.d&&c.d.success!==false&&(Date.now()-c.t)<ttl){cb(c.d);return Promise.resolve(c.d);}}catch(e){}return callAPI(p).then(function(d){try{if(d&&d.success!==false)sessionStorage.setItem(key,JSON.stringify({t:Date.now(),d:d}));}catch(e){}cb(d);return d;}).catch(function(){});}
 function fmt(n){if(n===undefined||n===null||isNaN(n))return'—';return Number(n).toLocaleString('th-TH')}
 
 /* Load Production stats */
