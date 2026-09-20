@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <!--sn-me-->
-<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
 
 <!--sn-perm-->
 <script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}var allow=P[u.role];document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.bottom-nav a,.bnav a').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop();if(h&&/\.html$/.test(h)&&h!=='index.html'&&h!=='hub.html'&&allow.indexOf(h)===-1)a.style.display='none';});});}}catch(e){}})();</script>
@@ -987,35 +987,28 @@ async function loadCashflow() {
   if (!rateLoaded) { try { await loadExchangeRate(); } catch (e) {} }  // ensure USD→THB rate ready
 
   try {
-    // Fetch payments for aggregation
-    var res = await fetch(API + "?api=listPayments");
-    var data = await res.json();
+    // Fire all three backend calls in PARALLEL (each ~2-3s serially = ~8s → ~one round trip).
+    var yearF = document.getElementById("cfYear").value;
+    var tok = sessionStorage.getItem("sn_token");
+    var params2 = "api=cashflowSummary&token=" + tok + (yearF ? "&year=" + yearF : "");
+    var R = await Promise.all([
+      fetch(API + "?api=listPayments").then(function(r){return r.json();}).catch(function(){return [];}),
+      fetch(API + "?" + params2).then(function(r){return r.json();}).catch(function(){return {};}),
+      fetch(API + "?api=listInvoices&token=" + tok).then(function(r){return r.json();}).catch(function(){return {};})
+    ]);
+    var data = R[0];
     var payments = Array.isArray(data) ? data : (data.payments || []);
-
-    // Also try cashflow summary for invoice data
-    var invoiceData = [];
-    try {
-      var yearF = document.getElementById("cfYear").value;
-      var params2 = "api=cashflowSummary&token=" + sessionStorage.getItem("sn_token");
-      if (yearF) params2 += "&year=" + yearF;
-      var res2 = await fetch(API + "?" + params2);
-      var d2 = await res2.json();
-      if (d2.success && d2.months) invoiceData = d2.months;
-    } catch(e) {}
+    var invoiceData = (R[1] && R[1].success && R[1].months) ? R[1].months : [];
 
     // ค้างชำระ = ผลรวม balanceDue ของ invoice ที่ยังจ่ายไม่ครบ (แปลง USD→THB ด้วยเรตปัจจุบัน)
-    var yfUnpaid = document.getElementById("cfYear").value;
+    var yfUnpaid = yearF;
     var totalUnpaid = 0;
-    try {
-      var invRes = await fetch(API + "?api=listInvoices&token=" + sessionStorage.getItem("sn_token"));
-      var invJson = await invRes.json();
-      (invJson.invoices || []).forEach(function(inv) {
-        var bal = Number(inv.balanceDue) || 0;
-        if (bal <= 0) return;
-        if (yfUnpaid) { var ym = String(inv.date || "").match(/(\d{4})/); if (!ym || ym[1] !== yfUnpaid) return; }
-        totalUnpaid += amtThb(bal, inv.currency);
-      });
-    } catch (e) {}
+    ((R[2] && R[2].invoices) || []).forEach(function(inv) {
+      var bal = Number(inv.balanceDue) || 0;
+      if (bal <= 0) return;
+      if (yfUnpaid) { var ym = String(inv.date || "").match(/(\d{4})/); if (!ym || ym[1] !== yfUnpaid) return; }
+      totalUnpaid += amtThb(bal, inv.currency);
+    });
 
     // Group payments by period
     var groups = {};
