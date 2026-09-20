@@ -132,140 +132,33 @@ window.location.href='login.html';
 </div>
 <div class="divider"></div>
 
-<!-- ── Instrument: cash-flow ring hero ── -->
-<div class="cd-hero" style="margin:6px 0 14px">
+<!-- ── Command Deck Hub ── -->
+<div class="cd-sys" style="margin:2px 2px 12px"><span>SYS/OPS · ONLINE</span><span class="live">● LIVE</span></div>
+
+<a href="finance.html" class="cd-hero" style="display:block;text-decoration:none;color:inherit;margin-bottom:14px" data-page="finance.html">
 <div class="cap">Cash Flow · เดือนนี้</div>
 <div class="cd-rings">
 <div class="cd-ring"><svg width="46" height="46" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="20" cy="20" r="16" fill="none" stroke="#68b09b" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="20" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><div class="v" id="h-in" style="color:#68b09b">—</div><div class="l">รายรับ</div></div>
 <div class="cd-ring"><svg width="46" height="46" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="20" cy="20" r="16" fill="none" stroke="#e5555a" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="46" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><div class="v" id="h-out" style="color:#e5555a">—</div><div class="l">รายจ่าย</div></div>
 <div class="cd-ring"><svg width="46" height="46" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="20" cy="20" r="16" fill="none" stroke="#e4c77a" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="8" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><div class="v" id="h-net" style="color:#e4c77a">—</div><div class="l">คงเหลือ</div></div>
 </div>
+</a>
+
+<!-- module tiles -->
+<div class="cd-tiles" style="margin-bottom:4px">
+<a href="production.html" class="cd-tile" data-page="production.html"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 7l8-4 8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/></svg><span class="n" id="t-prod">—</span></div><span class="lb">ผลิต</span></a>
+<a href="inventory.html" class="cd-tile" data-page="inventory.html"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg><span class="n" id="t-inv">—</span></div><span class="lb">สต็อก</span></a>
+<a href="cost.html" class="cd-tile" data-page="cost.html"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg><span class="n" id="t-cost">—</span></div><span class="lb">ต้นทุน</span></a>
 </div>
 
-<!-- ══════════════════════════════════════ -->
-<!-- SECTION 1: Production -->
-<!-- ══════════════════════════════════════ -->
-<div class="section">
-<a href="production.html" class="section-head">
-<div class="section-icon prod"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5-8 4.5-8-4.5L12 3z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></div>
-<div class="section-info">
-<div class="section-title">Production</div>
-<div class="section-desc">จัดการ Batch การผลิต ติดตามสถานะ</div>
-</div>
-<div class="section-arrow">›</div>
-</a>
-<!-- Flow -->
-<div class="flow-row">
-<span class="flow-step">สร้าง Batch</span><span class="flow-sep">→</span>
-<span class="flow-step">สถานะ Batch</span><span class="flow-sep">→</span>
-<span class="flow-step">อัพเดท Phase</span>
-</div>
-<!-- Stats -->
-<div class="section-stats" id="prod-stats">
-<div class="stat-item"><div class="stat-val red" id="ps-active">—</div><div class="stat-lbl">กำลังผลิต</div></div>
-<div class="stat-item"><div class="stat-val green" id="ps-done">—</div><div class="stat-lbl">เสร็จแล้ว</div></div>
-<div class="stat-item"><div class="stat-val amber" id="ps-total">—</div><div class="stat-lbl">ทั้งหมด</div></div>
-</div>
-<!-- Sub-links -->
-<div class="sub-links">
-<a href="production.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-<a href="production.html?action=create" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สร้าง Batch</span><span class="sl-arrow">›</span></a>
-<a href="qr.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สถานะ / QR</span><span class="sl-arrow">›</span></a>
-</div>
-</div>
+<!-- stock alerts -->
+<div class="cd-sechdr" data-page="inventory.html"><span class="d"></span> แจ้งเตือนสต็อก</div>
+<a href="inventory.html" style="text-decoration:none;color:inherit" data-page="inventory.html"><div class="cd-rows" id="hubAlerts"><div class="cd-row" style="justify-content:center;color:var(--ink3)">กำลังโหลด...</div></div></a>
 
-<!-- ══════════════════════════════════════ -->
-<!-- SECTION 2: Inventory -->
-<!-- ══════════════════════════════════════ -->
-<div class="section">
-<a href="inventory.html" class="section-head">
-<div class="section-icon inv"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg></div>
-<div class="section-info">
-<div class="section-title">Inventory</div>
-<div class="section-desc">สต็อกวัตถุดิบ จัดการ PO</div>
-</div>
-<div class="section-arrow">›</div>
-</a>
-<!-- Flow -->
-<div class="flow-row">
-<span class="flow-step">รายการสต็อก</span><span class="flow-sep">→</span>
-<span class="flow-step">แก้ไขสต็อก</span>
-</div>
-<!-- Stats -->
-<div class="section-stats" id="inv-stats">
-<div class="stat-item"><div class="stat-val green" id="is-ok">—</div><div class="stat-lbl">OK</div></div>
-<div class="stat-item"><div class="stat-val amber" id="is-low">—</div><div class="stat-lbl">ต่ำ</div></div>
-<div class="stat-item"><div class="stat-val red" id="is-crit">—</div><div class="stat-lbl">วิกฤต</div></div>
-</div>
-<!-- Sub-links -->
-<div class="sub-links">
-<a href="inventory.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-<a href="inventory.html?tab=list" class="sub-link"><span class="sl-icon"></span><span class="sl-text">รายการสต็อก</span><span class="sl-arrow">›</span></a>
-<a href="inventory.html?tab=po" class="sub-link"><span class="sl-icon"></span><span class="sl-text">สร้าง PO</span><span class="sl-arrow">›</span></a>
-</div>
-</div>
+<!-- production queue -->
+<div class="cd-sechdr" data-page="production.html"><span class="d"></span> คิวการผลิต</div>
+<a href="production.html" style="text-decoration:none;color:inherit" data-page="production.html"><div class="cd-rows" id="hubQueue" style="margin-bottom:8px"><div class="cd-row" style="justify-content:center;color:var(--ink3)">กำลังโหลด...</div></div></a>
 
-<!-- ══════════════════════════════════════ -->
-<!-- SECTION 3: Finance -->
-<!-- ══════════════════════════════════════ -->
-<div class="section">
-<a href="finance.html" class="section-head">
-<div class="section-icon fin"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h6v6"/></svg></div>
-<div class="section-info">
-<div class="section-title">Financial</div>
-<div class="section-desc">รายรับ-รายจ่าย Cash Flow</div>
-</div>
-<div class="section-arrow">›</div>
-</a>
-<!-- Flow -->
-<div class="flow-row">
-<span class="flow-step">อัพโหลด Invoice</span><span class="flow-sep">→</span>
-<span class="flow-step">Cash Flow</span>
-</div>
-<!-- Stats -->
-<div class="section-stats" id="fin-stats">
-<div class="stat-item"><div class="stat-val green" id="fs-in">—</div><div class="stat-lbl">รายรับ</div></div>
-<div class="stat-item"><div class="stat-val red" id="fs-out">—</div><div class="stat-lbl">รายจ่าย</div></div>
-<div class="stat-item"><div class="stat-val amber" id="fs-net">—</div><div class="stat-lbl">คงเหลือ</div></div>
-</div>
-<!-- Sub-links -->
-<div class="sub-links">
-<a href="finance.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-<a href="finance.html?tab=upload" class="sub-link"><span class="sl-icon"></span><span class="sl-text">อัพโหลด</span><span class="sl-arrow">›</span></a>
-<a href="finance.html?tab=cashflow" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Cash Flow</span><span class="sl-arrow">›</span></a>
-</div>
-</div>
-
-<!-- ══════════════════════════════════════ -->
-<!-- SECTION 4: Cost Analysis -->
-<!-- ══════════════════════════════════════ -->
-<div class="section">
-<a href="cost.html" class="section-head">
-<div class="section-icon" style="background:rgba(206,162,74,.16)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/></svg></div>
-<div class="section-info">
-<div class="section-title">Cost Analysis</div>
-<div class="section-desc">วิเคราะห์ต้นทุน AURA</div>
-</div>
-<div class="section-arrow">›</div>
-</a>
-<!-- Flow -->
-<div class="flow-row">
-<span class="flow-step">Stream vs Beam</span><span class="flow-sep">→</span>
-<span class="flow-step">เปรียบเทียบ Variant</span>
-</div>
-<!-- Stats — dynamic from API -->
-<div class="section-stats" id="cost-stats">
-<div class="stat-item"><div class="stat-val green" id="cs-margin">—</div><div class="stat-lbl">กำไรเฉลี่ย</div></div>
-<div class="stat-item"><div class="stat-val" id="cs-variants">—</div><div class="stat-lbl">Variants</div></div>
-<div class="stat-item"><div class="stat-val red" id="cs-price">—</div><div class="stat-lbl">ราคาขาย</div></div>
-</div>
-<!-- Sub-links -->
-<div class="sub-links">
-<a href="cost.html" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Dashboard</span><span class="sl-arrow">›</span></a>
-<a href="cost.html#stream" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Stream</span><span class="sl-arrow">›</span></a>
-<a href="cost.html#beam" class="sub-link"><span class="sl-icon"></span><span class="sl-text">Beam</span><span class="sl-arrow">›</span></a>
-</div>
-</div>
 
 <!-- ══════════════════════════════════════ -->
 <!-- SECTION: My Profile (self-edit) -->
@@ -311,69 +204,44 @@ function callAPI(p){var url=API+'?'+Object.keys(p).map(function(k){return k+'='+
 function cachedAPI(p,ttl,cb){var key='sn_cache_'+p.api;try{var c=JSON.parse(sessionStorage.getItem(key)||'null');if(c&&c.d&&c.d.success!==false&&(Date.now()-c.t)<ttl){cb(c.d);return Promise.resolve(c.d);}}catch(e){}return callAPI(p).then(function(d){try{if(d&&d.success!==false)sessionStorage.setItem(key,JSON.stringify({t:Date.now(),d:d}));}catch(e){}cb(d);return d;}).catch(function(){});}
 function fmt(n){if(n===undefined||n===null||isNaN(n))return'—';return Number(n).toLocaleString('th-TH')}
 
-/* Load Production stats */
+/* ── Command Deck hub helpers ── */
+function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':s);return d.innerHTML;}
+function setTile(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===undefined||v===null||isNaN(v))?'—':v;}
+function invChip(lvl){var m={crit:['crit','วิกฤต'],low:['warn','ต่ำ']};var c=m[lvl];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
+function stChip(s){var m={'Start Producing':['print','ผลิต'],'Print Finish':['print','พิมพ์เสร็จ'],'Outsource':['warn','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['ok','ส่งแล้ว'],'Created':['','รอ']};var c=m[s||'']||['print',(s||'-')];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
+
+/* Production → active tile + queue rows */
 callAPI({api:'listBatches'}).then(function(data){
 var list=Array.isArray(data)?data:(data&&data.batches?data.batches:[]);
-var active=0,done=0;
-list.forEach(function(b){
-if(b.status==='Shipped'||b.status==='QC Pass')done++;else if(b.status!=='Created')active++;
-});
-document.getElementById('ps-active').textContent=active;
-document.getElementById('ps-done').textContent=done;
-document.getElementById('ps-total').textContent=list.length;
+var active=0,queue=[];
+list.forEach(function(b){var s=b.status||'';if(s!=='Shipped'&&s!=='QC Pass'&&s!=='Created'){active++;if(queue.length<4)queue.push(b);}});
+setTile('t-prod',active);
+var el=document.getElementById('hubQueue');if(el)el.innerHTML=queue.length?queue.map(function(b){return '<div class="cd-row"><span class="id">'+esc(b.batchId||b.id||'')+'</span><span class="nm">'+esc((b.product||'')+(b.qty?(' ×'+b.qty):''))+'</span>'+stChip(b.status)+'</div>';}).join(''):'<div class="cd-row" style="justify-content:center;color:var(--ink3)">ไม่มีงานในคิว</div>';
 }).catch(function(){});
 
-/* Load Inventory stats */
+/* Inventory → item tile + low/crit alert rows */
 callAPI({api:'listInventory'}).then(function(data){
-var items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
-if(!items.length) return;
-var ok=0,low=0,crit=0;
-items.forEach(function(item){
-var qty=Number(item.stock)||0,min=Number(item.min)||0;
-if(qty<=0)crit++;else if(qty<min)crit++;else if(qty<min*1.5)low++;else ok++;
-});
-document.getElementById('is-ok').textContent=ok;
-document.getElementById('is-low').textContent=low;
-document.getElementById('is-crit').textContent=crit;
+var items=Array.isArray(data)?data:(data&&data.items?data.items:[]);
+setTile('t-inv',items.length);
+var alerts=[];
+items.forEach(function(it){var qty=Number(it.stock)||0,min=Number(it.min)||0;var lvl=(qty<=0||qty<min)?'crit':(qty<min*1.5?'low':'ok');if(lvl!=='ok')alerts.push({item:it.item,cat:it.category||'',lvl:lvl});});
+alerts.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
+var el=document.getElementById('hubAlerts');if(el)el.innerHTML=alerts.length?alerts.slice(0,4).map(function(x){return '<div class="cd-row"><span class="id">'+esc(x.item)+'</span><span class="nm">'+esc(x.cat)+'</span>'+invChip(x.lvl)+'</div>';}).join(''):'<div class="cd-row" style="justify-content:center;color:var(--live)">สต็อกปกติทั้งหมด ✓</div>';
 }).catch(function(){});
 
-/* Load Finance stats */
+/* Cashflow → ring hero (compact ฿k) */
 callAPI({api:'listCashflow'}).then(function(data){
 if(!data)return;
-document.getElementById('fs-in').textContent='฿'+fmt(data.totalIncome||0);
-document.getElementById('fs-out').textContent='฿'+fmt(data.totalExpense||0);
 var net=(data.totalIncome||0)-(data.totalExpense||0);
-var el=document.getElementById('fs-net');
-el.textContent='฿'+fmt(net);
-el.className='stat-val '+(net>=0?'green':'red');
-// feed the Command Deck ring hero (compact ฿k)
 function kfmt(n){n=Math.round(n||0);var a=Math.abs(n);return '฿'+(a>=1000?(Math.round(n/100)/10)+'k':n);}
 var setk=function(id,v){var e=document.getElementById(id);if(e)e.textContent=kfmt(v);};
 setk('h-in',data.totalIncome);setk('h-out',data.totalExpense);setk('h-net',net);
 }).catch(function(){});
 
-/* Load Cost Analysis stats — dynamic from getProducts + getCostData */
+/* Cost → variants tile */
 cachedAPI({api:'getProducts'},1800000,function(data){
 if(!data||!data.success)return;
-var products=data.products||[];
-document.getElementById('cs-variants').textContent=products.length;
-if(products.length&&products[0].sellPrice){
-document.getElementById('cs-price').textContent='฿'+fmt(products[0].sellPrice);
-}
-}).catch(function(){});
-
-cachedAPI({api:'getCostData'},1800000,function(data){
-if(!data||!data.success)return;
-var keys=Object.keys(data.data||{});
-var totalMargin=0,count=0;
-keys.forEach(function(k){
-var items=data.data[k].items||[];
-var cost=items.reduce(function(s,i){return s+(i.cost||0)},0);
-if(cost>0){totalMargin+=((25900-cost)/25900)*100;count++;}
-});
-if(count>0){
-document.getElementById('cs-margin').textContent=(totalMargin/count).toFixed(1)+'%';
-}
+setTile('t-cost',(data.products||[]).length);
 }).catch(function(){});
 
 /* Admin FAB */
@@ -430,6 +298,10 @@ document.addEventListener('DOMContentLoaded',function(){
     var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}
     if(!P||!P[u.role])return;                                   // no matrix → show all (fail-open)
     var allow=P[u.role];
+    document.querySelectorAll('[data-page]').forEach(function(el){
+      var pg=(el.getAttribute('data-page')||'');
+      if(pg&&pg!=='index.html'&&pg!=='hub.html'&&allow.indexOf(pg)===-1) el.style.display='none';
+    });
     document.querySelectorAll('.section').forEach(function(sec){
       var a=sec.querySelector('a[href$=".html"]'); if(!a)return;   // profile card has no page link → keep
       var pg=(a.getAttribute('href')||'').split('#')[0].split('?')[0].split('/').pop();
