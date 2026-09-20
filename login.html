@@ -18,32 +18,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>SN ERP — เข้าสู่ระบบ</title>
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.login-container{width:100%;max-width:400px;padding:24px}
-.logo-section{text-align:center;margin-bottom:40px}.logo-wrap{display:inline-block;max-width:90%;}.logo-wrap img{display:block;margin-bottom:12px}
-.logo-section h1{font-size:2rem;font-weight:800;letter-spacing:2px;color:#fff}
-
-.logo-img{height:60px;margin-bottom:8px}
-.tab-bar{display:flex;margin-bottom:24px;border-radius:12px;background:#1a1a1a;overflow:hidden}
-.tab-bar button{flex:1;padding:12px;background:transparent;border:none;color:#888;font-size:.9rem;cursor:pointer;transition:all .2s}
-.tab-bar button.active{background:#e74c3c;color:#fff;font-weight:600}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:.8rem;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
-.form-group input,.form-group select{width:100%;padding:14px 16px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff;font-size:1rem;outline:none;transition:border .2s}
-.form-group input:focus,.form-group select:focus{border-color:#e74c3c}
-.pin-input-row{display:flex;gap:10px;justify-content:center}
-.pin-input-row input{width:52px;height:56px;text-align:center;font-size:1.5rem;font-weight:700;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff;outline:none;transition:border .2s}
-.pin-input-row input:focus{border-color:#e74c3c}
-.btn-primary{width:100%;padding:16px;background:#e74c3c;border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .2s}
-.btn-primary:hover{opacity:.9}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.error-msg{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:#e74c3c;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:none}
-.success-msg{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);color:#68b09b;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:none}
-.info-text{text-align:center;color:#666;font-size:.8rem;margin-top:16px}
-.version-tag{position:fixed;bottom:12px;right:16px;color:#333;font-size:.7rem}
-.loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+body{background:#08090b;color:#ecebe5;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+.login-container{width:100%;max-width:392px;padding:24px}
+.brand{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:24px}
+.brand .wm{font-family:'Chakra Petch',sans-serif;font-weight:700;letter-spacing:.2em;font-size:1.55rem;color:#fff}
+.brand .sub{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.32em;color:#63656d;text-transform:uppercase}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:#8d8b83;text-align:center;margin-bottom:18px}
+.tab-bar{display:flex;margin-bottom:22px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.tab-bar button{flex:1;padding:11px;background:transparent;border:none;color:#8d8b83;font-family:'Chakra Petch',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:.2s}
+.tab-bar button.active{background:#cea24a;color:#141005}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:#8d8b83;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+.form-group input,.form-group select{width:100%;padding:13px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);border-radius:11px;color:#ecebe5;font-size:1rem;outline:none;transition:.2s;font-family:'IBM Plex Sans Thai',sans-serif}
+.form-group input:focus,.form-group select:focus{border-color:#cea24a;box-shadow:0 0 0 2px rgba(206,162,74,.16)}
+.pin-input-row{display:flex;gap:9px;justify-content:center}
+.pin-input-row input{flex:1;max-width:66px;aspect-ratio:1;text-align:center;font-size:1.4rem;font-weight:700;font-family:'Chakra Petch',sans-serif;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#e4c77a;outline:none;transition:.2s}
+.pin-input-row input:focus{border-color:#cea24a;box-shadow:0 0 0 2px rgba(206,162,74,.16)}
+.btn-primary{width:100%;padding:15px;background:linear-gradient(180deg,#e4c77a,#cea24a);border:none;border-radius:12px;color:#141005;font-family:'Chakra Petch',sans-serif;font-size:1.02rem;font-weight:700;cursor:pointer;margin-top:6px;transition:.2s}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+.error-msg{background:rgba(229,85,90,.14);border:1px solid rgba(229,85,90,.32);color:#e5686d;padding:12px 14px;border-radius:10px;font-size:.85rem;margin-bottom:14px;display:none}
+.success-msg{background:rgba(104,176,155,.14);border:1px solid rgba(104,176,155,.32);color:#68b09b;padding:12px 14px;border-radius:10px;font-size:.85rem;margin-bottom:14px;display:none}
+.remember{display:flex;align-items:center;gap:8px;margin:10px 0 14px;font-size:.85rem;color:#a7a59d;cursor:pointer}
+.remember input{accent-color:#cea24a;width:16px;height:16px}
+.info-text{text-align:center;color:#63656d;font-size:.78rem;margin-top:16px}
+.online{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.06em;color:#68b09b;margin-top:16px}
+.version-tag{position:fixed;bottom:12px;right:16px;color:#3a3c42;font-size:.66rem;font-family:'IBM Plex Mono',monospace}
+.loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(20,16,5,.35);border-top-color:#141005;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <!--sn-perf-->
@@ -54,12 +60,12 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFo
 </head>
 <body>
 <div class="login-container">
-  <div class="logo-section">
-    <div class="logo-wrap">
-      <img src="logo.svg" alt="SN">
-      <p style="color:#888;font-size:.85rem;letter-spacing:4px;margin-top:4px;text-transform:uppercase">PRODUCTION & OPERATIONS</p>
-    </div>
+  <div class="brand">
+    <svg width="52" height="52" viewBox="0 0 40 40" fill="none" aria-label="SN"><rect x="1.5" y="1.5" width="37" height="37" rx="10" stroke="#cea24a" stroke-width="1.6"/><path d="M13 25c0-3 3-3 6-4.5S25 16 25 13m-12 1c0 3 3 3 6 4.5S25 24 25 27" stroke="#e4c77a" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <div class="wm">SN&nbsp;ERP</div>
+    <div class="sub">Production &amp; Operations</div>
   </div>
+  <div class="eyebrow">· Secure Access ·</div>
   <div class="tab-bar">
     <button class="active" onclick="showTab('login')">เข้าสู่ระบบ</button>
     <button onclick="showTab('register')">ลงทะเบียน</button>
@@ -81,7 +87,8 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFo
       </div>
       <input type="hidden" id="loginPin">
     </div>
-    <label style="display:flex;align-items:center;gap:8px;margin:8px 0 12px;font-size:.85rem;color:#aaa;cursor:pointer"><input type="checkbox" id="keepLogin" style="accent-color:#e74c3c">จดจำการเข้าสู่ระบบ</label><button type="submit" class="btn-primary" id="loginBtn">เข้าสู่ระบบ</button>
+    <label class="remember"><input type="checkbox" id="keepLogin">จดจำการเข้าสู่ระบบ</label><button type="submit" class="btn-primary" id="loginBtn">เข้าสู่ระบบ</button>
+    <div class="online">● SYSTEM ONLINE</div>
   </form>
   <form id="registerForm" style="display:none" onsubmit="doRegister(event)">
     <div class="form-group">
@@ -117,7 +124,7 @@ body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFo
   </form>
   <p class="info-text" id="footerInfo">ใช้ PIN 4 หลักในการเข้าสู่ระบบ</p>
 </div>
-<div class="version-tag">SN ERP v2.9</div>
+<div class="version-tag">SN ERP v3.0 · COMMAND DECK</div>
 <script>
 var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';
 (function(){var t=sessionStorage.getItem('sn_token');if(t)window.location.href='index.html'})();

@@ -1,203 +1,190 @@
 /* ═══════════════════════════════════════════════════════════════════
-   SN ERP — AXIS skin
-   Shared design system that reskins every page to the AXIS instrument
-   language: night-cockpit ground + carbon weave, gold (#cea24a) accent,
-   teal (#68b09b) for "good", Psionic on Latin legends/nav/numerals.
-   Loaded LAST in each <head> so it overrides the per-page inline CSS.
-   Thai body text intentionally keeps the system font (Psionic is Latin-only).
+   SN ERP — COMMAND DECK skin  (direction A+C)
+   A's carbon-and-gold gauge shell + C's dense mono data & status chips.
+   Loaded LAST in each <head> so it overrides per-page inline CSS.
+   Type: Chakra Petch (display/labels/numerals, Thai+Latin) ·
+         IBM Plex Sans Thai (body) · IBM Plex Mono (ids/data/system text).
    ═══════════════════════════════════════════════════════════════════ */
-@font-face{
-  font-family:'Psionic';
-  src:url('fonts/psionic.otf') format('opentype');
-  font-weight:normal;font-style:normal;font-display:swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 :root{
-  --ground:#08090b; --panel:#14171c; --panel2:#1a1e24; --panelhi:#20242b;
-  --hair:rgba(238,240,244,.08); --hair2:rgba(238,240,244,.16);
-  --gold:#cea24a; --goldhi:#e0b85a; --golddim:#7a6128; --goldglow:rgba(206,162,74,.16);
-  --ink:#eef0f4; --ink2:#8b9199; --ink3:#565c64;
-  --live:#68b09b; --amber:#f59e0b; --red:#e0554e;
-  --psi:'Psionic','SF Mono',ui-monospace,Menlo,monospace;
+  --ground:#08090b; --panel:#141519; --panel2:#181b21; --panelhi:#1e222a;
+  --hair:rgba(238,240,244,.08); --hair2:rgba(238,240,244,.15);
+  --gold:#cea24a; --goldhi:#e4c77a; --golddim:#7a6128; --goldglow:rgba(206,162,74,.16); --goldline:rgba(206,162,74,.22);
+  --ink:#ecebe5; --ink2:#8d8b83; --ink3:#63656d;
+  --live:#68b09b; --amber:#e8a13c; --red:#e5555a;
+  --disp:'Chakra Petch',system-ui,sans-serif;
+  --body:'IBM Plex Sans Thai',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --psi:var(--disp);   /* legacy: everything that used Psionic now uses Chakra Petch */
 }
 
-/* ── Ground: deep cockpit + fine carbon-fibre weave ── */
-body{
+/* ── Global type ── */
+body{font-family:var(--body) !important;color:var(--ink);
   background:
-    repeating-linear-gradient(45deg, rgba(255,255,255,.014) 0 1.5px, transparent 1.5px 3px),
-    repeating-linear-gradient(-45deg, rgba(255,255,255,.014) 0 1.5px, transparent 1.5px 3px),
-    radial-gradient(135% 90% at 50% -8%, #101318 0%, #08090b 58%) fixed !important;
-  color:var(--ink);
+    repeating-linear-gradient(45deg, rgba(255,255,255,.013) 0 1.5px, transparent 1.5px 3px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.013) 0 1.5px, transparent 1.5px 3px),
+    radial-gradient(135% 90% at 50% -8%, #14171d 0%, #08090b 56%) fixed !important;
 }
+h1,h2,h3,.section-title,.logo-text{font-family:var(--disp) !important}
 
-/* ── Auth bar → frosted dark w/ gold hairline ── */
-.auth-bar{
-  background:rgba(18,21,27,.72) !important;
-  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);
-  border-bottom:1px solid rgba(206,162,74,.14) !important;
-}
-.auth-bar .user-info strong{color:var(--gold) !important}
-.auth-bar .role-badge{font-family:var(--psi);letter-spacing:.1em}
-.auth-bar .role-admin{background:var(--goldglow) !important;color:var(--gold) !important}
-.auth-bar .logout-btn{border-color:var(--hair2) !important;color:var(--ink2) !important;font-family:var(--psi);letter-spacing:.06em}
-.auth-bar .logout-btn:hover{border-color:var(--gold) !important;color:var(--gold) !important}
-
-/* ── Wordmark / header ── */
-.logo-text{font-family:var(--psi) !important;letter-spacing:.22em !important;color:var(--ink) !important;font-weight:400 !important}
-.logo-sub{font-family:var(--psi) !important;color:var(--ink3) !important;letter-spacing:.42em !important}
-.divider{background:linear-gradient(90deg,var(--golddim),var(--gold)) !important;box-shadow:0 0 12px -2px var(--goldglow)}
-
-/* ── Panels: section cards / generic cards ── */
-.section,.card,.phase-card,.stat,.stcard,.heat{
-  background:linear-gradient(180deg,var(--panel2),var(--panel)) !important;
-  border:1px solid var(--hair) !important;
-}
-.section{border-radius:16px !important}
-
-/* ── Section icons (Hub) → gold-tinted, gold glyph ── */
-.section-icon{color:var(--gold)}
-.section-icon.prod,.section-icon.inv,.section-icon.fin{background:var(--goldglow) !important}
-.section-title{letter-spacing:.01em}
-.section-desc,.stat-lbl,.flow-step,.hdr{color:var(--ink3) !important}
-
-/* ── Stat values: instrument numerals ── */
-.stat-val,.stat .n,.big,.val{font-family:var(--psi) !important;font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.stat-val.red{color:var(--gold) !important}     /* "active / in-progress" reads as the accent */
-.stat-val.green{color:var(--live) !important}
-.stat-val.amber{color:var(--amber) !important}
-
-/* ── Flow / active step ── */
-.flow-step.active{color:var(--ink) !important;font-weight:600}
-.flow-sep{color:var(--golddim) !important}
-
-/* ── Buttons ── */
-.btn-p,.btn-g{
-  background:var(--gold) !important;color:#161003 !important;font-weight:700;
-  box-shadow:0 8px 22px -10px var(--goldglow);
-}
-.btn-o{background:transparent !important;border:1px solid var(--hair2) !important;color:var(--ink2) !important}
-.btn-o:active{border-color:var(--gold) !important;color:var(--gold) !important}
-
-/* ── Bottom nav → gold active, Psionic ── */
-.bottom-nav{background:rgba(15,17,21,.94) !important;border-top:1px solid rgba(206,162,74,.14) !important}
-.bottom-nav a{font-family:var(--psi) !important;letter-spacing:.08em;color:var(--ink3) !important;text-transform:uppercase;font-size:9.5px !important}
-.bottom-nav a.active{color:var(--gold) !important}
-
-/* ── Sub-links (Hub) ── */
-.sub-link{color:var(--ink2) !important;border-color:var(--hair) !important}
-.sub-link:active{background:var(--panelhi) !important}
-.sub-link .sl-arrow,.section-arrow{color:var(--golddim) !important}
-
-/* ── Inputs ── */
-input,select,textarea{background:var(--panelhi) !important;border:1px solid var(--hair2) !important;color:var(--ink) !important}
-input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outline:none}
-
-/* ── Spinners / accents ── */
-.spinner,.loading-spinner{border-top-color:var(--gold) !important}
-
-/* ── Toast (keep semantic ok/err, refine ok→gold) ── */
-.toast-ok{background:var(--gold) !important;color:#161003 !important}
-
-/* ── Admin FAB → gold pill ── */
-.admin-fab{background:var(--gold) !important;color:#161003 !important;font-family:var(--psi);letter-spacing:.06em;
-  box-shadow:0 8px 22px -8px var(--goldglow) !important}
-
-/* ── Footer ── */
-.footer{color:var(--ink3) !important;font-family:var(--psi);letter-spacing:.14em}
-
-/* ── Timeline dots (QR) → gold "now" ── */
-.tl-d.now{background:var(--gold) !important;border-color:var(--gold) !important;box-shadow:0 0 10px var(--goldglow) !important}
-.tl-d.done{background:var(--live) !important;border-color:var(--live) !important}
-
-/* ── Bespoke brand classes (finance / cost tabs & buttons) → gold, danger stays red ── */
-.tab.active{background:var(--gold) !important;color:#161003 !important;border-color:var(--gold) !important}
-.tab-bar{background:var(--panelhi) !important}
-.tab-bar button.active{background:var(--gold) !important;color:#161003 !important}
-.btn-primary{background:var(--gold) !important;color:#161003 !important}
-.btn-primary:hover{background:var(--goldhi) !important}
-.btn-secondary{background:var(--panelhi) !important;color:var(--ink) !important;border:1px solid var(--hair2) !important}
-.upload-zone{border-color:var(--hair2) !important}
-.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold) !important;background:rgba(206,162,74,.06) !important}
-.badge-income{background:rgba(104,176,155,.14) !important;color:var(--live) !important}
-.status-step.done{background:var(--gold) !important}
-.status-step.current{background:var(--amber) !important}
-.filter-btn.active{color:var(--gold) !important;border-color:var(--gold) !important}
-/* finance / generic cards + panels that use their own class names */
-.cf-card,.summary-box,.preview-card,.inv-item,.sum-item,.modal,.confirm-box,.batch-card,.tab{
-  background:linear-gradient(180deg,var(--panel2),var(--panel)) !important;border-color:var(--hair) !important;
-}
-/* numeric headline values → instrument face */
-.sum-item .n,.batch-id{font-family:var(--psi) !important;font-variant-numeric:tabular-nums}
-/* finance currency values can be large (฿ hundreds-of-thousands) → narrower tabular
-   mono instead of the wide Psionic so they never overflow the card */
-.summary-box .num,.cf-card .amount{font-family:ui-monospace,'SF Mono',Menlo,monospace !important;
-  font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap}
-.summary-box .num{font-size:1.2rem !important}
-.cf-card .amount{font-size:1.1rem !important}
-/* page sub-heads / muted text alignment with AXIS ink scale */
-.subtitle,.batch-meta,.inv-meta,.preview-row .label,.hdr{color:var(--ink3) !important}
-
-/* ═══════════════════════════════════════════════════════════════════
-   AXIS APP PARITY — frosted glass + living aero background
-   Makes the ERP read like the SN AXIS companion app: translucent
-   panels over a slowly-drifting gold/teal aero glow on the carbon weave.
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* Living aero-flow layer — sits above the carbon ground, below content */
+/* Living aero-flow layer (kept, calmer) */
 body::before{
   content:'';position:fixed;inset:-15%;z-index:-1;pointer-events:none;
   background:
-    radial-gradient(38% 30% at 28% 38%, rgba(206,162,74,.12), transparent 70%),
-    radial-gradient(32% 26% at 76% 66%, rgba(104,176,155,.08), transparent 72%),
-    radial-gradient(30% 24% at 60% 18%, rgba(206,162,74,.06), transparent 70%);
-  filter:blur(40px);
-  animation:snAero 26s ease-in-out infinite alternate;
+    radial-gradient(38% 30% at 26% 36%, rgba(206,162,74,.11), transparent 70%),
+    radial-gradient(32% 26% at 78% 68%, rgba(104,176,155,.06), transparent 72%);
+  filter:blur(46px);animation:snAero 30s ease-in-out infinite alternate;
 }
-@keyframes snAero{
-  0%{transform:translate3d(-3%,-2%,0) scale(1.05)}
-  100%{transform:translate3d(3%,3%,0) scale(1.18)}
-}
+@keyframes snAero{0%{transform:translate3d(-3%,-2%,0) scale(1.05)}100%{transform:translate3d(3%,3%,0) scale(1.16)}}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
 
-/* Frosted-glass primary surfaces — translucent + blur so the aero drifts through */
+/* ── Auth / app bar ── */
+.auth-bar{background:rgba(16,18,23,.78) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);
+  border-bottom:1px solid var(--goldline) !important;}
+.auth-bar .user-info strong{color:var(--gold) !important}
+.auth-bar .role-badge,.role-badge{font-family:var(--mono);letter-spacing:.06em;font-size:9px}
+.auth-bar .role-admin{background:var(--goldglow) !important;color:var(--goldhi) !important}
+.auth-bar .logout-btn{border-color:var(--hair2) !important;color:var(--ink2) !important;font-family:var(--mono);letter-spacing:.04em}
+.auth-bar .logout-btn:active,.auth-bar .logout-btn:hover{border-color:var(--gold) !important;color:var(--gold) !important}
+
+/* ── Wordmark / header ── */
+.logo-text{letter-spacing:.2em !important;color:var(--ink) !important;font-weight:700 !important}
+.logo-sub{font-family:var(--mono) !important;color:var(--ink3) !important;letter-spacing:.34em !important;font-size:9px !important}
+.divider{background:linear-gradient(90deg,var(--gold),transparent) !important;box-shadow:0 0 12px -2px var(--goldglow)}
+
+/* ── Console surfaces (sharper than frosted; defined lines) ── */
 .section,.card,.phase-card,.stat,.stcard,.heat,.cf-card,.summary-box,
-.modal,.confirm-box,.preview-card,.tab,.upload-zone{
-  background:linear-gradient(180deg, rgba(27,31,38,.60), rgba(18,21,27,.50)) !important;
-  -webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);
-  border:1px solid rgba(206,162,74,.10) !important;
+.preview-card,.modal,.confirm-box,.tab,.upload-zone{
+  background:linear-gradient(180deg, rgba(26,29,36,.72), rgba(18,21,27,.66)) !important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.25);backdrop-filter:blur(14px) saturate(1.25);
+  border:1px solid var(--hair) !important;
 }
-/* List rows: translucent but NO blur (keeps long lists smooth on mobile) */
+.section{border-radius:16px !important;box-shadow:0 12px 34px -20px rgba(0,0,0,.8)}
+/* list rows: crisp, no blur (smooth long lists) */
 .batch-card,.inv-item,.sum-item{
-  background:rgba(23,27,33,.55) !important;
-  border:1px solid rgba(206,162,74,.08) !important;
+  background:rgba(22,25,31,.6) !important;border:1px solid var(--hair) !important;
 }
-/* gold-lit frost on selected/active */
-.tab.active,.tab-bar button.active{
-  background:var(--gold) !important;color:#161003 !important;
-  -webkit-backdrop-filter:none;backdrop-filter:none;
-}
+.section-icon{color:var(--gold)}
+.section-icon.prod,.section-icon.inv,.section-icon.fin{background:var(--goldglow) !important}
+.section-desc,.stat-lbl,.flow-step,.hdr,.subtitle,.batch-meta,.inv-meta,.preview-row .label{color:var(--ink3) !important}
 
-/* Frosted footer nav (AXIS-app style) with a gold chip under the active tab */
-.bottom-nav{
-  background:rgba(13,15,19,.80) !important;
+/* ── Numerals / instrument values ── */
+.stat-val,.stat .n,.big,.val,.sum-item .n,.batch-id{font-family:var(--disp) !important;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.stat-val.red{color:var(--goldhi) !important}
+.stat-val.green{color:var(--live) !important}
+.stat-val.amber{color:var(--amber) !important}
+/* big currency → mono tabular so ฿ hundreds-of-thousands never overflow */
+.summary-box .num,.cf-card .amount{font-family:var(--disp) !important;font-variant-numeric:tabular-nums;
+  letter-spacing:-.01em;white-space:nowrap}
+.summary-box .num{font-size:1.25rem !important}.cf-card .amount{font-size:1.12rem !important}
+
+/* ── Buttons ── */
+.btn-p,.btn-g,.btn-primary,.btn-save{
+  background:linear-gradient(180deg,var(--goldhi),var(--gold)) !important;color:#141005 !important;font-weight:700;
+  font-family:var(--disp);box-shadow:0 10px 24px -12px var(--goldglow);}
+.btn-primary:hover{background:var(--goldhi) !important}
+.btn-o,.btn-secondary{background:rgba(255,255,255,.02) !important;border:1px solid var(--hair2) !important;color:var(--ink2) !important;font-family:var(--disp)}
+.btn-o:active,.btn-secondary:hover{border-color:var(--gold) !important;color:var(--gold) !important}
+
+/* ── Tabs / filters ── */
+.tab{font-family:var(--mono) !important;letter-spacing:.03em}
+.tab.active,.tab-bar button.active{background:var(--gold) !important;color:#141005 !important;border-color:var(--gold) !important;
+  -webkit-backdrop-filter:none;backdrop-filter:none;font-weight:600}
+.tab-bar{background:var(--panelhi) !important}
+.filter-btn.active{color:var(--gold) !important;border-color:var(--gold) !important}
+
+/* ── Inputs ── */
+input,select,textarea{background:rgba(255,255,255,.03) !important;border:1px solid var(--hair2) !important;color:var(--ink) !important;font-family:var(--body)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outline:none;box-shadow:0 0 0 2px var(--goldglow)}
+
+/* ── Bottom nav → mono, gold active chip ── */
+.bottom-nav{background:rgba(12,14,18,.86) !important;
   -webkit-backdrop-filter:blur(20px) saturate(1.2);backdrop-filter:blur(20px) saturate(1.2);
-  border-top:1px solid rgba(206,162,74,.16) !important;
-}
-.bottom-nav a.active{position:relative}
-.bottom-nav a.active::after{
-  content:'';position:absolute;left:50%;bottom:5px;transform:translateX(-50%);
-  width:18px;height:3px;border-radius:2px;background:var(--gold);box-shadow:0 0 8px var(--goldglow);
-}
+  border-top:1px solid var(--goldline) !important;}
+.bottom-nav a{font-family:var(--mono) !important;letter-spacing:.05em;color:var(--ink3) !important;text-transform:uppercase;font-size:9px !important}
+.bottom-nav a.active{color:var(--goldhi) !important;position:relative}
+.bottom-nav a.active::after{content:'';position:absolute;left:50%;bottom:5px;transform:translateX(-50%);
+  width:18px;height:3px;border-radius:2px;background:var(--gold);box-shadow:0 0 8px var(--goldglow)}
 
-/* Softer, deeper card shadow so panels float like the app */
-.section,.card,.cf-card,.summary-box,.stat{box-shadow:0 10px 30px -18px rgba(0,0,0,.7)}
+/* ── Sub-links / arrows ── */
+.sub-link{color:var(--ink2) !important;border-color:var(--hair) !important;font-family:var(--disp)}
+.sub-link:active{background:var(--panelhi) !important}
+.sub-link .sl-arrow,.section-arrow{color:var(--golddim) !important}
 
-@media (prefers-reduced-motion: reduce){
-  body::before{animation:none}
-}
-
-/* admin primary action button → gold (was racing red) */
-.btn-save{background:var(--gold) !important;color:#161003 !important;font-weight:700}
-
-/* department role badges (auth-bar + admin) */
+/* ── Misc accents ── */
+.spinner,.loading-spinner{border-top-color:var(--gold) !important}
+.toast-ok{background:var(--gold) !important;color:#141005 !important}
+.admin-fab{background:linear-gradient(180deg,var(--goldhi),var(--gold)) !important;color:#141005 !important;font-family:var(--disp);letter-spacing:.04em;box-shadow:0 8px 22px -8px var(--goldglow) !important}
+.footer,.footer *{color:var(--ink3) !important;font-family:var(--mono);letter-spacing:.14em}
+.tl-d.now{background:var(--gold) !important;border-color:var(--gold) !important;box-shadow:0 0 10px var(--goldglow) !important}
+.tl-d.done{background:var(--live) !important;border-color:var(--live) !important}
+.badge-income{background:rgba(104,176,155,.14) !important;color:var(--live) !important}
+.status-step.done{background:var(--gold) !important}.status-step.current{background:var(--amber) !important}
 .role-production{background:rgba(96,165,250,.18) !important;color:#60a5fa !important}
 .role-finance{background:rgba(104,176,155,.18) !important;color:#68b09b !important}
 .role-marketing{background:rgba(167,139,250,.18) !important;color:#a78bfa !important}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMMAND DECK components — reusable across pages
+   ═══════════════════════════════════════════════════════════════════ */
+.cd-sys{font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--ink3);
+  display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--hair);padding-bottom:8px;margin-bottom:4px}
+.cd-sys .live{color:var(--live)}
+.cd-sechdr{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink2);display:flex;align-items:center;gap:7px;margin:14px 2px 8px}
+.cd-sechdr .d{width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);flex:none}
+
+/* status chips */
+.cd-chip{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.04em;
+  padding:3px 8px;border-radius:5px;white-space:nowrap;display:inline-block}
+.cd-chip.ok{background:rgba(104,176,155,.16);color:#7fd0b6}
+.cd-chip.warn{background:rgba(232,161,60,.16);color:#eab55f}
+.cd-chip.crit{background:rgba(229,85,90,.18);color:#f08a8e}
+.cd-chip.print,.cd-chip.gold{background:var(--goldglow);color:var(--goldhi)}
+.cd-chip.in{background:rgba(104,176,155,.14);color:#7fd0b6}
+.cd-chip.ex{background:rgba(229,85,90,.16);color:#f08a8e}
+
+/* dense mono data rows */
+.cd-rows{border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:rgba(22,25,31,.5)}
+.cd-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--hair);font-size:13px}
+.cd-row:last-child{border-bottom:0}
+.cd-row .id{font-family:var(--mono);font-size:11px;color:var(--ink2)}
+.cd-row .nm{font-family:var(--body);font-weight:500;color:var(--ink)}
+.cd-row .amt{margin-left:auto;font-family:var(--disp);font-weight:700;font-variant-numeric:tabular-nums}
+.cd-row .amt.g{color:var(--live)}.cd-row .amt.r{color:var(--red)}
+
+/* KPI cells (C) */
+.cd-cells{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cd-cell{border:1px solid var(--hair);border-radius:11px;padding:10px 11px;background:rgba(255,255,255,.02)}
+.cd-cell .c{font-family:var(--mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3)}
+.cd-cell .v{font-family:var(--disp);font-weight:700;font-size:1.25rem;margin-top:3px;font-variant-numeric:tabular-nums}
+.cd-cell .v.g{color:var(--live)}.cd-cell .v.r{color:var(--red)}.cd-cell .v.a{color:var(--amber)}.cd-cell .v.gd{color:var(--goldhi)}
+.cd-cell .s{font-family:var(--mono);font-size:9px;color:var(--ink3);margin-top:2px}
+
+/* gold-ring hero */
+.cd-hero{border:1px solid var(--goldline);border-radius:16px;padding:12px 14px;
+  background:linear-gradient(180deg,rgba(206,162,74,.06),transparent)}
+.cd-hero .cap{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.cd-rings{display:flex;gap:10px;margin-top:9px}
+.cd-ring{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cd-ring .v{font-family:var(--disp);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.cd-ring .l{font-family:var(--mono);font-size:8.5px;letter-spacing:.04em;color:var(--ink2)}
+
+/* mini module tiles */
+.cd-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cd-tile{border:1px solid var(--hair);border-radius:12px;padding:10px 11px;background:rgba(255,255,255,.022);
+  display:flex;flex-direction:column;gap:5px;text-decoration:none}
+.cd-tile .top{display:flex;align-items:center;justify-content:space-between}
+.cd-tile svg{width:16px;height:16px;stroke:var(--goldhi)}
+.cd-tile .n{font-family:var(--disp);font-weight:700;font-size:17px;color:var(--goldhi)}
+.cd-tile .lb{font-family:var(--mono);font-size:9px;letter-spacing:.03em;color:var(--ink2)}
+
+/* skeleton shimmer (loading state) */
+.cd-skel{position:relative;overflow:hidden;background:rgba(255,255,255,.04);border-radius:8px;min-height:14px}
+.cd-skel::after{content:'';position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(206,162,74,.10),transparent);animation:cdShimmer 1.2s infinite}
+@keyframes cdShimmer{100%{transform:translateX(100%)}}
+@media (prefers-reduced-motion:reduce){.cd-skel::after{animation:none}}
