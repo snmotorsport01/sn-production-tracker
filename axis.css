@@ -188,3 +188,34 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
   background:linear-gradient(90deg,transparent,rgba(206,162,74,.10),transparent);animation:cdShimmer 1.2s infinite}
 @keyframes cdShimmer{100%{transform:translateX(100%)}}
 @media (prefers-reduced-motion:reduce){.cd-skel::after{animation:none}}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ALL PAGES — finish the Command Deck look (badges→mono chips, more cards)
+   ═══════════════════════════════════════════════════════════════════ */
+/* every status badge (inventory b-ok/low/crit/out · production b-created/startprod/
+   printfinish/outsource/qcpass/shipped · finance income/expense) → mono chip.
+   Colour variants keep their own bg/fg; we only restyle the typography+shape. */
+.badge{font-family:var(--mono) !important;letter-spacing:.04em !important;font-size:10px !important;
+  font-weight:600 !important;padding:3px 8px !important;border-radius:5px !important;text-transform:uppercase}
+.badge.role-admin,.badge.role-production,.badge.role-finance,.badge.role-marketing,
+.role-badge{text-transform:none}
+.badge-stream,.badge-beam{font-family:var(--mono) !important;letter-spacing:.04em}
+
+/* remaining card surfaces (admin · cost · qr · report) → console panels */
+.stat-card,.user-card,.variant-card,.batch-item,.cost-table{
+  background:linear-gradient(180deg, rgba(26,29,36,.72), rgba(18,21,27,.66)) !important;
+  border:1px solid var(--hair) !important;
+}
+.stat-card,.user-card{border-radius:14px !important}
+.stat-card .n,.stat-card .num,.stat-card .val,.user-card .n{font-family:var(--disp) !important;font-variant-numeric:tabular-nums}
+.variant-card.active,.variant-card.selected,.variant-card.sel{border-color:var(--gold) !important;box-shadow:0 0 0 1px var(--goldglow) !important}
+
+/* production status progress bar */
+.status-step{background:rgba(255,255,255,.06) !important}
+
+/* cost legend dots + table header → refined */
+.cost-table th{font-family:var(--mono) !important;letter-spacing:.04em;color:var(--ink3) !important;text-transform:uppercase;font-size:10px}
+.cost-table td{font-variant-numeric:tabular-nums}
+
+/* page section titles across pages use Chakra Petch already; muted heads → mono */
+.hdr{font-family:var(--mono) !important;letter-spacing:.1em}
