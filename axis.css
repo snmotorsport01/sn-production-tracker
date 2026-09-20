@@ -146,6 +146,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
 .cd-chip.print,.cd-chip.gold{background:var(--goldglow);color:var(--goldhi)}
 .cd-chip.in{background:rgba(104,176,155,.14);color:#7fd0b6}
 .cd-chip.ex{background:rgba(229,85,90,.16);color:#f08a8e}
+/* real production-status colours (match production.html b-* badges) */
+.cd-chip.red{background:rgba(248,113,113,.16);color:#f8a0a0}
+.cd-chip.blue{background:rgba(96,165,250,.16);color:#8fc0fb}
+.cd-chip.purple{background:rgba(167,139,250,.16);color:#c3b0fb}
+.cd-chip.green{background:rgba(104,176,155,.16);color:#7fd0b6}
+.cd-chip.grey{background:rgba(255,255,255,.08);color:#9a988f}
 
 /* dense mono data rows */
 .cd-rows{border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:rgba(22,25,31,.5)}

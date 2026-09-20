@@ -208,7 +208,7 @@ function fmt(n){if(n===undefined||n===null||isNaN(n))return'—';return Number(n
 function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':s);return d.innerHTML;}
 function setTile(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===undefined||v===null||isNaN(v))?'—':v;}
 function invChip(lvl){var m={crit:['crit','วิกฤต'],low:['warn','ต่ำ']};var c=m[lvl];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
-function stChip(s){var m={'Start Producing':['print','ผลิต'],'Print Finish':['print','พิมพ์เสร็จ'],'Outsource':['warn','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['ok','ส่งแล้ว'],'Created':['','รอ']};var c=m[s||'']||['print',(s||'-')];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
+function stChip(s){var m={'Start Producing':['red','ผลิต'],'Print Finish':['blue','พิมพ์เสร็จ'],'Outsource':['purple','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['green','ส่งแล้ว'],'Created':['grey','รอ']};var c=m[s||'']||['gold',(s||'-')];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
 
 /* Production → active tile + queue rows */
 callAPI({api:'listBatches'}).then(function(data){

@@ -220,7 +220,7 @@ return {id:id, name:name, type:type, arm:armWeight, armCost:armCost, matTotal:ma
 }
 
 function loadCostDetails() {
-fetch(API_URL+'?api=getCostData').then(function(r){return r.json();}).then(function(data){
+fetch(API_URL+'?api=getCostData&_ts='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
 if(!data.success || !data.data) throw new Error('getCostData failed');
 COST_DATA = data.data;
 rebuildWithCostData();
@@ -258,8 +258,8 @@ render();
 }
 
 function fetchGviz(tabName) {
-var url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(tabName);
-return fetch(url).then(function(r){return r.text();}).then(function(txt){
+var url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(tabName)+'&_ts='+Date.now();
+return fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(txt){
 var json = JSON.parse(txt.replace(/^[^{]*/, '').replace(/[^}]*$/, ''));
 return json.table ? json.table.rows : [];
 });
@@ -299,7 +299,7 @@ loadFromAPI();
 }
 
 function loadFromAPI() {
-fetch(API_URL+'?api=getProducts').then(function(r){return r.json();}).then(function(data){
+fetch(API_URL+'?api=getProducts&_ts='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
 if(!data.success || !data.products || data.products.length===0) throw new Error('API failed');
 VARIANTS = [];
 data.products.forEach(function(p){
@@ -572,6 +572,10 @@ if(!t){ window.location.href='login.html'; return; }
 })();
 
 loadDynamic();
+/* keep Cost in sync with the 1RLo sheet: re-pull live cost items periodically
+   while the page is open, and whenever the tab regains focus */
+setInterval(function(){ if(VARIANTS.length) loadCostDetails(); }, 90000);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && VARIANTS.length) loadCostDetails(); });
 window.addEventListener('resize', function(){ if(VARIANTS.length) { drawBarChart(); drawPie(); } });
 </script>
 </body>
