@@ -219,3 +219,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
 
 /* page section titles across pages use Chakra Petch already; muted heads → mono */
 .hdr{font-family:var(--mono) !important;letter-spacing:.1em}
+
+/* ── Finance cashflow summary → Command Deck KPI cells (2×2, mono cap on top) ── */
+#cfSummary{display:grid !important;grid-template-columns:1fr 1fr;gap:8px}
+#cfSummary .summary-box{display:flex !important;flex-direction:column-reverse;align-items:flex-start;
+  text-align:left;padding:11px 13px !important;gap:3px}
+#cfSummary .summary-box .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3) !important}
+#cfSummary .summary-box .num{font-size:1.4rem !important}

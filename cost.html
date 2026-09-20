@@ -83,7 +83,12 @@ select.select-box{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-
 
 <div class="summary-row">
 <div class="summary-box"><div class="num" id="sumCost">฿0</div><div class="lbl">ต้นทุนเฉลี่ย</div></div>
-<div class="summary-box"><div class="num green" id="sumProfit">0%</div><div class="lbl">กำไรเฉลี่ย</div></div>
+<div class="summary-box" style="display:flex;flex-direction:column;align-items:center;gap:7px">
+<div style="position:relative;width:82px;height:82px">
+<svg width="82" height="82" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="7"/><circle id="sumProfitArc" cx="40" cy="40" r="32" fill="none" stroke="#68b09b" stroke-width="7" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .6s ease"/></svg>
+<div class="num green" id="sumProfit" style="position:absolute;inset:0;display:grid;place-items:center;font-size:1.05rem">0%</div>
+</div>
+<div class="lbl">กำไรเฉลี่ย</div></div>
 </div>
 <div class="summary-row">
 <div class="summary-box"><div class="num" id="sumMin">฿0</div><div class="lbl">ต้นทุนต่ำสุด</div></div>
@@ -359,7 +364,8 @@ var avgP = list.reduce(function(s,v){return s+v.profit;},0)/list.length;
 var mn = Math.min.apply(null,list.map(function(v){return v.total;}));
 var mx = Math.max.apply(null,list.map(function(v){return v.total;}));
 document.getElementById('sumCost').textContent = '฿'+fmtShort(avg);
-document.getElementById('sumProfit').textContent = avgP.toFixed(2)+'%';
+document.getElementById('sumProfit').textContent = avgP.toFixed(1)+'%';
+(function(){var arc=document.getElementById('sumProfitArc');if(arc){var C=201,p=Math.max(0,Math.min(100,avgP||0));arc.style.strokeDashoffset=String(C*(1-p/100));}})();
 document.getElementById('sumMin').textContent = '฿'+fmtShort(mn);
 document.getElementById('sumMax').textContent = '฿'+fmtShort(mx);
 }
