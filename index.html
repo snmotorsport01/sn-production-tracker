@@ -210,39 +210,35 @@ function setTile(id,v){var e=document.getElementById(id);if(e)e.textContent=(v==
 function invChip(lvl){var m={crit:['crit','วิกฤต'],low:['warn','ต่ำ']};var c=m[lvl];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
 function stChip(s){var m={'Start Producing':['red','ผลิต'],'Print Finish':['blue','พิมพ์เสร็จ'],'Outsource':['purple','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['green','ส่งแล้ว'],'Created':['grey','รอ']};var c=m[s||'']||['gold',(s||'-')];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
 
-/* Production → active tile + queue rows */
-callAPI({api:'listBatches'}).then(function(data){
+/* Stale-while-revalidate: paint last data instantly from cache, refresh in background */
+function swrCall(api,render){var key='sn_hub_'+api;try{var c=JSON.parse(sessionStorage.getItem(key)||'null');if(c)render(c);}catch(e){}callAPI({api:api}).then(function(d){try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}render(d);}).catch(function(){});}
+
+function renderProd(data){
 var list=Array.isArray(data)?data:(data&&data.batches?data.batches:[]);
 var active=0,queue=[];
 list.forEach(function(b){var s=b.status||'';if(s!=='Shipped'&&s!=='QC Pass'&&s!=='Created'){active++;if(queue.length<4)queue.push(b);}});
 setTile('t-prod',active);
 var el=document.getElementById('hubQueue');if(el)el.innerHTML=queue.length?queue.map(function(b){return '<div class="cd-row"><span class="id">'+esc(b.batchId||b.id||'')+'</span><span class="nm">'+esc((b.product||'')+(b.qty?(' ×'+b.qty):''))+'</span>'+stChip(b.status)+'</div>';}).join(''):'<div class="cd-row" style="justify-content:center;color:var(--ink3)">ไม่มีงานในคิว</div>';
-}).catch(function(){});
-
-/* Inventory → item tile + low/crit alert rows */
-callAPI({api:'listInventory'}).then(function(data){
+}
+function renderInv(data){
 var items=Array.isArray(data)?data:(data&&data.items?data.items:[]);
 setTile('t-inv',items.length);
 var alerts=[];
 items.forEach(function(it){var qty=Number(it.stock)||0,min=Number(it.min)||0;var lvl=(qty<=0||qty<min)?'crit':(qty<min*1.5?'low':'ok');if(lvl!=='ok')alerts.push({item:it.item,cat:it.category||'',lvl:lvl});});
 alerts.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
 var el=document.getElementById('hubAlerts');if(el)el.innerHTML=alerts.length?alerts.slice(0,4).map(function(x){return '<div class="cd-row"><span class="id">'+esc(x.item)+'</span><span class="nm">'+esc(x.cat)+'</span>'+invChip(x.lvl)+'</div>';}).join(''):'<div class="cd-row" style="justify-content:center;color:var(--live)">สต็อกปกติทั้งหมด ✓</div>';
-}).catch(function(){});
-
-/* Cashflow → ring hero (compact ฿k) */
-callAPI({api:'listCashflow'}).then(function(data){
+}
+function renderCash(data){
 if(!data)return;
 var net=(data.totalIncome||0)-(data.totalExpense||0);
 function kfmt(n){n=Math.round(n||0);var a=Math.abs(n);return '฿'+(a>=1000?(Math.round(n/100)/10)+'k':n);}
 var setk=function(id,v){var e=document.getElementById(id);if(e)e.textContent=kfmt(v);};
 setk('h-in',data.totalIncome);setk('h-out',data.totalExpense);setk('h-net',net);
-}).catch(function(){});
-
-/* Cost → variants tile */
-cachedAPI({api:'getProducts'},1800000,function(data){
-if(!data||!data.success)return;
-setTile('t-cost',(data.products||[]).length);
-}).catch(function(){});
+}
+swrCall('listBatches',renderProd);
+swrCall('listInventory',renderInv);
+swrCall('listCashflow',renderCash);
+cachedAPI({api:'getProducts'},1800000,function(data){if(!data||!data.success)return;setTile('t-cost',(data.products||[]).length);}).catch(function(){});
 
 /* Admin FAB */
 (function(){

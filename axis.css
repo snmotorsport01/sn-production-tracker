@@ -6,6 +6,8 @@
          IBM Plex Sans Thai (body) · IBM Plex Mono (ids/data/system text).
    ═══════════════════════════════════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* SN brand wordmark font (Latin-only) — used for the "SN ERP" wordmark */
+@font-face{font-family:'Psionic';src:url('fonts/psionic.otf') format('opentype');font-weight:400 700;font-style:normal;font-display:swap;}
 
 :root{
   --ground:#08090b; --panel:#141519; --panel2:#181b21; --panelhi:#1e222a;
@@ -50,7 +52,8 @@ body::before{
 .auth-bar .logout-btn:active,.auth-bar .logout-btn:hover{border-color:var(--gold) !important;color:var(--gold) !important}
 
 /* ── Wordmark / header ── */
-.logo-text{letter-spacing:.2em !important;color:var(--ink) !important;font-weight:700 !important}
+.logo-text,.brand .wm,.appbar .wm{font-family:'Psionic',var(--disp),sans-serif !important}
+.logo-text{letter-spacing:.14em !important;color:var(--ink) !important;font-weight:400 !important}
 .logo-sub{font-family:var(--mono) !important;color:var(--ink3) !important;letter-spacing:.34em !important;font-size:9px !important}
 .divider{background:linear-gradient(90deg,var(--gold),transparent) !important;box-shadow:0 0 12px -2px var(--goldglow)}
 
