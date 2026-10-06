@@ -29,3 +29,21 @@
 @keyframes sn-text-reveal{0%{opacity:0;transform:translateY(4px)}22%{opacity:.8;transform:translate(-1px,1px);text-shadow:1px 0 #bdbdbd66}35%{transform:translate(1px,0);text-shadow:-1px 0 #c9a84c55}48%{transform:translate(-.5px,0);text-shadow:none}100%{opacity:1;transform:none;text-shadow:none}}
 .login-monogram{width:112px;height:112px;object-fit:contain;display:block}.login-container{border-radius:28px}.login-container .tab-bar{border-radius:999px}.login-container .form-group input,.login-container .form-group select,.login-container .pin-input-row input,.login-container .btn-primary,.login-container .error-msg,.login-container .success-msg{border-radius:20px!important}
 @media(prefers-reduced-motion:reduce){.sn-text-enter{animation:none!important}}
+
+/* Status palette: one muted/desaturated set for hub chips (.sn-badge.*) AND page
+   badges (.b-*) so batch status + inventory read as soft Operations Lounge tones,
+   not flat grey or vivid. Overrides grey-flatten (.sn-row .sn-badge) + axis.css .badge !important. */
+#sn-axis-demo .sn-badge.red,#sn-axis-demo .sn-badge.crit,#sn-axis-demo .b-startprod,#sn-axis-demo .b-crit{color:#cf9d94!important;background:rgba(209,139,135,.12)!important;border-color:rgba(209,139,135,.28)!important}
+#sn-axis-demo .sn-badge.red:before,#sn-axis-demo .sn-badge.crit:before{background:#cf9d94!important}
+#sn-axis-demo .sn-badge.blue,#sn-axis-demo .b-printfinish{color:#93aac4!important;background:rgba(147,170,196,.12)!important;border-color:rgba(147,170,196,.28)!important}
+#sn-axis-demo .sn-badge.blue:before{background:#93aac4!important}
+#sn-axis-demo .sn-badge.purple,#sn-axis-demo .b-outsource{color:#ab9ec6!important;background:rgba(171,158,198,.12)!important;border-color:rgba(171,158,198,.28)!important}
+#sn-axis-demo .sn-badge.purple:before{background:#ab9ec6!important}
+#sn-axis-demo .sn-badge.ok,#sn-axis-demo .b-qcpass,#sn-axis-demo .b-ok{color:#8fc7b2!important;background:rgba(143,199,178,.12)!important;border-color:rgba(143,199,178,.28)!important}
+#sn-axis-demo .sn-badge.ok:before{background:#8fc7b2!important}
+#sn-axis-demo .sn-badge.green,#sn-axis-demo .b-shipped{color:#68b09b!important;background:rgba(104,176,155,.12)!important;border-color:rgba(104,176,155,.28)!important}
+#sn-axis-demo .sn-badge.green:before{background:#68b09b!important}
+#sn-axis-demo .sn-badge.gold,#sn-axis-demo .sn-badge.warn,#sn-axis-demo .b-low{color:#cba96b!important;background:rgba(203,169,107,.12)!important;border-color:rgba(203,169,107,.28)!important}
+#sn-axis-demo .sn-badge.gold:before,#sn-axis-demo .sn-badge.warn:before{background:#cba96b!important}
+#sn-axis-demo .sn-badge.grey,#sn-axis-demo .b-created,#sn-axis-demo .b-out{color:#9a9a9a!important;background:rgba(189,189,189,.08)!important;border-color:rgba(189,189,189,.18)!important}
+#sn-axis-demo .sn-badge.grey:before{background:#9a9a9a!important}
