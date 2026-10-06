@@ -550,7 +550,7 @@ if(!t){ window.location.href='login.html'; return; }
 loadDynamic();
 /* keep Cost in sync with the 1RLo sheet: re-pull live cost items periodically
    while the page is open, and whenever the tab regains focus */
-setInterval(function(){ if(VARIANTS.length) loadCostDetails(); }, 90000);
+setInterval(function(){ if(VARIANTS.length && !document.hidden) loadCostDetails(); }, 300000);
 document.addEventListener('visibilitychange', function(){ if(!document.hidden && VARIANTS.length) loadCostDetails(); });
 window.addEventListener('resize', function(){ if(VARIANTS.length) { drawBarChart(); drawPie(); } });
 </script>

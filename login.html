@@ -140,7 +140,7 @@ setupPinInputs('.pin-digit','loginPin');setupPinInputs('.reg-pin-digit','regPin'
 /* Login requests are bounded, never silently retried, and never cache credentials. */
 var loginBusy=false,registerBusy=false,authGeneration=0;
 function authRequest(payload,timeout){
-  var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},timeout||25000);
+  var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},timeout||35000);
   return snFetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),signal:controller.signal,cache:'no-store'})
     .then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.text();})
     .then(function(text){try{return JSON.parse(text);}catch(e){throw Error('INVALID_AUTH_RESPONSE');}})

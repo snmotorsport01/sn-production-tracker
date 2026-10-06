@@ -250,7 +250,7 @@ function el(id){return document.getElementById(id);}
 function set(id,v){var e=el(id);if(e)e.textContent=v;}
 
 loadCeo();
-setInterval(function(){ if(!document.hidden) loadCeo(true); }, 120000);
+setInterval(function(){ if(!document.hidden) loadCeo(true); }, 300000);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) loadCeo(true); });
 </script>
 </body>

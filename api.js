@@ -11,7 +11,7 @@ window.snFetch=function(input,options){
   var started=performance.now(),attempts=0;
   async function request(){
     while(true){
-      attempts++;var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},read?12000:(backend?25000:6000));
+      attempts++;var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},read?30000:(backend?30000:6000));
       var abort=function(){controller.abort();};if(options.signal){if(options.signal.aborted)controller.abort();else options.signal.addEventListener('abort',abort,{once:true});}
       try{
         var config=Object.assign({},options,{signal:controller.signal});if(backend)config.cache='no-store';
@@ -21,7 +21,7 @@ window.snFetch=function(input,options){
         return response;
       }catch(err){
         var cancelled=options.signal&&options.signal.aborted;
-        if(!read||attempts>=2||cancelled||err.permanent||(err.transient===false)||(/^HTTP /.test(err.message)&&!err.transient))throw err.name==='AbortError'?new Error('Request timed out'):err;
+        if(!read||attempts>=2||cancelled||err.name==='AbortError'||err.permanent||(err.transient===false)||(/^HTTP /.test(err.message)&&!err.transient))throw err.name==='AbortError'?new Error('Request timed out'):err;
       }finally{clearTimeout(timer);if(options.signal)options.signal.removeEventListener('abort',abort);}
     }
   }
