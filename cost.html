@@ -30,6 +30,8 @@ h2{font-size:1.2rem;margin-bottom:4px}
 .summary-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .summary-box{flex:1;min-width:130px;background:#1a1a1a;border-radius:10px;padding:14px;text-align:center}
 .summary-box .num{font-size:1.25rem;font-weight:700;margin-bottom:2px}
+/* Profit % sits INSIDE the ring: keep it narrow (mono) and small so it never overlaps the arc stroke, overriding the global .summary-box .num !important sizing. */
+#sumProfit{font-size:.98rem!important;font-family:'IBM Plex Mono',ui-monospace,monospace!important;font-weight:700!important;letter-spacing:-.02em;line-height:1;margin-bottom:0!important}
 .summary-box .lbl{color:#888;font-size:.73rem}
 .nav-back{color:#888;text-decoration:none;font-size:.85rem;display:inline-block;margin-bottom:12px}
 .green{color:#68b09b!important}
