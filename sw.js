@@ -2,15 +2,15 @@
    Strategy:
    - App shell (same-origin HTML/SVG/PNG/JSON): stale-while-revalidate → instant loads + offline, updates land next visit.
    - CDN libraries (cdnjs, versioned/immutable): cache-first → heavy libs load once, then from cache.
-   - Apps Script API (script.google.com): network-first with cache fallback → always fresh when online, still works offline.
+   - Apps Script API (script.google.com): bypass service worker; shared transport handles timeouts and safe read retries.
    Only GET requests are cached; POST (auth, uploads, mutations) always hits the network.
    Bump VERSION to force a refresh of all cached assets. */
-var VERSION = 'v51';
+var VERSION = 'v52';
 var SHELL   = 'sn-shell-' + VERSION;
 var RUNTIME = 'sn-runtime-' + VERSION;
 
 var SHELL_ASSETS = [
-  './', 'sn-monogram.png', 'axis.css', 'lounge.css', 'axis.js', 'batch-media.js', 'batch-media.css', 'fonts/psionic.otf',
+  './', 'api.js', 'sn-monogram.png', 'axis.css', 'lounge.css', 'axis.js', 'batch-media.js', 'batch-media.css', 'fonts/psionic.otf',
   'index.html', 'hub.html', 'production.html', 'inventory.html',
   'finance.html', 'cost.html', 'ceo.html', 'qr.html', 'report.html',
   'admin.html', 'login.html',
@@ -78,11 +78,7 @@ self.addEventListener('fetch', function (e) {
   var url = new URL(req.url);
 
   // Apps Script backend: fresh-first, cache as offline fallback
-  if (url.hostname === 'script.google.com') {
-    if (url.searchParams.has('token') || url.searchParams.get('api') === 'batchHistory') return;
-    e.respondWith(networkFirst(req, RUNTIME));
-    return;
-  }
+  if (url.hostname === 'script.google.com') return; // API helper owns timeout; never cache authenticated reads or legacy GET writes.
 
   // CDN libraries: cache-first (versioned URLs are immutable)
   if (url.hostname === 'cdnjs.cloudflare.com') {

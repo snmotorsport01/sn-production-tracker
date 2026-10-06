@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<!--sn-me-->
-<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+<!-- Shared transport and one throttled auth refresh -->
+<script src="api.js"></script>
 
 <!--sn-perm-->
 <script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}var allow=P[u.role];document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.bottom-nav a,.bnav a').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop();if(h&&/\.html$/.test(h)&&h!=='index.html'&&h!=='hub.html'&&allow.indexOf(h)===-1)a.style.display='none';});});}}catch(e){}})();</script>
@@ -356,7 +356,7 @@ var rateLoaded = false;
 // ============================================================
 async function loadExchangeRate() {
   try {
-    var res = await fetch("https://open.er-api.com/v6/latest/USD");
+    var res = await snFetch("https://open.er-api.com/v6/latest/USD");
     var data = await res.json();
     if (data.result === "success" && data.rates && data.rates.THB) {
       usdThbRate = data.rates.THB;
@@ -725,7 +725,7 @@ async function saveInvoice() {
   };
 
   try {
-    var res = await fetch(API, {
+    var res = await snFetch(API, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(payload)
@@ -742,7 +742,7 @@ async function saveInvoice() {
           "&supplier=" + encodeURIComponent(parsedInvoice.customer || "") +
           "&notes=" + encodeURIComponent("Invoice " + (parsedInvoice.invoiceId || "") + (payload.notes ? (" · " + payload.notes) : "")) +
           "&currency=" + encodeURIComponent(payload.currency);
-        await fetch(API + "?api=recordPayment&" + pp);
+        await snFetch(API + "?api=recordPayment&" + pp);
       } catch (e) { /* ledger add is best-effort; invoice is already saved */ }
       toast("บันทึก " + parsedInvoice.invoiceId + " + ลงรายรับรายจ่ายแล้ว!");
       clearPreview();
@@ -779,7 +779,7 @@ async function loadInvoices() {
   if (monthF) params += "&month=" + monthF;
 
   try {
-    var res = await fetch(API + "?" + params);
+    var res = await snFetch(API + "?" + params);
     var data = await res.json();
     if (!data.success) { container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
 
@@ -829,7 +829,7 @@ async function editInvoicePayment(id, total, currency, curPct) {
   var balanceDue = Math.round(((Number(total) || 0) - paid) * 100) / 100;
   var status = pct >= 100 ? "paid" : pct <= 0 ? "unpaid" : "partial";
   try {
-    var res = await fetch(API, {
+    var res = await snFetch(API, {
       method: "POST", headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({
         action: "update_invoice", token: sessionStorage.getItem("sn_token"),
@@ -848,7 +848,7 @@ async function editInvoicePayment(id, total, currency, curPct) {
 async function deleteInvoice(id) {
   if (!confirm("ลบ Invoice " + id + " ?")) return;
   try {
-    var res = await fetch(API, {
+    var res = await snFetch(API, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ action: "delete_invoice", token: sessionStorage.getItem("sn_token"), invoiceId: id })
@@ -919,9 +919,9 @@ async function exportReport(){
     }
 
     // pull the ledger + invoices fresh (report may run without visiting other tabs)
-    var pr = await fetch(API + "?api=listPayments"); var pj = await pr.json();
+    var pr = await snFetch(API + "?api=listPayments"); var pj = await pr.json();
     var pays = Array.isArray(pj) ? pj : (pj.payments || []);
-    var ir = await fetch(API + "?api=listInvoices&token=" + sessionStorage.getItem("sn_token")); var ij = await ir.json();
+    var ir = await snFetch(API + "?api=listInvoices&token=" + sessionStorage.getItem("sn_token")); var ij = await ir.json();
     var invs = (ij && ij.invoices) || [];
 
     var incCat = {}, expCat = {}, tInc = 0, tExp = 0;
@@ -984,23 +984,25 @@ async function exportReport(){
   if (btn) { btn.disabled = false; btn.textContent = "⬇ ดาวน์โหลดงบ (P&L)"; }
 }
 
+var snCashflowVersion=0;
 async function loadCashflow() {
+  var requestVersion=++snCashflowVersion;
   var grid = document.getElementById("cfGrid");
   // Instant paint from cache (SWR); fall back to spinner only on first-ever load.
   snPaint("cfSummary", "sn_h_cfsum_v47");
   if (!snPaint("cfGrid", "sn_h_cfgrid")) grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
-  if (!rateLoaded) { try { await loadExchangeRate(); } catch (e) {} }  // ensure USD→THB rate ready
+  var ratePromise=rateLoaded?Promise.resolve():loadExchangeRate();
 
   try {
-    // Fire all three backend calls in PARALLEL (each ~2-3s serially = ~8s → ~one round trip).
+    // Fetch the financial snapshot once; exchange-rate lookup runs in parallel.
     var yearF = document.getElementById("cfYear").value;
     var tok = sessionStorage.getItem("sn_token");
-    var params2 = "api=cashflowSummary&token=" + tok + (yearF ? "&year=" + yearF : "");
-    var R = await Promise.all([
-      fetch(API + "?api=listPayments").then(function(r){return r.json();}).catch(function(){return [];}),
-      fetch(API + "?" + params2).then(function(r){return r.json();}).catch(function(){return {};}),
-      fetch(API + "?api=listInvoices&token=" + tok).then(function(r){return r.json();}).catch(function(){return {};})
-    ]);
+    var results=await Promise.all([snApiGet('financeBundle',{token:tok,year:yearF}),ratePromise]);
+    var bundle=results[0];
+    var sections=bundle.sections||{};
+    if(!sections.listPayments||!sections.listInvoices||!sections.cashflowSummary)throw new Error('โหลดข้อมูลไม่ครบ กรุณาลองอีกครั้ง');
+    if(requestVersion!==snCashflowVersion)return;
+    var R=[sections.listPayments,sections.cashflowSummary,sections.listInvoices];
     var data = R[0];
     var payments = Array.isArray(data) ? data : (data.payments || []);
     var invoiceData = (R[1] && R[1].success && R[1].months) ? R[1].months : [];
@@ -1117,6 +1119,8 @@ async function loadCashflow() {
     snSave("cfSummary", "sn_h_cfsum_v47"); snSave("cfGrid", "sn_h_cfgrid");
 
   } catch (err) {
+    if(requestVersion!==snCashflowVersion)return;
+    toast("อัปเดตข้อมูลไม่ได้ ยังแสดงข้อมูลที่โหลดไว้ก่อนหน้า");
     if (!/cf-card/.test(grid.innerHTML)) grid.innerHTML = '<div class="empty">' + err.message + '</div>';
   }
 }
@@ -1137,7 +1141,7 @@ async function loadPayments() {
   if (!snPaint("payList", "sn_h_pay")) container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
 
   try {
-    var res = await fetch(API + "?api=listPayments");
+    var res = await snFetch(API + "?api=listPayments");
     var data = await res.json();
     // API returns array directly OR {success,payments}
     if (Array.isArray(data)) {
@@ -1238,7 +1242,7 @@ function hidePaymentForm() {
 }
 
 async function loadProductList() {
-  fetch(API + "?api=getProducts").then(function(r){ return r.json(); }).then(function(d) {
+  snFetch(API + "?api=getProducts").then(function(r){ return r.json(); }).then(function(d) {
     if (d.success && d.products) {
       productList = d.products.map(function(p){ return { name: p.name, type: p.type, tab: p.tabName, sellPrice: p.sellPrice }; });
       populateProductDropdown();
@@ -1380,7 +1384,7 @@ async function savePayment() {
   if (paySlipDataUrl && !editRow) {
     var slipHandled = false;
     try {
-      var res0 = await fetch(API, {
+      var res0 = await snFetch(API, {
         method: "POST", headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({
           action: "add_slip_expense", token: sessionStorage.getItem("sn_token"),
@@ -1400,7 +1404,7 @@ async function savePayment() {
         slipHandled = true;
       }
       // else: backend not updated yet → fall through and record WITHOUT the image
-    } catch (err) { /* fall through to plain save below */ }
+    } catch (err) { slipHandled=true;toast("การเชื่อมต่อขาด กรุณาตรวจรายการก่อนกดบันทึกอีกครั้ง"); }
     if (slipHandled) { btn.disabled = false; btn.textContent = "บันทึก"; return; }
     toast("บันทึกรายจ่ายแล้ว — แต่แนบสลิปยังไม่ได้ (ต้องอัปเดต backend ก่อน)");
   }
@@ -1416,7 +1420,7 @@ async function savePayment() {
   if (editRow) params += "&row=" + editRow;
 
   try {
-    var res = await fetch(API + "?api=" + apiName + "&" + params);
+    var res = await snFetch(API + "?api=" + apiName + "&" + params);
     var data = await res.json();
     if (data.success) {
       toast(editRow ? "แก้ไขสำเร็จ" : "เพิ่มรายการสำเร็จ");
@@ -1441,7 +1445,7 @@ function editPaymentRow(row) {
 async function deletePaymentRow(row) {
   if (!confirm("ลบรายการนี้?")) return;
   try {
-    var res = await fetch(API + "?api=deletePayment&row=" + row);
+    var res = await snFetch(API + "?api=deletePayment&row=" + row);
     var data = await res.json();
     if (data.success) {
       toast("ลบรายการแล้ว");
@@ -1469,7 +1473,6 @@ function toast(msg) {
 // Init — load exchange rate first, then cashflow
 // ============================================================
 (async function() {
-  await loadExchangeRate();
   loadCashflow();
  loadProductList();
 })();

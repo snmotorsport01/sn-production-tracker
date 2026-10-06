@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<!--sn-me-->
-<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+<!-- Shared transport and one throttled auth refresh -->
+<script src="api.js"></script>
 
 <!--sn-perm-->
 <script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}}}catch(e){}})();</script>
@@ -107,7 +107,7 @@ var API = "https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_
 
 /* ---- currency helper (USD -> THB, mirrors finance.html) ---- */
 var usdThbRate = 36, rateLoaded = false;
-async function loadExchangeRate(){try{var r=await fetch("https://open.er-api.com/v6/latest/USD");var j=await r.json();if(j&&j.rates&&j.rates.THB){usdThbRate=j.rates.THB;rateLoaded=true;}}catch(e){}}
+async function loadExchangeRate(){try{var r=await snFetch("https://open.er-api.com/v6/latest/USD");var j=await r.json();if(j&&j.rates&&j.rates.THB){usdThbRate=j.rates.THB;rateLoaded=true;}}catch(e){}}
 function amtThb(a,c){a=Number(a)||0;if((c||"THB")==="USD"&&rateLoaded&&usdThbRate)return a*usdThbRate;return a;}
 
 /* ---- formatting ---- */
@@ -124,17 +124,20 @@ function cacheSet(k,v){try{sessionStorage.setItem(k,JSON.stringify(v));}catch(e)
 
 var RAW = { payments:[], invoices:[] };
 
+var snCeoVersion=0;
 async function loadCeo(force){
+  var requestVersion=++snCeoVersion;
   // SWR: paint from cache instantly, then refresh
   var cached = cacheGet("sn_ceo_raw");
   if(cached && !force){ RAW = cached; buildYears(); renderAll(); }
-  if(!rateLoaded){ try{ await loadExchangeRate(); }catch(e){} }
+  var ratePromise=rateLoaded?Promise.resolve():loadExchangeRate();
   try{
     var tok = sessionStorage.getItem("sn_token") || "";
-    var R = await Promise.all([
-      fetch(API+"?api=listPayments").then(function(r){return r.json();}).catch(function(){return [];}),
-      fetch(API+"?api=listInvoices&token="+encodeURIComponent(tok)).then(function(r){return r.json();}).catch(function(){return {};})
-    ]);
+    var results=await Promise.all([snApiGet('ceoBundle',{token:tok,fresh:force?'1':undefined}),ratePromise]);
+    var sections=results[0].sections||{};
+    if(!sections.listPayments||!sections.listInvoices)throw new Error('โหลดข้อมูลไม่ครบ กรุณาลองอีกครั้ง');
+    if(requestVersion!==snCeoVersion)return;
+    var R=[sections.listPayments,sections.listInvoices];
     var pay = Array.isArray(R[0]) ? R[0] : (R[0].payments || []);
     var inv = (R[1] && R[1].invoices) ? R[1].invoices : [];
     RAW = { payments: pay, invoices: inv };
@@ -142,6 +145,8 @@ async function loadCeo(force){
     buildYears(); renderAll();
     var now=new Date();document.getElementById("ceoStamp").textContent="อัปเดต "+now.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
   }catch(err){
+    if(requestVersion!==snCeoVersion)return;
+    document.getElementById("ceoStamp").textContent="อัปเดตไม่ได้ แสดงข้อมูลที่โหลดไว้ก่อนหน้า";
     if(!RAW.payments.length){
       document.getElementById("monthChart").innerHTML='<div class="empty">โหลดข้อมูลไม่ได้</div>';
       document.getElementById("catChart").innerHTML='<div class="empty">'+(err.message||"error")+'</div>';

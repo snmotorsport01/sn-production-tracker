@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<!--sn-me-->
-<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+<!-- Shared transport and one throttled auth refresh -->
+<script src="api.js"></script>
 
 <!--sn-perm-->
 <script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}var allow=P[u.role];document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.bottom-nav a,.bnav a').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop();if(h&&/\.html$/.test(h)&&h!=='index.html'&&h!=='hub.html'&&allow.indexOf(h)===-1)a.style.display='none';});});}}catch(e){}})();</script>
@@ -224,7 +224,7 @@ return {id:id, name:name, type:type, arm:armWeight, armCost:armCost, matTotal:ma
 }
 
 function loadCostDetails() {
-fetch(API_URL+'?api=getCostData&_ts='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
+snFetch(API_URL+'?api=getCostData',{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
 if(!data.success || !data.data) throw new Error('getCostData failed');
 COST_DATA = data.data;
 rebuildWithCostData();
@@ -263,47 +263,19 @@ render();
 
 function fetchGviz(tabName) {
 var url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent(tabName)+'&_ts='+Date.now();
-return fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(txt){
+return snFetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(txt){
 var json = JSON.parse(txt.replace(/^[^{]*/, '').replace(/[^}]*$/, ''));
 return json.table ? json.table.rows : [];
 });
 }
 
-function loadDynamic() {
-fetchGviz('Config').then(function(rows){
-if(!rows || rows.length < 2) throw new Error('No config data');
-var products = [];
-for(var i=0; i<rows.length; i++){
-var c = rows[i].c;
-if(!c || !c[0] || !c[0].v) continue;
-var tabName = c[0].v.toString().trim();
-if(tabName === 'tab_name') continue;
-products.push({
-tabName: tabName,
-name: c[1] ? c[1].v.toString().trim() : tabName,
-type: c[2] ? c[2].v.toString().trim() : 'stream',
-sellPrice: c[3] ? parseFloat(c[3].v) : SELL,
-armWeight: c[4] ? parseFloat(c[4].v) : 0
-});
-}
-if(products.length === 0) throw new Error('No products found');
-VARIANTS = [];
-products.forEach(function(p){
-SELL = p.sellPrice || SELL;
-VARIANTS.push(buildVariant(p.name, p.type, p.armWeight, p.sellPrice, p.tabName));
-});
-dataSource = 'gviz';
-document.querySelector('.subtitle').textContent = 'Dynamic — ราคาขาย ฿'+fmtShort(SELL)+' ทุก Variant';
-render();
-loadCostDetails();
-}).catch(function(e){
-console.warn('Gviz failed, trying API...', e);
-loadFromAPI();
-});
-}
+function loadDynamic() { loadFromAPI(); }
 
 function loadFromAPI() {
-fetch(API_URL+'?api=getProducts&_ts='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
+snApiGet('costBundle',{token:sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token')||''}).then(function(bundle){
+var data=bundle.sections&&bundle.sections.getProducts,details=bundle.sections&&bundle.sections.getCostData;
+if(!data)throw new Error('Products unavailable');
+if(details&&details.success)COST_DATA=details.data;
 if(!data.success || !data.products || data.products.length===0) throw new Error('API failed');
 VARIANTS = [];
 data.products.forEach(function(p){
@@ -318,7 +290,7 @@ VARIANTS.push(buildVariant(pName, pType, armW, sp, tName));
 dataSource = 'api';
 document.querySelector('.subtitle').textContent = 'API — ราคาขาย ฿'+fmtShort(SELL)+' ทุก Variant';
 render();
-loadCostDetails();
+rebuildWithCostData();
 }).catch(function(e){
 console.warn('API failed, using fallback', e);
 useFallback();
