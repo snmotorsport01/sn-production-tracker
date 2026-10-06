@@ -86,6 +86,8 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 <link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="axis.js" defer></script>
 </head>
 <body>
 
@@ -121,12 +123,12 @@ h1{font-size:1.4rem;margin-bottom:8px;color:#fff}
   </div>
   <div style="color:#666;font-size:.72rem;margin:-8px 0 12px">งบกำไรขาดทุน — เลือกเดือน (ช่องขวา) หรือปี (ช่องซ้าย) แล้วกดดาวน์โหลด</div>
 
-  <div class="summary-row" id="cfSummary">
-    <div class="summary-box"><div class="num green" id="cfIncome">฿0</div><div class="lbl">รายรับรวม</div></div>
-    <div class="summary-box"><div class="num red" id="cfExpense">฿0</div><div class="lbl">รายจ่ายรวม</div></div>
-    <div class="summary-box"><div class="num" id="cfProfit">฿0</div><div class="lbl">กำไร/ขาดทุน</div></div>
-    <div class="summary-box"><div class="num yellow" id="cfUnpaid">฿0</div><div class="lbl">ค้างชำระ</div></div>
-  </div>
+  <div class="sn-kpis" id="cfSummary">
+<article class="sn-kpi sn-glass" data-money="income"><label>เงินเข้ารวม</label><div class="sn-value num green" id="cfIncome">฿0</div><div class="sn-kpi-foot">รายรับตามช่วงที่เลือก</div></article>
+<article class="sn-kpi sn-glass" data-money="expense"><label>เงินออกรวม</label><div class="sn-value num red" id="cfExpense">฿0</div><div class="sn-kpi-foot">รายจ่ายตามช่วงที่เลือก</div></article>
+<article class="sn-kpi sn-glass"><label>กระแสเงินสดสุทธิ</label><div class="sn-value num" id="cfProfit">฿0</div><div class="sn-kpi-foot">เงินเข้า − เงินออก</div></article>
+</div>
+<div class="sn-panel sn-glass" style="margin-bottom:20px">ยอดค้างชำระ <span id="cfUnpaid">฿0</span></div>
 
   <h2 style="font-size:1rem;margin-bottom:12px;color:#fff">รายเดือน</h2>
   <div class="cashflow-grid" id="cfGrid">
@@ -985,7 +987,7 @@ async function exportReport(){
 async function loadCashflow() {
   var grid = document.getElementById("cfGrid");
   // Instant paint from cache (SWR); fall back to spinner only on first-ever load.
-  snPaint("cfSummary", "sn_h_cfsum");
+  snPaint("cfSummary", "sn_h_cfsum_v47");
   if (!snPaint("cfGrid", "sn_h_cfgrid")) grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
   if (!rateLoaded) { try { await loadExchangeRate(); } catch (e) {} }  // ensure USD→THB rate ready
 
@@ -1068,7 +1070,7 @@ async function loadCashflow() {
       document.getElementById("cfExpense").textContent = "฿0";
       document.getElementById("cfProfit").textContent = "฿0";
       document.getElementById("cfUnpaid").textContent = "฿" + Math.round(totalUnpaid).toLocaleString();
-      snSave("cfSummary", "sn_h_cfsum"); snSave("cfGrid", "sn_h_cfgrid");
+      snSave("cfSummary", "sn_h_cfsum_v47"); snSave("cfGrid", "sn_h_cfgrid");
       return;
     }
 
@@ -1077,10 +1079,10 @@ async function loadCashflow() {
     keys.forEach(function(k) { totalIncome += groups[k].income; totalExpense += groups[k].expense; });
     var totalProfit = totalIncome - totalExpense;
 
-    document.getElementById("cfIncome").textContent = "฿" + Math.round(totalIncome).toLocaleString();
-    document.getElementById("cfExpense").textContent = "฿" + Math.round(totalExpense).toLocaleString();
+    document.getElementById("cfIncome").textContent = "+฿" + Math.round(totalIncome).toLocaleString();
+    document.getElementById("cfExpense").textContent = "−฿" + Math.round(totalExpense).toLocaleString();
     document.getElementById("cfProfit").textContent = "฿" + Math.round(totalProfit).toLocaleString();
-    document.getElementById("cfProfit").className = "num " + (totalProfit >= 0 ? "green" : "red");
+    document.getElementById("cfProfit").className = "sn-value num " + (totalProfit >= 0 ? "neutral" : "red");
     document.getElementById("cfUnpaid").textContent = "฿" + Math.round(totalUnpaid).toLocaleString();
 
     // Render cards
@@ -1112,7 +1114,7 @@ async function loadCashflow() {
         '<div class="detail">รายจ่าย <span class="red">฿' + Math.round(g.expense).toLocaleString() + '</span></div>';
       grid.appendChild(card);
     });
-    snSave("cfSummary", "sn_h_cfsum"); snSave("cfGrid", "sn_h_cfgrid");
+    snSave("cfSummary", "sn_h_cfsum_v47"); snSave("cfGrid", "sn_h_cfgrid");
 
   } catch (err) {
     if (!/cf-card/.test(grid.innerHTML)) grid.innerHTML = '<div class="empty">' + err.message + '</div>';

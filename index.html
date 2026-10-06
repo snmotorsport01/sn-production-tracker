@@ -97,6 +97,8 @@ body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 <link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="axis.js" defer></script>
 </head>
 <body>
 
@@ -125,42 +127,9 @@ window.location.href='login.html';
 }
 </script>
 
-<!-- ── Header ── -->
-<div class="header">
-<div class="logo-text">SN ERP</div>
-<div class="logo-sub">Production &amp; Operations</div>
-</div>
-<div class="divider"></div>
-
-<!-- ── Command Deck Hub ── -->
-<div class="cd-sys" style="margin:2px 2px 12px"><span>SYS/OPS · ONLINE</span><span class="live">● LIVE</span></div>
-
-<a href="finance.html" class="cd-hero" style="display:block;text-decoration:none;color:inherit;margin-bottom:14px" data-page="finance.html">
-<div class="cap">Cash Flow · เดือนนี้</div>
-<div class="cd-rings">
-<div class="cd-ring"><svg width="46" height="46" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="20" cy="20" r="16" fill="none" stroke="#68b09b" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="20" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><div class="v" id="h-in" style="color:#68b09b">—</div><div class="l">รายรับ</div></div>
-<div class="cd-ring"><svg width="46" height="46" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="20" cy="20" r="16" fill="none" stroke="#e5555a" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="46" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><div class="v" id="h-out" style="color:#e5555a">—</div><div class="l">รายจ่าย</div></div>
-<div class="cd-ring"><svg width="46" height="46" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="20" cy="20" r="16" fill="none" stroke="#e4c77a" stroke-width="4" stroke-dasharray="100" stroke-dashoffset="8" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><div class="v" id="h-net" style="color:#e4c77a">—</div><div class="l">คงเหลือ</div></div>
-</div>
-</a>
-
-<!-- module tiles -->
-<div class="cd-tiles" style="margin-bottom:4px">
-<a href="production.html" class="cd-tile" data-page="production.html"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 7l8-4 8 4-8 4-8-4z"/><path d="M4 12l8 4 8-4"/></svg><span class="n" id="t-prod">—</span></div><span class="lb">ผลิต</span></a>
-<a href="inventory.html" class="cd-tile" data-page="inventory.html"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg><span class="n" id="t-inv">—</span></div><span class="lb">สต็อก</span></a>
-<a href="cost.html" class="cd-tile" data-page="cost.html"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/></svg><span class="n" id="t-cost">—</span></div><span class="lb">ต้นทุน</span></a>
-</div>
-
-<!-- stock alerts -->
-<div class="cd-sechdr" data-page="inventory.html"><span class="d"></span> แจ้งเตือนสต็อก</div>
-<a href="inventory.html" style="text-decoration:none;color:inherit" data-page="inventory.html"><div class="cd-rows" id="hubAlerts"><div class="cd-row" style="justify-content:center;color:var(--ink3)">กำลังโหลด...</div></div></a>
-
-<!-- production queue -->
-<div class="cd-sechdr" data-page="production.html"><span class="d"></span> คิวการผลิต</div>
-<a href="production.html" style="text-decoration:none;color:inherit" data-page="production.html"><div class="cd-rows" id="hubQueue" style="margin-bottom:8px"><div class="cd-row" style="justify-content:center;color:var(--ink3)">กำลังโหลด...</div></div></a>
-
-
-<!-- ══════════════════════════════════════ -->
+<div class="sn-kpis" aria-live="polite"><article class="sn-kpi sn-glass" data-page="finance.html"><label data-klabel="0">กระแสเงินสดสุทธิ</label><div class="sn-value" data-kvalue="0" id="h-net">—</div><div class="sn-kpi-foot" data-kfoot="0"><span class="sn-money-income">เงินเข้า <span id="h-in">—</span></span> · <span class="sn-money-expense">เงินออก <span id="h-out">—</span></span></div><div class="sn-bars" aria-hidden="true"><span style="height:8px"></span><span style="height:13px"></span><span style="height:10px"></span><span style="height:20px"></span><span style="height:23px"></span></div></article><article class="sn-kpi sn-glass" data-page="production.html"><label data-klabel="1">กำลังผลิต</label><div class="sn-value" data-kvalue="1"><span id="t-prod">—</span> <small>Batch</small></div><div class="sn-kpi-foot" data-kfoot="1">อยู่ระหว่างการผลิตและตรวจสอบ</div></article><article class="sn-kpi sn-glass" data-page="inventory.html"><label data-klabel="2">สต็อกที่ต้องตรวจสอบ</label><div class="sn-value" data-kvalue="2"><span id="t-inv">—</span> <small>รายการ</small></div><div class="sn-kpi-foot" data-kfoot="2">ต่ำกว่าระดับขั้นต่ำ</div></article></div>
+<div class="sn-grid"><section class="sn-panel sn-glass" data-page="production.html"><div class="sn-panel-head"><h3 data-left-title>คิวการผลิต</h3><span class="sn-count" data-left-count id="hubActiveCount">—</span></div><div data-left-rows id="hubQueue">กำลังโหลด…</div></section><section class="sn-panel sn-glass" data-page="inventory.html"><div class="sn-panel-head"><h3 data-right-title>รายการที่ต้องจัดการ</h3><span class="sn-count" data-right-count id="hubAlertCount">—</span></div><div data-right-rows id="hubAlerts">กำลังโหลด…</div></section></div>
+<div class="sn-shortcuts"><button class="cursor-interaction" onclick="location.href='inventory.html'" data-page="inventory.html">รับเข้าสินค้า</button><button class="cursor-interaction" onclick="location.href='finance.html'" data-page="finance.html">บันทึกรายจ่าย</button><button class="cursor-interaction" onclick="location.href='qr.html'" data-page="qr.html">สแกน QR</button></div>
 <!-- SECTION: My Profile (self-edit) -->
 <!-- ══════════════════════════════════════ -->
 <div class="section">
@@ -207,8 +176,8 @@ function fmt(n){if(n===undefined||n===null||isNaN(n))return'—';return Number(n
 /* ── Command Deck hub helpers ── */
 function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':s);return d.innerHTML;}
 function setTile(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===undefined||v===null||isNaN(v))?'—':v;}
-function invChip(lvl){var m={crit:['crit','วิกฤต'],low:['warn','ต่ำ']};var c=m[lvl];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
-function stChip(s){var m={'Start Producing':['red','ผลิต'],'Print Finish':['blue','พิมพ์เสร็จ'],'Outsource':['purple','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['green','ส่งแล้ว'],'Created':['grey','รอ']};var c=m[s||'']||['gold',(s||'-')];return '<span class="cd-chip '+c[0]+'">'+c[1]+'</span>';}
+function invChip(lvl){var m={crit:['crit','วิกฤต'],low:['warn','ต่ำ']};var c=m[lvl];return '<span class="sn-badge '+c[0]+'">'+c[1]+'</span>';}
+function stChip(s){var m={'Start Producing':['red','ผลิต'],'Print Finish':['blue','พิมพ์เสร็จ'],'Outsource':['purple','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['green','ส่งแล้ว'],'Created':['grey','รอ']};var c=m[s||'']||['gold',(s||'-')];return '<span class="sn-badge '+c[0]+'">'+c[1]+'</span>';}
 
 /* Stale-while-revalidate: paint last data instantly from cache, refresh in background */
 function swrCall(api,render){var key='sn_hub_'+api;try{var c=JSON.parse(sessionStorage.getItem(key)||'null');if(c)render(c);}catch(e){}callAPI({api:api}).then(function(d){try{sessionStorage.setItem(key,JSON.stringify(d));}catch(e){}render(d);}).catch(function(){});}
@@ -217,16 +186,17 @@ function renderProd(data){
 var list=Array.isArray(data)?data:(data&&data.batches?data.batches:[]);
 var active=0,queue=[];
 list.forEach(function(b){var s=b.status||'';if(s!=='Shipped'&&s!=='QC Pass'&&s!=='Created'){active++;if(queue.length<4)queue.push(b);}});
-setTile('t-prod',active);
-var el=document.getElementById('hubQueue');if(el)el.innerHTML=queue.length?queue.map(function(b){return '<div class="cd-row"><span class="id">'+esc(b.batchId||b.id||'')+'</span><span class="nm">'+esc((b.product||'')+(b.qty?(' ×'+b.qty):''))+'</span>'+stChip(b.status)+'</div>';}).join(''):'<div class="cd-row" style="justify-content:center;color:var(--ink3)">ไม่มีงานในคิว</div>';
+setTile('t-prod',active);var activeCount=document.getElementById('hubActiveCount');if(activeCount)activeCount.textContent=active+' ACTIVE';
+var el=document.getElementById('hubQueue');if(el)el.innerHTML=queue.length?queue.map(function(b){return '<div class="sn-row"><div>'+esc((b.product||'')+(b.carModel?' · '+b.carModel:''))+'<small>'+esc(b.batchId||b.id||'')+(b.qty?' · '+esc(b.qty)+' ชุด':'')+'</small></div>'+stChip(b.status)+'</div>';}).join(''):'<div class="sn-row" style="justify-content:center;color:var(--ink3)">ไม่มีงานในคิว</div>';
 }
 function renderInv(data){
 var items=Array.isArray(data)?data:(data&&data.items?data.items:[]);
-setTile('t-inv',items.length);
+setTile('t-inv',0);
 var alerts=[];
 items.forEach(function(it){var qty=Number(it.stock)||0,min=Number(it.min)||0;var lvl=(qty<=0||qty<min)?'crit':(qty<min*1.5?'low':'ok');if(lvl!=='ok')alerts.push({item:it.item,cat:it.category||'',lvl:lvl});});
+setTile('t-inv',alerts.length);var alertCount=document.getElementById('hubAlertCount');if(alertCount)alertCount.textContent=alerts.length+' ITEMS';
 alerts.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
-var el=document.getElementById('hubAlerts');if(el)el.innerHTML=alerts.length?alerts.slice(0,4).map(function(x){return '<div class="cd-row"><span class="id">'+esc(x.item)+'</span><span class="nm">'+esc(x.cat)+'</span>'+invChip(x.lvl)+'</div>';}).join(''):'<div class="cd-row" style="justify-content:center;color:var(--live)">สต็อกปกติทั้งหมด ✓</div>';
+var el=document.getElementById('hubAlerts');if(el)el.innerHTML=alerts.length?alerts.slice(0,4).map(function(x){return '<div class="sn-row"><div>'+esc(x.item)+'<small>'+esc(x.cat)+'</small></div>'+invChip(x.lvl)+'</div>';}).join(''):'<div class="sn-row" style="justify-content:center;color:var(--live)">สต็อกปกติทั้งหมด ✓</div>';
 }
 function renderCash(data){
 if(!data)return;
@@ -235,10 +205,21 @@ function kfmt(n){n=Math.round(n||0);var a=Math.abs(n);return '฿'+(a>=1000?(Mat
 var setk=function(id,v){var e=document.getElementById(id);if(e)e.textContent=kfmt(v);};
 setk('h-in',data.totalIncome);setk('h-out',data.totalExpense);setk('h-net',net);
 }
-swrCall('listBatches',renderProd);
-swrCall('listInventory',renderInv);
-swrCall('listCashflow',renderCash);
-cachedAPI({api:'getProducts'},1800000,function(data){if(!data||!data.success)return;setTile('t-cost',(data.products||[]).length);}).catch(function(){});
+/* Paint the existing snapshots immediately, then refresh in one request. */
+(function loadHub(){
+var renders={listBatches:renderProd,listInventory:renderInv,listCashflow:renderCash};
+Object.keys(renders).forEach(function(api){try{var d=JSON.parse(sessionStorage.getItem('sn_hub_'+api)||'null');if(d&&d.success!==false)renders[api](d);}catch(e){}});
+var products=null;
+try{var c=JSON.parse(sessionStorage.getItem('sn_cache_getProducts')||'null');if(c&&c.d&&c.d.success===true&&Date.now()-c.t<1800000)products=c.d;}catch(e){}
+function renderProducts(d){if(d&&d.success===true)setTile('t-cost',(d.products||[]).length);}
+if(products)renderProducts(products);
+function accept(api,d){if(!d||d.success===false)return;if(api==='getProducts'){try{sessionStorage.setItem('sn_cache_getProducts',JSON.stringify({t:Date.now(),d:d}));}catch(e){}renderProducts(d);}else{try{sessionStorage.setItem('sn_hub_'+api,JSON.stringify(d));}catch(e){}renders[api](d);}}
+function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catch(function(){});}
+callAPI({api:'hubBundle',products:products?'0':'1'}).then(function(d){
+if(!d||d.success!==true||!d.sections)throw new Error('Bundle unavailable');
+Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else fallback(api);});
+}).catch(function(){Object.keys(renders).concat(products?[]:['getProducts']).forEach(fallback);});
+})();
 
 /* Admin FAB */
 (function(){

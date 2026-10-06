@@ -256,3 +256,31 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold) !important;outl
   body{max-width:1200px !important}
   .bottom-nav{max-width:1200px !important}
 }
+
+/* Operations Lounge — rounded frosted surfaces, CI monochrome + functional finance colors. */
+:root{--ground:#0a0a0a;--panel:#1a1a1a;--panel2:#222;--panelhi:#2a2a2a;--ink:#e0e0e0;--ink2:#bdbdbd;--ink3:#999;--gold:#c9a84c;--goldhi:#c9a84c;--goldline:rgba(201,168,76,.22);--live:#86b69f;--red:#d18b87;--income:#86b69f;--expense:#d18b87;--body:'Sukhumvit Set',Thonburi,'IBM Plex Sans Thai',system-ui,sans-serif;--disp:'Psionic','Sukhumvit Set',Thonburi,'IBM Plex Sans Thai',sans-serif;--card-radius:24px}
+body{background:radial-gradient(ellipse at 85% 8%,rgba(189,189,189,.12),transparent 45%),radial-gradient(ellipse at 10% 90%,rgba(201,168,76,.04),transparent 40%),#0a0a0a !important;background-attachment:fixed!important}
+body::before{animation:none!important;background:none!important}
+.card,.batch-card,.phase-card,.hub-card,.cf-card,.summary-box,.stat-card,.user-card,.variant-card,.preview-card,.n8n-panel,.section,.cd-hero,.cd-tile,.cd-cell,.cd-rows,.cost-table{border-radius:var(--card-radius)!important;border:1px solid rgba(224,224,224,.13)!important;border-top-color:rgba(224,224,224,.24)!important;background:linear-gradient(135deg,rgba(43,43,43,.84),rgba(24,24,24,.94))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.14)!important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.card,.batch-card,.phase-card,.hub-card,.cf-card,.summary-box,.stat-card,.user-card,.variant-card,.preview-card,.section,.cd-hero,.cd-tile,.cd-cell{padding:20px!important}
+.modal,.confirm-box,.overlay .modal,.axis-media-panel{border-radius:28px!important;background:linear-gradient(135deg,rgba(38,38,38,.98),rgba(22,22,22,.98))!important;border:1px solid rgba(224,224,224,.2)!important;-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
+.modal-bg{align-items:center!important;padding:18px!important}.modal{max-height:88dvh;overflow-y:auto}.modal-bg.open .modal{transform:none}
+input:not([type=checkbox]):not([type=radio]),textarea,select,.select-box,.search-box{border-radius:18px!important;border-color:rgba(224,224,224,.2)!important}
+.btn,.btn-edit,.btn-del,.tab,.filter-btn,.badge,.cd-chip,.role-badge,.logout-btn,.chips button,.chip{border-radius:999px!important}
+.btn,.btn-edit,.btn-del,.logout-btn{min-height:44px}.badge,.cd-chip{font-family:var(--body)!important;letter-spacing:0!important;background:rgba(189,189,189,.09)!important;color:var(--ink2)!important;border:1px solid rgba(189,189,189,.16)!important}
+.cd-tile .n,.cd-tile svg,.stat-card .n,.stat-card .num,.auth-bar .user-info strong{color:var(--ink)!important;stroke:currentColor}
+.cd-sechdr,.hdr,.cd-cell .c,.cd-tile .lb{font-family:var(--body)!important;letter-spacing:.02em!important;font-size:12px!important;color:var(--ink2)!important}
+.cd-cell .s,.cd-ring .l,.cd-hero .cap,.cd-sys{font-size:11px!important;color:var(--ink2)!important}.cd-cell .v,.cd-tile .n{font-size:24px!important}.cd-row .id{font-size:12px!important;color:var(--ink2)!important}
+.status-step,.status-bar{border-radius:999px!important}.status-step.done,.status-step.current{background:var(--ink2)!important}.divider{background:linear-gradient(90deg,rgba(189,189,189,.3),transparent)!important;box-shadow:none!important}
+.axis-nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px;margin:18px 0 24px;border:1px solid rgba(224,224,224,.13);border-top-color:rgba(224,224,224,.24);border-radius:28px;background:linear-gradient(120deg,rgba(43,43,43,.85),rgba(24,24,24,.93));-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.axis-nav a{flex:1;min-width:85px;display:flex;align-items:center;justify-content:center;text-align:center;min-height:44px;padding:10px 12px;border-radius:999px;color:var(--ink2);text-decoration:none;font-size:13px;border:1px solid transparent}
+.axis-nav a:hover{background:rgba(224,224,224,.06)}.axis-nav a[aria-current=page]{background:rgba(224,224,224,.08);border-color:rgba(224,224,224,.18);color:var(--ink)}
+.axis-lounge .bottom-nav,.axis-lounge .bnav{display:none!important}.axis-lounge{padding-bottom:24px!important}.axis-wordmark{position:relative}.axis-glitch{animation:axisGlitch .4s steps(2,end) 1}
+@keyframes axisGlitch{0%,100%{transform:none;text-shadow:none}25%{transform:translateX(2px);text-shadow:-2px 0 #bdbdbd}50%{transform:translateX(-2px);text-shadow:2px 0 #c9a84c}75%{transform:translateX(1px);text-shadow:none}}
+/* Green/red belong to amounts and transaction identity, never large card surfaces. */
+.green,.income,.money-income,#cfIncome,#h-in,.cd-row .amt.g,.cd-cell .v.g{color:var(--income)!important}.red,.expense,.money-expense,#cfExpense,#h-out,.cd-row .amt.r,.cd-cell .v.r{color:var(--expense)!important}
+.badge-income{color:var(--income)!important;background:rgba(134,182,159,.09)!important;border-color:rgba(134,182,159,.2)!important}.badge-expense{color:var(--expense)!important;background:rgba(209,139,135,.09)!important;border-color:rgba(209,139,135,.2)!important}
+#h-net{color:var(--ink)!important}.cd-ring:has(#h-in) svg circle:last-child{stroke:var(--income)}.cd-ring:has(#h-out) svg circle:last-child{stroke:var(--expense)}.cd-ring:has(#h-net) svg circle:last-child{stroke:var(--ink2)}
+@media(min-width:900px){body{max-width:1200px!important;padding:24px 32px!important}.axis-nav{margin-bottom:28px}.header{text-align:left!important}.cd-tiles{gap:16px}.cd-rings{gap:32px}.cd-ring .v{font-size:26px!important}.axis-hub-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.axis-hub-grid .cd-rows{margin-top:12px}}
+@media(max-width:600px){.axis-nav{gap:4px;padding:8px;border-radius:24px}.axis-nav a{min-width:75px;font-size:12px;padding:8px}.card,.batch-card,.phase-card,.cd-hero,.cd-tile,.cd-cell{padding:16px!important}.cd-tiles{grid-template-columns:1fr!important}.cd-tile .top{gap:12px}.modal-bg{padding:12px!important}.modal{border-radius:24px!important}.axis-lounge input,.axis-lounge textarea,.axis-lounge select{font-size:16px!important}}
+@media(prefers-reduced-motion:reduce){.axis-glitch{animation:none!important}}

@@ -134,20 +134,20 @@ justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 <link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="axis.js" defer></script>
+<link rel="stylesheet" href="batch-media.css">
+<script src="batch-media.js" defer></script>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
 
-<div style="text-align:center;margin:12px 0 4px">
-  <div style="font-size:11px;color:#cea24a;font-weight:700;letter-spacing:3px">SN ERP</div>
-  <div style="font-size:18px;font-weight:800;margin-top:2px;color:#fff">Production Dashboard</div>
-  <div style="width:40px;height:3px;background:#cea24a;margin:8px auto 0;border-radius:2px"></div>
-</div>
+
 
 <!-- Quick Actions -->
 <div style="display:flex;gap:8px;margin:16px 0 12px">
-  <button class="btn btn-p" style="flex:1;margin:0;font-size:13px;padding:10px" onclick="openCreateBatch()">+ สร้าง Batch ใหม่</button>
+
   <button class="btn btn-w" style="flex:1;margin:0;font-size:13px;padding:10px" onclick="location.href='qr.html#list'">อัพเดตสถานะ Batch</button>
   <a href="qr.html" class="btn btn-o" style="flex:1;margin:0;text-decoration:none;font-size:13px;padding:10px;text-align:center">SCAN QR</a>
 </div>
@@ -445,6 +445,8 @@ function loadData() {
     }
     renderOverview();
     buildFilters();
+    renderBatches();
+    renderReport();
   }).catch(function(err) {
     document.getElementById('overview-content').innerHTML =
       '<div class="card" style="text-align:center;color:#f87171">โหลดข้อมูลไม่ได้<br><span style="font-size:13px">' + err + '</span></div>' +
@@ -593,6 +595,7 @@ function renderBatches() {
     html += '</div>';
     // Action buttons
     html += '<div class="batch-actions">';
+    html += '<button class="axis-status-button" data-update-batch="' + b.batchId + '">อัปเดตสถานะ / แนบไฟล์</button>';
     html += '<button class="btn-edit" onclick="openEditBatch(\'' + b.batchId + '\')">✏️ แก้ไข</button>';
     html += '<button class="btn-del" onclick="openDeleteConfirm(\'' + b.batchId + '\')">🗑️ ลบ</button>';
     html += '</div>';
@@ -923,5 +926,6 @@ loadProducts();
 loadCostData();
 loadData();
 </script>
+<script>document.addEventListener('click',function(e){var button=e.target.closest('[data-update-batch]');if(!button)return;var b=allBatches.find(function(x){return x.batchId===button.dataset.updateBatch;});if(b)snOpenBatchStatus({batchId:b.batchId,product:b.product,status:b.status,onSaved:loadData});});</script>
 </body>
 </html>

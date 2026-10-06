@@ -119,6 +119,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 <link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="axis.js" defer></script>
+<link rel="stylesheet" href="batch-media.css">
+<script src="batch-media.js" defer></script>
 </head>
 <body><script>
 (function(){
@@ -411,6 +415,9 @@ function confirmPhaseUpdate(batchId, phaseNum) {
 }
 
 function doPhaseUpdate(batchId, phase) {
+  snOpenBatchStatus({batchId:batchId,status:phase.status,notes:'Station QR scan',onSaved:function(){loadPhase(phase.num);}});
+  return;
+
   var el = document.getElementById('phase-list');
   if (el) el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
 
@@ -610,6 +617,10 @@ function renderBatch(b) {
 }
 
 function doUpdate(status) {
+  if (!currentBatch) return;
+  snOpenBatchStatus({batchId:currentBatch.batchId,product:currentBatch.product,status:status,notes:document.getElementById('u-notes')?document.getElementById('u-notes').value:'',onSaved:function(){loadBatch(currentBatch.batchId);}});
+  return;
+
   var b = currentBatch;
   if (!b) return;
   var btn = document.getElementById('btn-update');

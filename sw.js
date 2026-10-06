@@ -5,12 +5,12 @@
    - Apps Script API (script.google.com): network-first with cache fallback → always fresh when online, still works offline.
    Only GET requests are cached; POST (auth, uploads, mutations) always hits the network.
    Bump VERSION to force a refresh of all cached assets. */
-var VERSION = 'v45';
+var VERSION = 'v47';
 var SHELL   = 'sn-shell-' + VERSION;
 var RUNTIME = 'sn-runtime-' + VERSION;
 
 var SHELL_ASSETS = [
-  './',
+  './', 'axis.css', 'lounge.css', 'axis.js', 'batch-media.js', 'batch-media.css', 'fonts/psionic.otf',
   'index.html', 'hub.html', 'production.html', 'inventory.html',
   'finance.html', 'cost.html', 'qr.html', 'report.html',
   'admin.html', 'login.html',
@@ -79,6 +79,7 @@ self.addEventListener('fetch', function (e) {
 
   // Apps Script backend: fresh-first, cache as offline fallback
   if (url.hostname === 'script.google.com') {
+    if (url.searchParams.has('token') || url.searchParams.get('api') === 'batchHistory') return;
     e.respondWith(networkFirst(req, RUNTIME));
     return;
   }
