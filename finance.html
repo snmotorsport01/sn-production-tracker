@@ -354,23 +354,31 @@ var rateLoaded = false;
 // ============================================================
 // Exchange Rate — USD to THB (free API, updates daily)
 // ============================================================
-async function loadExchangeRate() {
-  try {
-    var res = await snFetch("https://open.er-api.com/v6/latest/USD");
-    var data = await res.json();
-    if (data.result === "success" && data.rates && data.rates.THB) {
-      usdThbRate = data.rates.THB;
-      rateLoaded = true;
-      document.getElementById("rateValue").textContent = usdThbRate.toFixed(2);
-      document.getElementById("rateTime").textContent = "updated: " + data.time_last_update_utc.substring(0, 16);
-    }
-  } catch (e) {
-    // Fallback rate
-    usdThbRate = 33.5;
-    rateLoaded = true;
-    document.getElementById("rateValue").textContent = usdThbRate.toFixed(2) + " (offline)";
-  }
+var snRateRequest=null;
+function snRestoreRate(){
+  try{var cached=JSON.parse(localStorage.getItem('sn_fx_usd_thb_v1')||'null');
+    if(cached&&Number.isFinite(cached.rate)&&cached.rate>0&&Date.now()-cached.savedAt<86400000){usdThbRate=cached.rate;rateLoaded=true;
+      document.getElementById('rateValue').textContent=usdThbRate.toFixed(2);
+      document.getElementById('rateTime').textContent='อัตราล่าสุดที่บันทึกไว้';return true;}
+  }catch(e){}return false;
 }
+function loadExchangeRate(){
+  if(snRateRequest)return snRateRequest;
+  snRateRequest=(async function(){
+    try{
+      var res=await snFetch('https://open.er-api.com/v6/latest/USD'),data=await res.json();
+      if(data.result!=='success'||!data.rates||!Number.isFinite(data.rates.THB)||data.rates.THB<=0)throw new Error('Invalid exchange rate');
+      usdThbRate=data.rates.THB;rateLoaded=true;
+      try{localStorage.setItem('sn_fx_usd_thb_v1',JSON.stringify({rate:usdThbRate,savedAt:Date.now()}));}catch(e){}
+      document.getElementById('rateValue').textContent=usdThbRate.toFixed(2);
+      document.getElementById('rateTime').textContent='updated: '+String(data.time_last_update_utc||'').substring(0,16);
+    }catch(e){
+      // Preserve a valid restored rate. Keep the existing offline estimate visibly labelled.
+      if(!rateLoaded){usdThbRate=33.5;rateLoaded=true;document.getElementById('rateValue').textContent=usdThbRate.toFixed(2)+' (offline)';}
+    }
+  })();return snRateRequest;
+}
+snRestoreRate();
 
 function toTHB(usd) {
   if (!rateLoaded || !usdThbRate) return "";
@@ -744,6 +752,7 @@ async function saveInvoice() {
           "&currency=" + encodeURIComponent(payload.currency);
         await snFetch(API + "?api=recordPayment&" + pp);
       } catch (e) { /* ledger add is best-effort; invoice is already saved */ }
+      snInvalidateFinance();
       toast("บันทึก " + parsedInvoice.invoiceId + " + ลงรายรับรายจ่ายแล้ว!");
       clearPreview();
     } else {
@@ -768,7 +777,7 @@ function toIsoDate(d) {
 // ============================================================
 // Load invoices list
 // ============================================================
-async function loadInvoices() {
+async function loadInvoices(force) {
   var container = document.getElementById("invList");
   if (!snPaint("invList", "sn_h_inv")) container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
 
@@ -779,8 +788,8 @@ async function loadInvoices() {
   if (monthF) params += "&month=" + monthF;
 
   try {
-    var res = await snFetch(API + "?" + params);
-    var data = await res.json();
+    var data=(await snGetFinanceBundle(force)).sections.listInvoices;
+    data={success:data.success,invoices:(data.invoices||[]).filter(function(inv){return (!typeF||inv.type===typeF)&&(!monthF||String(inv.date||'').substring(0,7)===monthF);})};
     if (!data.success) { container.innerHTML = '<div class="empty">' + (data.error || "Error") + '</div>'; return; }
 
     var invoices = data.invoices || [];
@@ -837,7 +846,7 @@ async function editInvoicePayment(id, total, currency, curPct) {
       })
     });
     var d = await res.json();
-    if (d.success) { toast("อัปเดตการชำระ " + id + " → " + pct + "%"); loadInvoices(); }
+    if (d.success) { toast("อัปเดตการชำระ " + id + " → " + pct + "%"); loadInvoices(true); }
     else toast(d.error || "เกิดข้อผิดพลาด");
   } catch (e) { toast(e.message); }
 }
@@ -856,7 +865,7 @@ async function deleteInvoice(id) {
     var data = await res.json();
     if (data.success) {
       toast("ลบ " + id + " แล้ว");
-      loadInvoices();
+      loadInvoices(true);
     } else {
       toast(data.error || "Error");
     }
@@ -984,23 +993,43 @@ async function exportReport(){
   if (btn) { btn.disabled = false; btn.textContent = "⬇ ดาวน์โหลดงบ (P&L)"; }
 }
 
+var snFinanceData=null,snFinanceSavedAt=0,snFinanceRequest=null,snFinanceGeneration=0;
+function snInvalidateFinance(){snCashflowVersion++;snFinanceGeneration++;snFinanceData=null;snFinanceSavedAt=0;snFinanceRequest=null;window.snFinanceReady=null;}
+function snGetFinanceBundle(force){
+  if(force)snInvalidateFinance();
+  if(snFinanceData&&Date.now()-snFinanceSavedAt<60000)return Promise.resolve(snFinanceData);
+  if(snFinanceRequest)return snFinanceRequest;
+  var generation=snFinanceGeneration;
+  var initial=window.snFinanceReady;window.snFinanceReady=null;
+  var request=initial||snApiGet('financeBundle',{token:sessionStorage.getItem('sn_token'),fresh:force?'1':undefined});
+  snFinanceRequest=Promise.resolve(request).then(function(bundle){
+    var sections=bundle.sections||{};
+    if(!sections.listPayments||!sections.listInvoices||!sections.cashflowSummary)throw new Error('โหลดข้อมูลไม่ครบ กรุณาลองอีกครั้ง');
+    if(generation!==snFinanceGeneration)throw new Error('Financial snapshot superseded');snFinanceData=bundle;snFinanceSavedAt=Date.now();return bundle;
+  }).finally(function(){if(generation===snFinanceGeneration)snFinanceRequest=null;});
+  return snFinanceRequest;
+}
 var snCashflowVersion=0;
-async function loadCashflow() {
+async function loadCashflow(force) {
+  var bundleRequest=snGetFinanceBundle(force);
   var requestVersion=++snCashflowVersion;
   var grid = document.getElementById("cfGrid");
   // Instant paint from cache (SWR); fall back to spinner only on first-ever load.
-  snPaint("cfSummary", "sn_h_cfsum_v47");
+  if(!snPaint("cfSummary", "sn_h_cfsum_v47")){["cfIncome","cfExpense","cfProfit","cfUnpaid"].forEach(function(id){document.getElementById(id).textContent="—";});}
   if (!snPaint("cfGrid", "sn_h_cfgrid")) grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
-  var ratePromise=rateLoaded?Promise.resolve():loadExchangeRate();
+  var ratePromise=loadExchangeRate();
 
   try {
     // Fetch the financial snapshot once; exchange-rate lookup runs in parallel.
     var yearF = document.getElementById("cfYear").value;
-    var tok = sessionStorage.getItem("sn_token");
-    var results=await Promise.all([snApiGet('financeBundle',{token:tok,year:yearF}),ratePromise]);
-    var bundle=results[0];
-    var sections=bundle.sections||{};
-    if(!sections.listPayments||!sections.listInvoices||!sections.cashflowSummary)throw new Error('โหลดข้อมูลไม่ครบ กรุณาลองอีกครั้ง');
+    var rateBefore=usdThbRate;
+    var bundle=await bundleRequest;
+    var sections=bundle.sections;
+    var paymentsForRate=Array.isArray(sections.listPayments)?sections.listPayments:(sections.listPayments.payments||[]);
+    var needsRate=paymentsForRate.some(function(p){return p.currency==='USD';})||(sections.listInvoices.invoices||[]).some(function(inv){return inv.currency==='USD'&&Number(inv.balanceDue)>0;});
+    // THB-only snapshots never wait for a separate FX service. USD totals use a valid saved rate or await FX.
+    if(needsRate&&!rateLoaded)await ratePromise;
+    rateBefore=usdThbRate;
     if(requestVersion!==snCashflowVersion)return;
     var R=[sections.listPayments,sections.cashflowSummary,sections.listInvoices];
     var data = R[0];
@@ -1016,6 +1045,8 @@ async function loadCashflow() {
       if (yfUnpaid) { var ym = String(inv.date || "").match(/(\d{4})/); if (!ym || ym[1] !== yfUnpaid) return; }
       totalUnpaid += amtThb(bal, inv.currency);
     });
+
+    if(needsRate)ratePromise.then(function(){if(requestVersion===snCashflowVersion&&usdThbRate!==rateBefore&&currentTab==='cashflow')loadCashflow();});
 
     // Group payments by period
     var groups = {};
@@ -1136,13 +1167,12 @@ var _cfRows = [];  // last cashflow summary rows (for report export)
 function snPaint(id, key) { try { var h = sessionStorage.getItem(key); if (h) { document.getElementById(id).innerHTML = h; return true; } } catch (e) {} return false; }
 function snSave(id, key) { try { sessionStorage.setItem(key, document.getElementById(id).innerHTML); } catch (e) {} }
 
-async function loadPayments() {
+async function loadPayments(force) {
   var container = document.getElementById("payList");
   if (!snPaint("payList", "sn_h_pay")) container.innerHTML = '<div class="loading">กำลังโหลด...</div>';
 
   try {
-    var res = await snFetch(API + "?api=listPayments");
-    var data = await res.json();
+    var data = (await snGetFinanceBundle(force)).sections.listPayments;
     // API returns array directly OR {success,payments}
     if (Array.isArray(data)) {
       allPayments = data;
@@ -1208,6 +1238,7 @@ function renderPayments() {
 }
 
 function showPaymentForm(editData) {
+  loadProductList().then(function(){if(editData&&document.getElementById("payEditRow").value===String(editData.row))document.getElementById("payProductModel").value=editData.productModel||"";});
   document.getElementById("payFormArea").style.display = "";
   clearSlip();
   if (editData) {
@@ -1241,13 +1272,14 @@ function hidePaymentForm() {
   document.getElementById("payFormArea").style.display = "none";
 }
 
-async function loadProductList() {
-  snFetch(API + "?api=getProducts").then(function(r){ return r.json(); }).then(function(d) {
-    if (d.success && d.products) {
-      productList = d.products.map(function(p){ return { name: p.name, type: p.type, tab: p.tabName, sellPrice: p.sellPrice }; });
-      populateProductDropdown();
-    }
-  }).catch(function(e){ console.warn("loadProductList error", e); });
+var snProductRequest=null,snProductsLoaded=false;
+function loadProductList(){
+  if(snProductsLoaded)return Promise.resolve();if(snProductRequest)return snProductRequest;
+  snProductRequest=snFetch(API+'?api=getProducts').then(function(r){return r.json();}).then(function(d){
+    if(!d.success||!d.products)throw new Error(d.error||'Products unavailable');
+    productList=d.products.map(function(p){return {name:p.name,type:p.type,tab:p.tabName,sellPrice:p.sellPrice};});
+    snProductsLoaded=true;populateProductDropdown();
+  }).catch(function(e){console.warn('loadProductList error',e);}).finally(function(){snProductRequest=null;});return snProductRequest;
 }
 
 function onProductModelChange() {
@@ -1348,6 +1380,7 @@ function driveThumb(url) {
 function populateProductDropdown() {
   var sel = document.getElementById("payProductModel");
   if (!sel) return;
+  var selected=sel.value;
   sel.innerHTML = '<option value="">เลือกรุ่น...</option>';
   productList.forEach(function(p) {
     var opt = document.createElement("option");
@@ -1355,6 +1388,7 @@ function populateProductDropdown() {
     opt.textContent = p.name + " (" + p.type + ")";
     sel.appendChild(opt);
   });
+  sel.value=selected;
 }
 
 function onCategoryChange() {
@@ -1397,7 +1431,7 @@ async function savePayment() {
       var d0 = await res0.json();
       if (d0.success) {
         toast(d0.imageUrl === "upload_error" ? "บันทึกแล้ว (แต่อัปโหลดสลิปไม่สำเร็จ)" : "เพิ่มรายจ่าย + แนบสลิปแล้ว");
-        clearSlip(); hidePaymentForm(); loadPayments();
+        clearSlip(); hidePaymentForm(); loadPayments(true);
         slipHandled = true;
       } else if (!/unknown action/i.test(d0.error || "")) {
         toast(d0.error || "เกิดข้อผิดพลาด");
@@ -1425,7 +1459,7 @@ async function savePayment() {
     if (data.success) {
       toast(editRow ? "แก้ไขสำเร็จ" : "เพิ่มรายการสำเร็จ");
       hidePaymentForm();
-      loadPayments();
+      loadPayments(true);
     } else {
       toast(data.error || "เกิดข้อผิดพลาด");
     }
@@ -1449,7 +1483,7 @@ async function deletePaymentRow(row) {
     var data = await res.json();
     if (data.success) {
       toast("ลบรายการแล้ว");
-      loadPayments();
+      loadPayments(true);
     } else {
       toast(data.error || "Error");
     }
@@ -1470,11 +1504,10 @@ function toast(msg) {
 }
 
 // ============================================================
-// Init — load exchange rate first, then cashflow
+// Init — only the financial snapshot is required for first paint
 // ============================================================
 (async function() {
   loadCashflow();
- loadProductList();
 })();
 </script>
 </body>

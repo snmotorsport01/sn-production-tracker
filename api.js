@@ -30,7 +30,7 @@ window.snFetch=function(input,options){
   return promise.then(function(r){return r.clone();});
 };
 window.snApiGet=async function(name,params){
-  var base=window.API||window.API_URL,url=new URL(base);url.searchParams.set('api',name);Object.keys(params||{}).forEach(function(k){if(params[k]!==undefined&&params[k]!==null)url.searchParams.set(k,params[k]);});
+  var base=window.API||window.API_URL||'https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec',url=new URL(base);url.searchParams.set('api',name);Object.keys(params||{}).forEach(function(k){if(params[k]!==undefined&&params[k]!==null)url.searchParams.set(k,params[k]);});
   var response=await window.snFetch(url.href),data=await response.json();
   if(data&&data.success===false||data&&data.error)throw Object.assign(new Error(data.error||'Data unavailable'),{code:data.code});return data;
 };
@@ -38,10 +38,13 @@ function readUser(){try{return JSON.parse(sessionStorage.getItem('sn_user')||loc
 window.snAuthReady=(async function(){
   var page=location.pathname.split('/').pop()||'index.html';if(page==='login.html')return null;
   var token=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token'),user=readUser();if(!token||!user)return null;
-  if(Date.now()-Number(sessionStorage.getItem('sn_me_ts')||0)<300000&&sessionStorage.getItem('sn_perms'))return user;
+  if(page==='finance.html')window.snFinanceReady=window.snApiGet('financeBundle',{token:token});
+  if(page!=='finance.html'&&Date.now()-Number(sessionStorage.getItem('sn_me_ts')||0)<300000&&sessionStorage.getItem('sn_perms'))return user;
   try{
     var url='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec?api=authMe&token='+encodeURIComponent(token);
-    var r=await window.snFetch(url),d=await r.json();
+    var d;
+    if(page==='finance.html'){var initial=await window.snFinanceReady;d=initial.auth;}
+    if(!d){var r=await window.snFetch(url);d=await r.json();} // supports backend v30 during rollout
     if(!d.success){if([401,403,404].includes(d.code)){sessionStorage.clear();['sn_token','sn_user','sn_perms','sn_me_ts'].forEach(function(k){localStorage.removeItem(k);});location.replace('login.html');}return null;}
     var keep=!!localStorage.getItem('sn_token');sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));
     if(!d.permissions){var pr=await window.snFetch(url.split('?')[0]+'?api=getPermissions');var legacy=await pr.json();if(!legacy.permissions||legacy.success===false)throw new Error('Permissions unavailable');d.permissions=legacy.permissions;} // legacy backend only
@@ -49,6 +52,6 @@ window.snAuthReady=(async function(){
     sessionStorage.setItem('sn_me_ts',String(Date.now()));
     if(d.user.role!=='admin'&&!['index.html','hub.html'].includes(page)&&!(d.permissions&&d.permissions[d.user.role]||[]).includes(page)){location.replace('index.html');return null;}
     window.dispatchEvent(new Event('sn:auth'));return d.user;
-  }catch(err){return null;} // keep snapshots on transient failure; do not mark auth fresh
+  }catch(err){if(err.code===403){location.replace('index.html');return null;}if([401,404].includes(err.code)){sessionStorage.clear();['sn_token','sn_user','sn_perms','sn_me_ts'].forEach(function(k){localStorage.removeItem(k);});location.replace(err.code===403?'index.html':'login.html');}return null;} // keep snapshots on transient failure; do not mark auth fresh
 })();
 })();
