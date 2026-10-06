@@ -63,7 +63,7 @@ body{background:#08090b;color:#ecebe5;min-height:100vh;min-height:100dvh;display
 <body>
 <div class="login-container">
   <div class="brand">
-    <svg width="52" height="52" viewBox="0 0 40 40" fill="none" aria-label="SN"><rect x="1.5" y="1.5" width="37" height="37" rx="10" stroke="#cea24a" stroke-width="1.6"/><path d="M13 25c0-3 3-3 6-4.5S25 16 25 13m-12 1c0 3 3 3 6 4.5S25 24 25 27" stroke="#e4c77a" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <img class="login-monogram" src="sn-monogram.png" width="112" height="112" alt="SN Motorsports monogram" fetchpriority="high">
     <div class="wm">SN&nbsp;ERP</div>
     <div class="sub">Production &amp; Operations</div>
   </div>
@@ -90,7 +90,7 @@ body{background:#08090b;color:#ecebe5;min-height:100vh;min-height:100dvh;display
       <input type="hidden" id="loginPin">
     </div>
     <label class="remember"><input type="checkbox" id="keepLogin">จดจำการเข้าสู่ระบบ</label><button type="submit" class="btn-primary" id="loginBtn">เข้าสู่ระบบ</button>
-    <div class="online">● SYSTEM ONLINE</div>
+    <div class="online">ใช้บัญชีและ PIN ของคุณ</div>
   </form>
   <form id="registerForm" style="display:none" onsubmit="doRegister(event)">
     <div class="form-group">
@@ -126,24 +126,78 @@ body{background:#08090b;color:#ecebe5;min-height:100vh;min-height:100dvh;display
   </form>
   <p class="info-text" id="footerInfo">ใช้ PIN 4 หลักในการเข้าสู่ระบบ</p>
 </div>
-<div class="version-tag">SN ERP v3.0 · COMMAND DECK</div>
+<div class="version-tag">SN ERP · OPERATIONS LOUNGE</div>
 <script>
 var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';
-(function(){var t=sessionStorage.getItem('sn_token');if(t)window.location.href='index.html'})();
+
 function showTab(tab){var b=document.querySelectorAll('.tab-bar button');b[0].className=tab==='login'?'active':'';b[1].className=tab==='register'?'active':'';document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';hideMessages()}
 function hideMessages(){document.getElementById('errorMsg').style.display='none';document.getElementById('successMsg').style.display='none'}
 function showError(m){var e=document.getElementById('errorMsg');e.textContent=m;e.style.display='block';document.getElementById('successMsg').style.display='none'}
 function showSuccess(m){var e=document.getElementById('successMsg');e.textContent=m;e.style.display='block';document.getElementById('errorMsg').style.display='none'}
-function setupPinInputs(sel,hid){var d=document.querySelectorAll(sel);d.forEach(function(inp,i){inp.addEventListener('input',function(){if(this.value.length===1&&i<3)d[i+1].focus();collectPin(sel,hid)});inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&this.value===''&&i>0){d[i-1].focus();d[i-1].value='';collectPin(sel,hid)}});inp.addEventListener('paste',function(e){e.preventDefault();var p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').substring(0,4);for(var j=0;j<p.length&&j<4;j++)d[j].value=p[j];if(p.length>0)d[Math.min(p.length,3)].focus();collectPin(sel,hid)})})}
+function setupPinInputs(sel,hid){var d=document.querySelectorAll(sel);d.forEach(function(inp,i){inp.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'');if(this.value.length===1&&i<3)d[i+1].focus();collectPin(sel,hid)});inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&this.value===''&&i>0){d[i-1].focus();d[i-1].value='';collectPin(sel,hid)}});inp.addEventListener('paste',function(e){e.preventDefault();var p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').substring(0,4);for(var j=0;j<p.length&&j<4;j++)d[j].value=p[j];if(p.length>0)d[Math.min(p.length,3)].focus();collectPin(sel,hid)})})}
 function collectPin(sel,hid){var d=document.querySelectorAll(sel);var p='';d.forEach(function(x){p+=x.value});document.getElementById(hid).value=p}
 setupPinInputs('.pin-digit','loginPin');setupPinInputs('.reg-pin-digit','regPin');setupPinInputs('.reg-pin2-digit','regPin2');
-function doLogin(e){e.preventDefault();hideMessages();var u=document.getElementById('loginUser').value.trim();var p=document.getElementById('loginPin').value;if(!u){showError('กรุณาระบุชื่อผู้ใช้');return}if(p.length!==4){showError('กรุณาระบุ PIN 4 หลัก');return}var btn=document.getElementById('loginBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังเข้าสู่ระบบ...';fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_login',username:u,pin:p})}).then(function(r){return r.json()}).then(function(d){if(d.success){var keep=document.getElementById('keepLogin').checked;sessionStorage.setItem('sn_token',d.token);sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep){localStorage.setItem('sn_token',d.token);localStorage.setItem('sn_user',JSON.stringify(d.user));}try{sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var _done=false,_go=function(){if(_done)return;_done=true;window.location.href='index.html'},_tm=setTimeout(_go,2500);fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){clearTimeout(_tm);_go()})}else{showError(d.error||'เข้าสู่ระบบไม่สำเร็จ');btn.disabled=false;btn.textContent='เข้าสู่ระบบ'}}).catch(function(err){if(!window._snLoginRetried){window._snLoginRetried=true;setTimeout(function(){doLogin(e)},500);return;}showError('เชื่อมต่อเซิร์ฟเวอร์ช้า/ไม่ได้ ลองกดใหม่');btn.disabled=false;btn.textContent='เข้าสู่ระบบ'})}
-function doRegister(e){e.preventDefault();hideMessages();var u=document.getElementById('regUser').value.trim();var n=document.getElementById('regName').value.trim();var p=document.getElementById('regPin').value;var p2=document.getElementById('regPin2').value;if(!u){showError('กรุณาระบุชื่อผู้ใช้');return}if(!/^[a-zA-Z0-9_]+$/.test(u)){showError('ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษเท่านั้น');return}if(!n){showError('กรุณาระบุชื่อแสดง');return}if(p.length!==4){showError('กรุณาระบุ PIN 4 หลัก');return}if(p!==p2){showError('PIN ไม่ตรงกัน');return}var btn=document.getElementById('regBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังลงทะเบียน...';fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_register',username:u,name:n,pin:p,role:'operator'})}).then(function(r){return r.json()}).then(function(d){if(d.success){showSuccess('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');btn.disabled=false;btn.textContent='ลงทะเบียน';setTimeout(function(){showTab('login')},1500)}else{showError(d.error||'ลงทะเบียนไม่สำเร็จ');btn.disabled=false;btn.textContent='ลงทะเบียน'}}).catch(function(err){showError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: '+err.message);btn.disabled=false;btn.textContent='ลงทะเบียน'})}
+/* Login requests are bounded, never silently retried, and never cache credentials. */
+var loginBusy=false,registerBusy=false,authGeneration=0;
+function authRequest(payload,timeout){
+  var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},timeout||25000);
+  return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),signal:controller.signal,cache:'no-store'})
+    .then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.text();})
+    .then(function(text){try{return JSON.parse(text);}catch(e){throw Error('INVALID_AUTH_RESPONSE');}})
+    .finally(function(){clearTimeout(timer);});
+}
+function authMessage(err){return err.name==='AbortError'?'เซิร์ฟเวอร์ใช้เวลานานเกินไป กรุณาลองอีกครั้ง':err.message==='INVALID_AUTH_RESPONSE'?'ระบบเข้าสู่ระบบยังไม่พร้อม กรุณาให้ผู้ดูแลตรวจ deployment':'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาตรวจอินเทอร์เน็ตแล้วลองอีกครั้ง';}
+function clearAuth(){['sn_token','sn_user','sn_perms','sn_me_ts'].forEach(function(key){sessionStorage.removeItem(key);localStorage.removeItem(key);});}
+function saveLogin(d,keep){
+  if(!d.token||!d.user||!d.user.username||!d.user.role)throw Error('INVALID_AUTH_RESPONSE');
+  clearAuth();
+  sessionStorage.setItem('sn_token',d.token);sessionStorage.setItem('sn_user',JSON.stringify(d.user));sessionStorage.setItem('sn_me_ts',String(Date.now()));
+  if(d.permissions)sessionStorage.setItem('sn_perms',JSON.stringify(d.permissions));
+  if(keep){localStorage.setItem('sn_token',d.token);localStorage.setItem('sn_user',JSON.stringify(d.user));if(d.permissions)localStorage.setItem('sn_perms',JSON.stringify(d.permissions));}
+}
+async function doLogin(e){
+  e.preventDefault();if(loginBusy)return;hideMessages();
+  collectPin('.pin-digit','loginPin');
+  var u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPin').value;
+  if(!u){showError('กรุณาระบุชื่อผู้ใช้');return;}if(!/^\d{4}$/.test(p)){showError('กรุณาระบุ PIN ตัวเลข 4 หลัก');return;}
+  loginBusy=true;authGeneration++;var btn=document.getElementById('loginBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังเข้าสู่ระบบ…';
+  try{
+    var d=await authRequest({action:'auth_login',username:u,pin:p});
+    if(!d.success){showError(d.error||'เข้าสู่ระบบไม่สำเร็จ');return;}
+    saveLogin(d,document.getElementById('keepLogin').checked);
+    // Updated backend supplies permissions in the same login response. Legacy
+    // deployments still redirect immediately and refresh permissions on the Hub.
+    window.location.replace('index.html');
+  }catch(err){showError(authMessage(err));}
+  finally{loginBusy=false;btn.disabled=false;btn.textContent='เข้าสู่ระบบ';}
+}
+async function doRegister(e){
+  e.preventDefault();if(registerBusy)return;hideMessages();
+  collectPin('.reg-pin-digit','regPin');collectPin('.reg-pin2-digit','regPin2');
+  var u=document.getElementById('regUser').value.trim(),n=document.getElementById('regName').value.trim(),p=document.getElementById('regPin').value,p2=document.getElementById('regPin2').value;
+  if(!/^[a-zA-Z0-9_]+$/.test(u)){showError('ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษ ตัวเลข หรือ _');return;}
+  if(!n){showError('กรุณาระบุชื่อแสดง');return;}if(!/^\d{4}$/.test(p)){showError('กรุณาระบุ PIN ตัวเลข 4 หลัก');return;}if(p!==p2){showError('PIN ไม่ตรงกัน');return;}
+  registerBusy=true;authGeneration++;var btn=document.getElementById('regBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังลงทะเบียน…';
+  try{var d=await authRequest({action:'auth_register',username:u,name:n,pin:p,role:'operator'});if(d.success){showTab('login');showSuccess('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');document.getElementById('loginUser').value=u;}else showError(d.error||'ลงทะเบียนไม่สำเร็จ');}
+  catch(err){showError(authMessage(err));}finally{registerBusy=false;btn.disabled=false;btn.textContent='ลงทะเบียน';}
+}
+// Validate remembered tokens before redirecting; expired tokens must not bounce
+// between login and Hub. The form remains available during this background check.
+(async function(){
+  var t=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token'),raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');
+  if(!t||!raw)return;
+  var generation=authGeneration,controller=new AbortController(),timer=setTimeout(function(){controller.abort();},15000);
+  try{
+    var r=await fetch(API+'?api=authMe&token='+encodeURIComponent(t),{signal:controller.signal,cache:'no-store'}),d=await r.json();
+    if(generation!==authGeneration)return;
+    if(d.success&&d.user){sessionStorage.setItem('sn_token',t);sessionStorage.setItem('sn_user',JSON.stringify(d.user));sessionStorage.setItem('sn_me_ts',String(Date.now()));if(localStorage.getItem('sn_token'))localStorage.setItem('sn_user',JSON.stringify(d.user));var perms=localStorage.getItem('sn_perms');if(perms&&!sessionStorage.getItem('sn_perms'))sessionStorage.setItem('sn_perms',perms);location.replace('index.html');}
+    else if(d.code===401||d.code===403||d.code===404){clearAuth();showError('เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง');}
+  }catch(err){/* A network failure is not proof that the stored token is invalid. */}
+  finally{clearTimeout(timer);}
+})();
+
 </script>
 
-<script>
-// Keep Login auto-check
-(function(){var t=localStorage.getItem('sn_token');var u=localStorage.getItem('sn_user');if(t&&u){sessionStorage.setItem('sn_token',t);sessionStorage.setItem('sn_user',u);window.location.href='index.html';return;}})();
-window.addEventListener('DOMContentLoaded',function(){var p=document.querySelector('.logo-wrap p');var img=document.querySelector('.logo-wrap img');if(p&&img){img.style.width=p.offsetWidth+'px';}window.addEventListener('resize',function(){if(p&&img)img.style.width=p.offsetWidth+'px';});});</script>
+
 </body>
 </html>

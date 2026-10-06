@@ -1,11 +1,12 @@
 /* Shared Operations Lounge shell. Product content and API handlers remain per page. */
 (function(){
 'use strict';
+installTextReveal();
 var page=location.pathname.split('/').pop()||'index.html';if(page==='login.html')return;
 function stored(key){try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null');}catch(e){return null;}}
 var user=stored('sn_user');if(!user)return;document.body.classList.add('axis-lounge');
 var root=document.createElement('div');root.id='sn-axis-demo';
-root.innerHTML='<div class="sn-app sn-horizontal"><header class="sn-top"><div class="sn-brand sn-display">SN ERP<small>THE PERFORMANCE ARCHITECT</small></div><div class="sn-meta"><span class="sn-date"></span><button type="button" class="sn-action" data-glitch>ลอง Glitch</button><span class="sn-avatar" aria-label="ผู้ใช้"></span><button type="button" class="sn-action" data-logout>ออก</button></div></header><div class="sn-shell"><nav class="sn-side" aria-label="เมนู SN ERP"></nav><main class="sn-main"><div class="sn-heading"><div><div class="sn-eyebrow">OPERATIONS / <span data-breadcrumb></span></div><h2 class="sn-display" data-title></h2><p data-subtitle></p></div><button type="button" class="sn-action primary" data-primary hidden></button></div></main></div></div>';
+root.innerHTML='<div class="sn-app sn-horizontal"><header class="sn-top"><div class="sn-brand sn-display">SN ERP<small>THE PERFORMANCE ARCHITECT</small></div><div class="sn-meta"><span class="sn-date"></span><span class="sn-avatar" aria-label="ผู้ใช้"></span><button type="button" class="sn-action" data-logout>ออก</button></div></header><div class="sn-shell"><nav class="sn-side" aria-label="เมนู SN ERP"></nav><main class="sn-main"><div class="sn-heading"><div><div class="sn-eyebrow">OPERATIONS / <span data-breadcrumb></span></div><h2 class="sn-display" data-title></h2><p data-subtitle></p></div><button type="button" class="sn-action primary" data-primary hidden></button></div></main></div></div>';
 var main=root.querySelector('main'),nav=root.querySelector('nav'),app=root.querySelector('.sn-app');
 // Preserve dialogs as body-level overlays. Only visible page content enters the shell.
 Array.from(document.body.children).forEach(function(el){if(['SCRIPT','DIALOG'].indexOf(el.tagName)>=0||el.classList.contains('modal-bg')||el.classList.contains('confirm-overlay')||el.id==='confirm-overlay'||el.id==='deleteConfirm'||el.classList.contains('auth-bar'))return;main.appendChild(el);});
@@ -20,6 +21,19 @@ renderNav();window.addEventListener('focus',renderNav);window.addEventListener('
 var primary=root.querySelector('[data-primary]');if(page==='index.html'&&(user.role==='admin'||(stored('sn_perms')||defaults)[user.role]?.indexOf('production.html')>=0)){primary.hidden=false;primary.textContent='สร้าง Batch';primary.addEventListener('click',function(){location.href='production.html?create=1';});}
 if(page==='finance.html'){primary.hidden=false;primary.textContent='บันทึกรายจ่าย';primary.addEventListener('click',function(){window.switchTab('payments');window.showPaymentForm();document.getElementById('payType').value='expense';if(window.onPayTypeChange)window.onPayTypeChange();document.getElementById('payFormArea').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});});}
 if(page==='production.html'){primary.hidden=false;primary.textContent='สร้าง Batch';primary.addEventListener('click',function(){window.openCreateBatch();});if(new URLSearchParams(location.search).get('create')==='1')window.openCreateBatch();}
-root.querySelector('[data-glitch]').addEventListener('click',function(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;app.classList.remove('sn-flash');void app.offsetWidth;app.classList.add('sn-flash');setTimeout(function(){app.classList.remove('sn-flash');},550);});
 root.querySelector('[data-logout]').addEventListener('click',function(){if(window.snLogout){window.snLogout();return;}var token=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');if(window.API||window.API_URL)fetch(window.API||window.API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'auth_logout',token:token})}).catch(function(){});['sn_token','sn_user','sn_perms','sn_me_ts'].forEach(function(key){sessionStorage.removeItem(key);localStorage.removeItem(key);});location.href='login.html';});
+
+// Animate visible text when it first appears or its content changes. Never
+// scramble text or animate input fields; preserve readable DOM and reduced motion.
+function installTextReveal(){
+  var media=matchMedia('(prefers-reduced-motion: reduce)'),seen=new WeakMap(),queued=false;
+  var selector='.sn-display,.sn-heading p,.sn-eyebrow,.sn-nav,.sn-kpi label,.sn-value,.sn-row strong,.sn-row small,.sn-panel h3,.brand .wm,.brand .sub,.eyebrow,h1,h2,h3,.stat-val,.form-group label,.axis-media-history p';
+  function animate(el){if(media.matches)return;el.classList.remove('sn-text-enter');requestAnimationFrame(function(){el.classList.add('sn-text-enter');});}
+  var io=typeof IntersectionObserver==='function'?new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){animate(entry.target);io.unobserve(entry.target);}});}):null;
+  function scan(){queued=false;if(media.matches)return;document.querySelectorAll(selector).forEach(function(el){var value=el.textContent.trim();if(!value||seen.get(el)===value)return;seen.set(el,value);if(io)io.observe(el);else animate(el);});}
+  new MutationObserver(function(){if(!queued){queued=true;requestAnimationFrame(scan);}}).observe(document.body,{subtree:true,childList:true,characterData:true});
+  document.addEventListener('animationend',function(e){if(e.animationName==='sn-text-reveal')e.target.classList.remove('sn-text-enter');});
+  scan();
+}
+
 })();

@@ -23,3 +23,9 @@
 @media(max-width:740px){#sn-axis-demo #cfSummary{grid-template-columns:1fr!important}#sn-axis-demo .sn-kpi{padding:18px!important}}
 
 .axis-lounge>.admin-fab{display:none!important}#sn-axis-demo .sn-main>.container{max-width:none;width:100%;padding:0}
+
+/* Text arrival: automatic, brief, monochrome glitch. */
+.sn-text-enter{animation:sn-text-reveal .34s ease-out both}
+@keyframes sn-text-reveal{0%{opacity:0;transform:translateY(4px)}22%{opacity:.8;transform:translate(-1px,1px);text-shadow:1px 0 #bdbdbd66}35%{transform:translate(1px,0);text-shadow:-1px 0 #c9a84c55}48%{transform:translate(-.5px,0);text-shadow:none}100%{opacity:1;transform:none;text-shadow:none}}
+.login-monogram{width:112px;height:112px;object-fit:contain;display:block}.login-container{border-radius:28px}.login-container .tab-bar{border-radius:999px}.login-container .form-group input,.login-container .form-group select,.login-container .pin-input-row input,.login-container .btn-primary,.login-container .error-msg,.login-container .success-msg{border-radius:20px!important}
+@media(prefers-reduced-motion:reduce){.sn-text-enter{animation:none!important}}
