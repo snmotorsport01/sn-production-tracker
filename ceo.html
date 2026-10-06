@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<!--sn-me-->
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+
+<!--sn-perm-->
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}}}catch(e){}})();</script>
+
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0a0a0a">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SN ERP — Executive</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"system-ui","Segoe UI",Roboto,sans-serif;background:#0a0a0a;color:#e0e0e0;padding:16px;max-width:600px;margin:0 auto}
+.subtitle{color:#888;font-size:.82rem;margin-bottom:16px}
+/* period filter */
+.ceo-filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.ceo-filter select{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-radius:10px;padding:9px 12px;font-size:.85rem;font-family:inherit;min-height:42px}
+.ceo-refresh{background:#1a1a1a;border:1px solid #333;color:#aaa;border-radius:10px;padding:9px 14px;font-size:.8rem;cursor:pointer;font-family:inherit;min-height:42px}
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:#141414;border:1px solid #222;border-radius:14px;padding:16px;min-width:0}
+.kpi .cap{font-size:.7rem;letter-spacing:.06em;color:#8a8a8a;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+/* Numbers: clean tabular mono (NOT the wide display font) so values never wrap or overlap the ฿ sign. */
+.kpi .val,#sn-axis-demo .kpi .val{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace!important;font-size:1.3rem!important;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1.15;white-space:nowrap}
+.kpi .sub{font-size:.72rem;color:#8a8a8a;margin-top:6px}
+.kpi.hero .val,#sn-axis-demo .kpi.hero .val{font-size:1.42rem!important}
+.green{color:#68b09b!important}.red{color:#d18b87!important}.gold{color:#cea24a!important}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+/* section */
+.section{background:#141414;border:1px solid #222;border-radius:14px;padding:16px;margin-bottom:14px}
+.section h3{font-size:.95rem;font-weight:600;margin-bottom:4px}
+.section .hint{font-size:.72rem;color:#777;margin-bottom:14px}
+/* month bars */
+.mbar{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:.78rem}
+.mbar .mlabel{width:62px;color:#aaa;flex-shrink:0;font-variant-numeric:tabular-nums}
+.mbar .mtrack{flex:1;min-width:0}
+.mbar .seg{height:9px;border-radius:5px;margin:2px 0}
+.mbar .seg.inc{background:#68b09b}
+.mbar .seg.exp{background:#d18b87}
+.mbar .mval{width:92px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+/* category rows */
+.crow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.crow .cname{width:96px;flex-shrink:0;font-size:.8rem;color:#ccc}
+.crow .ctrack{flex:1;height:10px;background:#1e1e1e;border-radius:6px;overflow:hidden;min-width:0}
+.crow .cfill{height:100%;border-radius:6px;background:linear-gradient(90deg,#cea24a,#8a6f2f)}
+.crow .cval{width:98px;text-align:right;flex-shrink:0;font-size:.8rem;font-variant-numeric:tabular-nums;color:#ddd}
+.crow .cpct{width:42px;text-align:right;flex-shrink:0;font-size:.72rem;color:#888}
+.legend{display:flex;gap:16px;font-size:.72rem;color:#999;margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.loading,.empty{color:#777;font-size:.85rem;padding:14px 0;text-align:center}
+.foot-note{font-size:.68rem;color:#666;line-height:1.6;margin-top:6px}
+@media(min-width:620px){.kpi-grid{grid-template-columns:repeat(4,1fr)}body{max-width:980px}}
+</style>
+<link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="axis.js" defer></script>
+</head>
+<body>
+
+<div class="ceo-filter">
+  <select id="ceoYear" onchange="renderAll()"><option value="">ทุกปี</option></select>
+  <button class="ceo-refresh" onclick="loadCeo(true)">↻ รีเฟรช</button>
+  <span id="ceoStamp" class="subtitle" style="margin:0 0 0 auto"></span>
+</div>
+
+<div id="kpiTop" class="kpi-grid">
+  <div class="kpi hero"><div class="cap"><span class="dot" style="background:#68b09b"></span>รายรับรวม</div><div class="val" id="kRevenue">—</div><div class="sub" id="kRevenueSub">&nbsp;</div></div>
+  <div class="kpi hero"><div class="cap"><span class="dot" style="background:#cea24a"></span>กำไรสุทธิ</div><div class="val" id="kProfit">—</div><div class="sub" id="kMargin">&nbsp;</div></div>
+  <div class="kpi hero"><div class="cap"><span class="dot" style="background:#cea24a"></span>ROI</div><div class="val" id="kRoi">—</div><div class="sub">กำไร ÷ ต้นทุนรวม</div></div>
+  <div class="kpi hero"><div class="cap"><span class="dot" style="background:#cea24a"></span>ROAS</div><div class="val" id="kRoas">—</div><div class="sub" id="kRoasSub">รายรับ ÷ ค่าการตลาด</div></div>
+</div>
+
+<div id="kpiBot" class="kpi-grid">
+  <div class="kpi"><div class="cap">ค่าใช้จ่ายรวม</div><div class="val red" id="kExpense" style="font-size:1.25rem">—</div><div class="sub" id="kExpenseSub">&nbsp;</div></div>
+  <div class="kpi"><div class="cap">ค่าการตลาด</div><div class="val" id="kMkt" style="font-size:1.25rem">—</div><div class="sub" id="kMktSub">&nbsp;</div></div>
+  <div class="kpi"><div class="cap">ลูกหนี้คงค้าง (AR)</div><div class="val gold" id="kAr" style="font-size:1.25rem">—</div><div class="sub">ยอดค้างรับจาก Invoice</div></div>
+  <div class="kpi"><div class="cap">เก็บเงินแล้ว</div><div class="val green" id="kCollected" style="font-size:1.25rem">—</div><div class="sub" id="kCollectedSub">&nbsp;</div></div>
+</div>
+
+<div class="section">
+  <h3>กำไรรายเดือน</h3>
+  <div class="hint">รายรับ (เขียว) เทียบ รายจ่าย (แดง) ต่อเดือน</div>
+  <div id="monthChart"><div class="loading">กำลังโหลด...</div></div>
+  <div class="legend"><span><span class="dot" style="background:#68b09b"></span>รายรับ</span><span><span class="dot" style="background:#d18b87"></span>รายจ่าย</span></div>
+</div>
+
+<div class="section">
+  <h3>รายจ่ายตามหมวด</h3>
+  <div class="hint">สัดส่วนค่าใช้จ่ายในช่วงที่เลือก</div>
+  <div id="catChart"><div class="loading">กำลังโหลด...</div></div>
+</div>
+
+<p class="foot-note" id="ceoNote"></p>
+
+<script>
+var API = "https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec";
+// pull token into session (keep-me)
+(function(){try{if(!sessionStorage.getItem("sn_token")&&localStorage.getItem("sn_token")){sessionStorage.setItem("sn_token",localStorage.getItem("sn_token"));sessionStorage.setItem("sn_user",localStorage.getItem("sn_user")||"");}}catch(e){}})();
+
+/* ---- currency helper (USD -> THB, mirrors finance.html) ---- */
+var usdThbRate = 36, rateLoaded = false;
+async function loadExchangeRate(){try{var r=await fetch("https://open.er-api.com/v6/latest/USD");var j=await r.json();if(j&&j.rates&&j.rates.THB){usdThbRate=j.rates.THB;rateLoaded=true;}}catch(e){}}
+function amtThb(a,c){a=Number(a)||0;if((c||"THB")==="USD"&&rateLoaded&&usdThbRate)return a*usdThbRate;return a;}
+
+/* ---- formatting ---- */
+function money(n){n=Math.round(Number(n)||0);return "฿"+n.toLocaleString("en-US");}
+function moneyK(n){n=Number(n)||0;if(Math.abs(n)>=1e6)return "฿"+(n/1e6).toFixed(2)+"M";if(Math.abs(n)>=1e3)return "฿"+Math.round(n/1e3)+"K";return "฿"+Math.round(n);}
+function pct(n){return (Number(n)||0).toFixed(1)+"%";}
+function catName(c){var m={product_sale:"ขายสินค้า",service:"บริการ",material:"วัตถุดิบ",shipping:"ค่าส่ง",salary:"เงินเดือน",marketing:"การตลาด",utility:"สาธารณูปโภค",other:"อื่นๆ","":"ไม่ระบุ"};return m[c]||c;}
+// Marketing/ad spend may be tagged with the English key OR a Thai label; match broadly so ROAS stays correct.
+function isMkt(c){c=String(c||"").toLowerCase();return c==="marketing"||c.indexOf("market")>=0||c.indexOf("โฆษณา")>=0||c.indexOf("ตลาด")>=0||c.indexOf("ads")>=0;}
+
+/* ---- SWR cache ---- */
+function cacheGet(k){try{var v=sessionStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
+function cacheSet(k,v){try{sessionStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+var RAW = { payments:[], invoices:[] };
+
+async function loadCeo(force){
+  // SWR: paint from cache instantly, then refresh
+  var cached = cacheGet("sn_ceo_raw");
+  if(cached && !force){ RAW = cached; buildYears(); renderAll(); }
+  if(!rateLoaded){ try{ await loadExchangeRate(); }catch(e){} }
+  try{
+    var tok = sessionStorage.getItem("sn_token") || "";
+    var R = await Promise.all([
+      fetch(API+"?api=listPayments").then(function(r){return r.json();}).catch(function(){return [];}),
+      fetch(API+"?api=listInvoices&token="+encodeURIComponent(tok)).then(function(r){return r.json();}).catch(function(){return {};})
+    ]);
+    var pay = Array.isArray(R[0]) ? R[0] : (R[0].payments || []);
+    var inv = (R[1] && R[1].invoices) ? R[1].invoices : [];
+    RAW = { payments: pay, invoices: inv };
+    cacheSet("sn_ceo_raw", RAW);
+    buildYears(); renderAll();
+    var now=new Date();document.getElementById("ceoStamp").textContent="อัปเดต "+now.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
+  }catch(err){
+    if(!RAW.payments.length){
+      document.getElementById("monthChart").innerHTML='<div class="empty">โหลดข้อมูลไม่ได้</div>';
+      document.getElementById("catChart").innerHTML='<div class="empty">'+(err.message||"error")+'</div>';
+    }
+  }
+}
+
+function buildYears(){
+  var set={};
+  RAW.payments.forEach(function(p){if(p.date)set[String(p.date).substring(0,4)]=true;});
+  var sel=document.getElementById("ceoYear");var cur=sel.value;
+  var years=Object.keys(set).sort().reverse();
+  if(!years.length){var ty=String(new Date().getFullYear());years=[ty];}
+  if(!cur) cur=years[0]; // default newest year
+  sel.innerHTML='<option value="">ทุกปี</option>'+years.map(function(y){return '<option value="'+y+'"'+(y===cur?' selected':'')+'>'+y+'</option>';}).join("");
+}
+
+function inYear(dateStr, yf){ if(!yf) return true; return String(dateStr||"").substring(0,4)===yf; }
+
+function renderAll(){
+  var yf = document.getElementById("ceoYear").value;
+
+  // ---- aggregate payments ----
+  var revenue=0, expense=0, marketing=0, byCat={}, months={};
+  RAW.payments.forEach(function(p){
+    if(!inYear(p.date, yf)) return;
+    var amt = amtThb(p.amount, p.currency);
+    var mk = String(p.date||"").substring(0,7);
+    if(!months[mk]) months[mk]={inc:0,exp:0};
+    if(p.type==="income"){ revenue+=amt; months[mk].inc+=amt; }
+    else {
+      expense+=amt; months[mk].exp+=amt;
+      var cn=catName(p.category||"");          // merge by display name (service + บริการ → one row)
+      byCat[cn]=(byCat[cn]||0)+amt;
+      if(isMkt(p.category)) marketing+=amt;
+    }
+  });
+
+  // ---- AR + collected from invoices ----
+  var unpaid=0, collected=0;
+  RAW.invoices.forEach(function(iv){
+    if(!inYear(iv.date, yf)) return;
+    if((iv.type||"income")!=="income") return;
+    var bal=amtThb(iv.balanceDue, iv.currency);
+    var paid=amtThb(iv.paid, iv.currency);
+    if(bal>0) unpaid+=bal;
+    collected+=paid;
+  });
+
+  var profit = revenue - expense;
+  var margin = revenue>0 ? profit/revenue*100 : 0;
+  var roi = expense>0 ? profit/expense*100 : 0;
+  var roas = marketing>0 ? revenue/marketing : null;
+  var collectRate = revenue>0 ? collected/revenue*100 : 0;
+  var mktPct = revenue>0 ? marketing/revenue*100 : 0;
+
+  // ---- KPI paint ----
+  set("kRevenue", money(revenue));
+  set("kProfit", money(profit)); el("kProfit").className = "val "+(profit>=0?"green":"red");
+  set("kMargin", "อัตรากำไรสุทธิ "+pct(margin));
+  set("kRoi", expense>0?pct(roi):"—"); el("kRoi").className="val "+(roi>=0?"green":"red");
+  set("kRoas", roas!==null?roas.toFixed(2)+"×":"—");
+  set("kRoasSub", roas!==null?("ทุก ฿1 ค่าตลาด → "+money(roas)+" รายรับ"):"ยังไม่มีค่าการตลาด");
+  set("kExpense", money(expense));
+  set("kMkt", money(marketing)); set("kMktSub", mktPct>0?("= "+pct(mktPct)+" ของรายรับ"):" ");
+  set("kAr", money(unpaid));
+  set("kCollected", money(collected)); set("kCollectedSub", revenue>0?("เก็บได้ "+pct(collectRate)):" ");
+
+  // ---- monthly chart ----
+  var mk = Object.keys(months).sort();
+  var maxM = 1; mk.forEach(function(k){maxM=Math.max(maxM,months[k].inc,months[k].exp);});
+  if(!mk.length){ el("monthChart").innerHTML='<div class="empty">ยังไม่มีข้อมูลในช่วงนี้</div>'; }
+  else {
+    el("monthChart").innerHTML = mk.map(function(k){
+      var m=months[k], inW=(m.inc/maxM*100).toFixed(1), exW=(m.exp/maxM*100).toFixed(1);
+      var lbl=k.substring(5)+"/"+k.substring(2,4);
+      var net=m.inc-m.exp;
+      return '<div class="mbar"><div class="mlabel">'+lbl+'</div><div class="mtrack">'+
+        '<div class="seg inc" style="width:'+inW+'%"></div><div class="seg exp" style="width:'+exW+'%"></div>'+
+        '</div><div class="mval '+(net>=0?"green":"red")+'">'+moneyK(net)+'</div></div>';
+    }).join("");
+  }
+
+  // ---- category chart ----
+  var cats = Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a];});
+  if(!cats.length || expense<=0){ el("catChart").innerHTML='<div class="empty">ยังไม่มีรายจ่าย</div>'; }
+  else {
+    var maxC = byCat[cats[0]]||1;
+    el("catChart").innerHTML = cats.map(function(c){
+      var v=byCat[c], w=(v/maxC*100).toFixed(1), p=(v/expense*100).toFixed(0);
+      return '<div class="crow"><div class="cname">'+catName(c)+'</div>'+
+        '<div class="ctrack"><div class="cfill" style="width:'+w+'%"></div></div>'+
+        '<div class="cval">'+money(v)+'</div><div class="cpct">'+p+'%</div></div>';
+    }).join("");
+  }
+
+  el("ceoNote").textContent = "ROI = กำไรสุทธิ ÷ ค่าใช้จ่ายรวม · ROAS = รายรับ ÷ ค่าการตลาด (หมวด “การตลาด”) · ยอด USD แปลงเป็นบาทที่เรต "+ (rateLoaded?usdThbRate.toFixed(2):"~"+usdThbRate) +" · ที่มา: Finance (Invoices/Payments)";
+}
+
+function el(id){return document.getElementById(id);}
+function set(id,v){var e=el(id);if(e)e.textContent=v;}
+
+loadCeo();
+setInterval(function(){ if(!document.hidden) loadCeo(true); }, 120000);
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) loadCeo(true); });
+</script>
+</body>
+</html>
