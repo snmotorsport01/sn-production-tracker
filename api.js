@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 var nativeFetch=window.fetch.bind(window),pending=new Map();
-var reads=new Set(['hubBundle','financeBundle','ceoBundle','costBundle','listBatches','getBatch','getStats','listInventory','listBOM','listPODrafts','listPayments','getCashFlow','listCashflow','listInvoices','getInvoice','cashflowSummary','getProducts','getCostData','getPermissions','authMe','authVerify','authListUsers','batchHistory','n8nHealth','n8nGetAll','n8nGetChanges','n8nSyncStatus']);
+var reads=new Set(['hubBundle','financeBundle','ceoBundle','costBundle','listBatches','getBatch','getStats','listInventory','listBOM','listPODrafts','listPayments','getCashFlow','listCashflow','listInvoices','getInvoice','cashflowSummary','getProducts','getCostData','getPermissions','authMe','authVerify','authListUsers','batchHistory','listWarranties','getWarranty','sync','n8nHealth','n8nGetAll','n8nGetChanges','n8nSyncStatus']);
 window.snApiMetrics=[];
 window.snFetch=function(input,options){
   options=options||{};var url=new URL(typeof input==='string'?input:input.url,location.href),method=(options.method||'GET').toUpperCase(),api=url.searchParams.get('api')||'';

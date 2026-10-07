@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<!--sn-me-->
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+<!--sn-perm-->
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}}}catch(e){}})();</script>
+
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0a0a0a">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SN ERP — Warranty</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"system-ui","Segoe UI",Roboto,sans-serif;background:#0a0a0a;color:#e0e0e0;padding:16px;max-width:600px;margin:0 auto}
+.subtitle{color:#888;font-size:.82rem;margin-bottom:16px}
+.w-filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.w-filter input{flex:1;min-width:160px;background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-radius:12px;padding:11px 14px;font-size:.9rem;font-family:inherit;min-height:44px}
+.w-refresh{background:#1a1a1a;border:1px solid #333;color:#aaa;border-radius:12px;padding:10px 14px;font-size:.8rem;cursor:pointer;font-family:inherit;min-height:44px}
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:#141414;border:1px solid #222;border-radius:14px;padding:14px;min-width:0}
+.kpi .cap{font-size:.68rem;letter-spacing:.05em;color:#8a8a8a;text-transform:uppercase}
+.kpi .val{font-size:1.4rem;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums;font-family:'IBM Plex Mono',ui-monospace,monospace}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{padding:9px 15px;background:#1a1a1a;border:1px solid #333;border-radius:999px;color:#aaa;cursor:pointer;font-size:.82rem;font-family:inherit;min-height:40px}
+.tab.active{background:#ffffff10;color:#fff;border-color:#ffffff30}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:600}
+.b-active{background:rgba(104,176,155,.12);color:#68b09b;border:1px solid rgba(104,176,155,.28)}
+.b-expiring{background:rgba(203,169,107,.12);color:#cba96b;border:1px solid rgba(203,169,107,.28)}
+.b-expired{background:rgba(209,139,135,.12);color:#cf9d94;border:1px solid rgba(209,139,135,.28)}
+.b-claim{background:rgba(147,170,196,.12);color:#93aac4;border:1px solid rgba(147,170,196,.28)}
+.wcard{background:#141414;border:1px solid #222;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
+.wcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.wcard .name{font-weight:600;font-size:.98rem}
+.wcard .meta{font-size:.76rem;color:#888;margin-top:3px;line-height:1.5}
+.wcard .count{text-align:right;flex-shrink:0}
+.wcard .days{font-family:'IBM Plex Mono',ui-monospace,monospace;font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.wcard .days small{display:block;font-size:.66rem;color:#888;font-weight:400;font-family:inherit}
+.loading,.empty{color:#777;font-size:.85rem;padding:24px 0;text-align:center}
+.foot-note{font-size:.68rem;color:#666;line-height:1.6;margin-top:10px}
+/* detail panel */
+.w-detail{position:fixed;inset:0;z-index:50;background:#0009;backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:28px 14px;overflow:auto}
+.w-detail.open{display:flex}
+.w-detail-inner{background:#161616;border:1px solid #ffffff22;border-radius:20px;max-width:520px;width:100%;padding:20px}
+.w-detail h3{font-size:1.05rem;margin-bottom:2px}
+.w-detail .dmeta{font-size:.8rem;color:#999;line-height:1.7;margin:10px 0 16px}
+.w-detail .dmeta b{color:#ddd}
+.dclose{float:right;background:#1a1a1a;border:1px solid #333;color:#aaa;border-radius:999px;width:34px;height:34px;cursor:pointer;font-size:1rem}
+.claim{border:1px solid #ffffff18;border-radius:12px;padding:12px;margin-bottom:10px;background:#191919}
+.claim .ch{display:flex;justify-content:space-between;gap:8px;font-size:.78rem;color:#aaa}
+.claim .ci{font-size:.9rem;margin:6px 0}
+.claim .cr{font-size:.8rem;color:#9fd0bf}
+.addclaim{margin-top:16px;border-top:1px solid #ffffff14;padding-top:14px}
+.addclaim label{display:block;font-size:.76rem;color:#999;margin:8px 0 4px}
+.addclaim textarea,.addclaim select{width:100%;background:#111;color:#e0e0e0;border:1px solid #333;border-radius:12px;padding:10px;font-size:.9rem;font-family:inherit}
+.addclaim textarea{min-height:60px;resize:vertical}
+.btn{display:block;width:100%;padding:13px;border-radius:12px;font-size:.95rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;margin-top:12px;background:#cea24a;color:#0a0a0a}
+.btn:disabled{opacity:.5}
+@media(min-width:620px){.kpi-grid{grid-template-columns:repeat(4,1fr)}body{max-width:960px}}
+</style>
+<link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="api.js"></script>
+<script src="store.js"></script>
+<script src="axis.js" defer></script>
+</head>
+<body>
+
+<div class="w-filter">
+  <input id="wSearch" type="search" placeholder="ค้นหา ชื่อ / เบอร์ / Serial / รุ่น" oninput="renderList()">
+  <button class="w-refresh" onclick="loadWarranty(true)">↻ รีเฟรช</button>
+  <span id="wStamp" class="subtitle" style="margin:0 0 0 auto"></span>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="cap">ลงทะเบียนทั้งหมด</div><div class="val" id="kTotal">—</div></div>
+  <div class="kpi"><div class="cap">ประกันใช้ได้</div><div class="val b-active" id="kActive" style="color:#68b09b">—</div></div>
+  <div class="kpi"><div class="cap">ใกล้หมด (≤30 วัน)</div><div class="val" id="kExpiring" style="color:#cba96b">—</div></div>
+  <div class="kpi"><div class="cap">เคลมที่ยังเปิด</div><div class="val" id="kClaims" style="color:#93aac4">—</div></div>
+</div>
+
+<div class="tabs" id="wTabs">
+  <button class="tab active" data-f="all" onclick="setFilter('all')">ทั้งหมด</button>
+  <button class="tab" data-f="active" onclick="setFilter('active')">ใช้ได้</button>
+  <button class="tab" data-f="expiring" onclick="setFilter('expiring')">ใกล้หมด</button>
+  <button class="tab" data-f="expired" onclick="setFilter('expired')">หมดแล้ว</button>
+  <button class="tab" data-f="claims" onclick="setFilter('claims')">มีเคลม</button>
+</div>
+
+<div id="wList"><div class="loading">กำลังโหลด...</div></div>
+<p class="foot-note" id="wNote"></p>
+
+<!-- detail -->
+<div class="w-detail" id="wDetail"><div class="w-detail-inner" id="wDetailInner"></div></div>
+
+<script>
+var API = "https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec";
+(function(){try{if(!sessionStorage.getItem("sn_token")&&localStorage.getItem("sn_token")){sessionStorage.setItem("sn_token",localStorage.getItem("sn_token"));sessionStorage.setItem("sn_user",localStorage.getItem("sn_user")||"");}}catch(e){}})();
+var WARRANTY_MONTHS = 12;   // ประกัน 1 ปี นับจากวันลงทะเบียน
+var ITEMS = [], curFilter = 'all';
+
+function tok(){return sessionStorage.getItem("sn_token")||localStorage.getItem("sn_token")||"";}
+function el(id){return document.getElementById(id);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function fmtDate(d){ if(!d)return "—"; var x=new Date(d); if(isNaN(x))return String(d); return x.toLocaleDateString("th-TH",{day:"2-digit",month:"short",year:"numeric"}); }
+function num(id,v){var e=el(id);if(!e)return;if(window.snCountUp)snCountUp(e,v,function(n){return String(Math.round(n));});else e.textContent=v;}
+
+// Compute warranty status from the registration timestamp (client-side so the
+// countdown stays live each day without refetching).
+function wStatus(registerDate){
+  var start=new Date(registerDate);
+  if(isNaN(start)) return {days:null,status:'unknown',expiry:null};
+  var exp=new Date(start); exp.setMonth(exp.getMonth()+WARRANTY_MONTHS);
+  var days=Math.ceil((exp.getTime()-Date.now())/86400000);
+  var st = days<0?'expired':(days<=30?'expiring':'active');
+  return {days:days,status:st,expiry:exp};
+}
+function statusBadge(st){
+  var m={active:['b-active','ใช้ได้'],expiring:['b-expiring','ใกล้หมด'],expired:['b-expired','หมดประกัน'],unknown:['b-expired','ไม่ทราบวันที่']};
+  var c=m[st]||m.unknown; return '<span class="badge '+c[0]+'">'+c[1]+'</span>';
+}
+
+async function loadWarranty(force){
+  // local-first: paint cached snapshot instantly, then refresh (warranty has no
+  // epoch domain yet → TTL refresh; GPT can add a 'warranty' domain later).
+  try{ var snap = window.snStore ? await snStore.get('warranty') : null;
+    if(snap && snap.data && !force){ ITEMS = snap.data; renderKPIs(); renderList(); stamp(snap.savedAt,true); } }catch(e){}
+  try{
+    var r = await (window.snApiGet ? snApiGet('listWarranties',{token:tok(),fresh:force?'1':undefined}) : fetch(API+'?api=listWarranties&token='+encodeURIComponent(tok())).then(function(x){return x.json();}));
+    var items = (r && r.items) ? r.items : (Array.isArray(r)?r:[]);
+    if(!r || r.success===false) throw new Error((r&&r.error)||'โหลดไม่สำเร็จ');
+    ITEMS = items;
+    try{ if(window.snStore) await snStore.put('warranty', ITEMS, null); }catch(e){}
+    renderKPIs(); renderList(); stamp(Date.now(),false);
+  }catch(err){
+    if(!ITEMS.length){
+      el('wList').innerHTML = '<div class="empty">ยังเชื่อมต่อระบบประกันไม่ได้<br><span style="font-size:.76rem;color:#666">('+esc(err.message||'backend ยังไม่พร้อม')+') — สร้าง Google Form + ตั้งค่า backend ก่อน</span></div>';
+    }
+  }
+}
+function stamp(ts,cached){try{el('wStamp').textContent=(cached?"แคช ":"อัปเดต ")+new Date(ts||Date.now()).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});}catch(e){}}
+
+function renderKPIs(){
+  var total=ITEMS.length, active=0, expiring=0, openClaims=0;
+  ITEMS.forEach(function(it){ var s=wStatus(it.registerDate); if(s.status==='active')active++; else if(s.status==='expiring')expiring++; openClaims += (it.openClaims||0); });
+  num('kTotal',total); num('kActive',active); num('kExpiring',expiring); num('kClaims',openClaims);
+}
+
+function setFilter(f){ curFilter=f; document.querySelectorAll('#wTabs .tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-f')===f);}); renderList(); }
+
+function renderList(){
+  var q=(el('wSearch').value||'').trim().toLowerCase();
+  var rows = ITEMS.map(function(it){ return Object.assign({},it,{_s:wStatus(it.registerDate)}); });
+  rows = rows.filter(function(it){
+    if(curFilter==='claims'){ if(!(it.claimCount>0)) return false; }
+    else if(curFilter!=='all' && it._s.status!==curFilter) return false;
+    if(q){ var hay=(it.customer+' '+it.phone+' '+it.serial+' '+it.model+' '+(it.warrantyId||'')).toLowerCase(); if(hay.indexOf(q)<0) return false; }
+    return true;
+  });
+  // sort: expiring soonest first, expired last
+  rows.sort(function(a,b){ var da=a._s.days==null?1e9:a._s.days, db=b._s.days==null?1e9:b._s.days; return da-db; });
+  if(!rows.length){ el('wList').innerHTML='<div class="empty">ไม่พบรายการ</div>'; return; }
+  el('wList').innerHTML = rows.map(function(it){
+    var s=it._s, daysTxt = s.days==null?'—':(s.days<0?('หมดแล้ว '+Math.abs(s.days)+' วัน'):(s.days+' วัน'));
+    return '<div class="wcard" onclick="openDetail(\''+esc(it.warrantyId)+'\')">'
+      +'<div class="top"><div><div class="name">'+esc(it.model||'-')+' · '+esc(it.customer||'-')+'</div>'
+      +'<div class="meta">'+(it.serial?('S/N '+esc(it.serial)+' · '):'')+esc(it.phone||'')+'<br>ลงทะเบียน '+fmtDate(it.registerDate)+' → หมด '+fmtDate(s.expiry)
+      +(it.claimCount>0?(' · <span style="color:#93aac4">เคลม '+it.claimCount+'</span>'):'')+'</div></div>'
+      +'<div class="count"><div class="days" style="color:'+(s.status==='expired'?'#cf9d94':s.status==='expiring'?'#cba96b':'#68b09b')+'">'+daysTxt+'</div><small>'+(s.status==='expired'?'สถานะ':'เหลือ')+'</small>'+statusBadge(s.status)+'</div></div>'
+      +'</div>';
+  }).join('');
+}
+
+var curId=null;
+async function openDetail(id){
+  curId=id; var it=ITEMS.filter(function(x){return x.warrantyId===id;})[0]; if(!it)return;
+  var s=wStatus(it.registerDate);
+  el('wDetailInner').innerHTML='<button class="dclose" onclick="closeDetail()">×</button>'
+    +'<h3>'+esc(it.model||'-')+'</h3>'+statusBadge(s.status)
+    +'<div class="dmeta"><b>'+esc(it.customer||'-')+'</b> · '+esc(it.phone||'')+(it.email?(' · '+esc(it.email)):'')+'<br>'
+    +(it.serial?('S/N: <b>'+esc(it.serial)+'</b><br>'):'')
+    +'ลงทะเบียน: <b>'+fmtDate(it.registerDate)+'</b><br>'
+    +'หมดประกัน: <b>'+fmtDate(s.expiry)+'</b> ('+(s.days==null?'—':s.days<0?('หมดแล้ว '+Math.abs(s.days)+' วัน'):('เหลือ '+s.days+' วัน'))+')<br>'
+    +(it.purchaseDate?('วันที่ซื้อ: '+fmtDate(it.purchaseDate)+'<br>'):'')
+    +(it.dealer?('ร้าน: '+esc(it.dealer)+'<br>'):'')
+    +(it.receiptUrl?('<a href="'+esc(it.receiptUrl)+'" target="_blank" style="color:#cea24a">ดูรูปใบเสร็จ/สินค้า</a>'):'')
+    +'</div>'
+    +'<div id="claimList"><div class="loading">กำลังโหลดประวัติเคลม...</div></div>'
+    +'<div class="addclaim"><h3 style="font-size:.95rem">บันทึกเคลมใหม่</h3>'
+    +'<label>อาการ/ปัญหา</label><textarea id="clIssue" placeholder="เช่น ผิวลอก, น็อตหลวม..."></textarea>'
+    +'<label>สถานะ</label><select id="clStatus"><option value="received">รับเรื่อง</option><option value="processing">กำลังเคลม</option><option value="resolved">เสร็จสิ้น</option><option value="rejected">ปฏิเสธ</option></select>'
+    +'<label>โน้ต/ผลเคลม (ถ้ามี)</label><textarea id="clNotes" placeholder="รายละเอียดเพิ่มเติม / การแก้ไข"></textarea>'
+    +'<button class="btn" id="clBtn" onclick="submitClaim()">บันทึกเคลม</button></div>';
+  el('wDetail').classList.add('open');
+  loadClaims(id);
+}
+function closeDetail(){ el('wDetail').classList.remove('open'); curId=null; }
+el('wDetail').addEventListener('click',function(e){ if(e.target===el('wDetail')) closeDetail(); });
+
+async function loadClaims(id){
+  try{
+    var r = await (window.snApiGet ? snApiGet('getWarranty',{token:tok(),id:id}) : fetch(API+'?api=getWarranty&token='+encodeURIComponent(tok())+'&id='+encodeURIComponent(id)).then(function(x){return x.json();}));
+    var claims = (r && r.claims) ? r.claims : [];
+    var cl = el('claimList'); if(!cl)return;
+    if(!claims.length){ cl.innerHTML='<div class="empty" style="padding:12px 0">ยังไม่มีประวัติเคลม</div>'; return; }
+    var stMap={received:'รับเรื่อง',processing:'กำลังเคลม',resolved:'เสร็จสิ้น',rejected:'ปฏิเสธ'};
+    cl.innerHTML = '<div style="font-size:.78rem;color:#999;margin-bottom:8px">ประวัติเคลม ('+claims.length+')</div>'+claims.map(function(c){
+      return '<div class="claim"><div class="ch"><span>'+fmtDate(c.date)+(c.by?(' · '+esc(c.by)):'')+'</span><span>'+esc(stMap[c.status]||c.status||'')+'</span></div>'
+        +'<div class="ci">'+esc(c.issue||'')+'</div>'+(c.resolution||c.notes?('<div class="cr">'+esc(c.resolution||c.notes)+'</div>'):'')
+        +(c.imageUrl?(' <a href="'+esc(c.imageUrl)+'" target="_blank" style="color:#cea24a;font-size:.78rem">ดูรูป</a>'):'')+'</div>';
+    }).join('');
+  }catch(e){ var cl=el('claimList'); if(cl)cl.innerHTML='<div class="empty" style="padding:12px 0">โหลดประวัติเคลมไม่ได้</div>'; }
+}
+
+async function submitClaim(){
+  var issue=(el('clIssue').value||'').trim();
+  if(!issue){ el('clIssue').focus(); return; }
+  var btn=el('clBtn'); btn.disabled=true; btn.textContent='กำลังบันทึก...';
+  try{
+    var payload={action:'add_claim',token:tok(),warrantyId:curId,issue:issue,status:el('clStatus').value,notes:(el('clNotes').value||'').trim()};
+    var res=await (window.snFetch?snFetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}):fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}));
+    var d=await res.json();
+    if(d&&d.success){ el('clIssue').value='';el('clNotes').value=''; loadClaims(curId); loadWarranty(true); }
+    else throw new Error((d&&d.error)||'บันทึกไม่สำเร็จ');
+  }catch(e){ alert('บันทึกเคลมไม่สำเร็จ: '+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent='บันทึกเคลม'; }
+}
+
+el('wNote').textContent='ประกัน '+WARRANTY_MONTHS+' เดือน นับจากวันลงทะเบียน (Google Form) · นับถอยหลังคำนวณสดทุกวัน';
+loadWarranty();
+setInterval(function(){ if(!document.hidden) loadWarranty(); }, 300000);
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) loadWarranty(); });
+</script>
+</body>
+</html>
