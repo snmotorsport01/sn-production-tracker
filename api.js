@@ -7,25 +7,36 @@ window.snApiMetrics=[];
 /* Latency instrumentation (best-effort; must never affect a request). Persisted
    ring buffer across page loads so p50/p95/cold-warm can be read over several
    periods: snMetrics.table() in the console. No tokens/PINs/payloads are stored. */
-var snSeen={},SN_MBUF='sn_metrics_v1',SN_MCAP=600;
+var snSeen={},SN_MBUF='sn_metrics_v1',SN_MCAP=600,SN_MSR='sn_metrics_sample';
+// Fraction of backend GET reads that opt in to server-side timing (?metrics=1).
+// Sampled, not always-on, so the extra server re-serialize stays off most requests.
+function snSampleRate(){try{var v=parseFloat(localStorage.getItem(SN_MSR));return isFinite(v)?Math.min(1,Math.max(0,v)):0.2;}catch(e){return 0.2;}}
+function snMShouldSample(){return Math.random()<snSampleRate();}
 function snMRead(){try{return JSON.parse(localStorage.getItem(SN_MBUF)||'[]');}catch(e){return[];}}
 function snMWrite(a){try{if(a.length>SN_MCAP)a=a.slice(a.length-SN_MCAP);localStorage.setItem(SN_MBUF,JSON.stringify(a));}catch(e){}}
-function snMRecord(api,method,ms,outcome,attempts){
+function snMRecord(api,method,ms,outcome,attempts,processingMs){
   var cold=!snSeen[api];snSeen[api]=true;
+  var pm=(typeof processingMs==='number'&&isFinite(processingMs)&&processingMs>=0)?processingMs:null;
+  // outsideHandlerMs = round-trip minus server handler time. Valid ONLY for a single
+  // wire attempt (retries span attempts processingMs can't match) with a nonnegative residual.
+  var oh=(pm!==null&&outcome==='ok'&&attempts===1&&(ms-pm)>=0)?(ms-pm):null;
   window.snApiMetrics.push({api:api,method:method,ms:ms,outcome:outcome,attempts:attempts,cold:cold});if(window.snApiMetrics.length>100)window.snApiMetrics.shift();
-  try{var b=snMRead();b.push({a:api,m:ms,o:outcome,c:cold?1:0,n:attempts,t:Date.now()});snMWrite(b);}catch(e){}
+  try{var b=snMRead(),rec={a:api,m:ms,o:outcome,c:cold?1:0,n:attempts,t:Date.now()};if(pm!==null)rec.pm=pm;if(oh!==null)rec.oh=oh;b.push(rec);snMWrite(b);}catch(e){}
 }
 function snPct(a,p){if(!a.length)return null;var s=a.slice().sort(function(x,y){return x-y;});return s[Math.min(s.length-1,Math.floor(p/100*s.length))];}
 window.snMetrics={
   summary:function(sinceHours){
     var since=sinceHours?Date.now()-sinceHours*3600000:0,buf=snMRead().filter(function(s){return s.t>=since;}),by={};
-    buf.forEach(function(s){var g=by[s.a]||(by[s.a]={ok:[],cold:[],warm:[],n:0,to:0,er:0});g.n++;if(s.o==='timeout')g.to++;else if(s.o==='error')g.er++;else{g.ok.push(s.m);(s.c?g.cold:g.warm).push(s.m);}});
-    var out={};Object.keys(by).forEach(function(a){var g=by[a];out[a]={count:g.n,okP50:snPct(g.ok,50),okP95:snPct(g.ok,95),coldP95:snPct(g.cold,95),warmP95:snPct(g.warm,95),timeoutRate:+(g.to/g.n).toFixed(3),errorRate:+(g.er/g.n).toFixed(3)};});
+    buf.forEach(function(s){var g=by[s.a]||(by[s.a]={ok:[],cold:[],warm:[],srv:[],out:[],n:0,to:0,er:0});g.n++;if(s.o==='timeout')g.to++;else if(s.o==='error')g.er++;else{g.ok.push(s.m);(s.c?g.cold:g.warm).push(s.m);}if(typeof s.pm==='number')g.srv.push(s.pm);if(typeof s.oh==='number')g.out.push(s.oh);});
+    var out={};Object.keys(by).forEach(function(a){var g=by[a];out[a]={count:g.n,okP50:snPct(g.ok,50),okP95:snPct(g.ok,95),coldP95:snPct(g.cold,95),warmP95:snPct(g.warm,95),serverP50:snPct(g.srv,50),serverP95:snPct(g.srv,95),outsideP50:snPct(g.out,50),outsideP95:snPct(g.out,95),metricN:g.srv.length,timeoutRate:+(g.to/g.n).toFixed(3),errorRate:+(g.er/g.n).toFixed(3)};});
     return out;
   },
   table:function(h){try{console.table(window.snMetrics.summary(h));}catch(e){console.log(JSON.stringify(window.snMetrics.summary(h),null,1));}return 'ok';},
   raw:function(){return snMRead();},
   clear:function(){try{localStorage.removeItem(SN_MBUF);}catch(e){}window.snApiMetrics=[];return 'cleared';},
+  // Server-timing sampling: fraction of backend GET reads that send ?metrics=1 (0..1).
+  setSampling:function(r){try{localStorage.setItem(SN_MSR,String(r));}catch(e){}return snSampleRate();},
+  sampling:function(){return snSampleRate();},
   // Perceived speed: time (ms since page load) to first LOCAL (cache) paint vs
   // first NETWORK data. Recorded as endpoint "TTF:<page>" where coldP95=local,
   // warmP95=network. Once per kind per page-load.
@@ -54,9 +65,12 @@ window.snFetch=function(input,options){
       }
     }
   }
-  var read=backend&&method==='GET'&&reads.has(api),key=method+' '+url.href;
+  var read=backend&&method==='GET'&&reads.has(api);
+  // Sample a fraction of backend GET reads for server handler timing (?metrics=1, URL query only).
+  if(read&&url.pathname==='/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec'&&!url.searchParams.get('metrics')&&snMShouldSample()){url.searchParams.set('metrics','1');input=isStr?url.href:new Request(url.href,input);}
+  var key=method+' '+url.href;
   if(read&&pending.has(key))return pending.get(key).then(function(r){return r.clone();});
-  var started=performance.now(),attempts=0;
+  var started=performance.now(),attempts=0,lastPm=null;
   async function request(){
     while(true){
       attempts++;var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},read?30000:(backend?30000:6000));
@@ -65,7 +79,7 @@ window.snFetch=function(input,options){
         var config=Object.assign({},options,{signal:controller.signal});if(backend)config.cache='no-store';
         var response=await nativeFetch(input,config);
         if(!response.ok){var http=new Error('HTTP '+response.status);http.transient=response.status===429||response.status>=500;throw http;}
-        if(backend){var payload;try{payload=await response.clone().json();}catch(jsonError){throw Object.assign(new Error('Server returned an invalid response'),{permanent:true});}if(read&&payload&&payload.success===false&&(payload.code===429||payload.code>=500))throw Object.assign(new Error(payload.error||'Service unavailable'),{transient:true});}
+        if(backend){var payload;try{payload=await response.clone().json();}catch(jsonError){throw Object.assign(new Error('Server returned an invalid response'),{permanent:true});}if(payload&&typeof payload.processingMs==='number'&&isFinite(payload.processingMs))lastPm=payload.processingMs;if(read&&payload&&payload.success===false&&(payload.code===429||payload.code>=500))throw Object.assign(new Error(payload.error||'Service unavailable'),{transient:true});}
         return response;
       }catch(err){
         var cancelled=options.signal&&options.signal.aborted;
@@ -73,7 +87,7 @@ window.snFetch=function(input,options){
       }finally{clearTimeout(timer);if(options.signal)options.signal.removeEventListener('abort',abort);}
     }
   }
-  var promise=request().then(function(r){snMRecord(api||url.hostname,method,Math.round(performance.now()-started),'ok',attempts);return r;},function(e){snMRecord(api||url.hostname,method,Math.round(performance.now()-started),/timed out/i.test(e&&e.message||'')?'timeout':'error',attempts);throw e;}).finally(function(){pending.delete(key);});
+  var promise=request().then(function(r){snMRecord(api||url.hostname,method,Math.round(performance.now()-started),'ok',attempts,lastPm);return r;},function(e){snMRecord(api||url.hostname,method,Math.round(performance.now()-started),/timed out/i.test(e&&e.message||'')?'timeout':'error',attempts);throw e;}).finally(function(){pending.delete(key);});
   if(read)pending.set(key,promise);
   return promise.then(function(r){return r.clone();});
 };
