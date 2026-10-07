@@ -12,7 +12,7 @@ window.snFetch=function(input,options){
   // Auto-attach the session token to OUR Apps Script exec only (never third parties),
   // so pages never rely on each call remembering it. GET -> query, POST JSON -> body.
   // login/register stay anonymous; existing explicit tokens are left untouched.
-  if(backend && url.pathname.indexOf('/macros/s/')===0){
+  if(url.origin==='https://script.google.com' && url.pathname==='/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec'){
     var _tk=null;try{_tk=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');}catch(e){}
     if(_tk){
       if(method==='GET'){

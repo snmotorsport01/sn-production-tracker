@@ -215,9 +215,10 @@ function renderUsers(users){
   var html = '';
   users.forEach(function(u){
     var isSelf = u.username === window._snUser.username;
+    var isActive = (u.active===true || String(u.active).toLowerCase()==='true');
     html += '<div class="user-card" id="user-'+u.username+'">'
       + '<div class="user-info">'
-      + '<div class="user-name">'+u.name+(isSelf?' (you)':'')+'</div>'
+      + '<div class="user-name">'+u.name+(isSelf?' (you)':'')+(isActive?'':' <span style="color:#cba96b;font-size:.72rem">● รออนุมัติ/ปิดใช้งาน</span>')+'</div>'
       + '<div class="user-id">@'+u.username+' | created: '+(u.created||'N/A')+'</div>'
       + '</div>'
       + '<div class="user-actions">'
@@ -226,7 +227,7 @@ function renderUsers(users){
       + '</select>'
       + (isSelf?'':'<button class="btn-sm btn-save" onclick="changeRole(\''+u.username+'\')">Save</button>')
       + (isSelf?'':'<button class="btn-sm btn-reset" onclick="resetPin(\''+u.username+'\')">Reset PIN</button>')
-      + (isSelf?'':'<button class="btn-sm btn-delete" onclick="deleteUser(\''+u.username+'\')">Delete</button>')
+      + (isSelf?'':(isActive?'<button class="btn-sm btn-delete" onclick="deleteUser(\''+u.username+'\')">ปิดใช้งาน</button>':'<button class="btn-sm btn-save" onclick="approveUser(\''+u.username+'\')">✓ อนุมัติ/เปิดใช้งาน</button>'))
       + '</div></div>';
   });
   document.getElementById('userList').innerHTML = html || '<div class="empty-state">No users found</div>';
@@ -256,6 +257,13 @@ function resetPin(username){
   });
 }
 
+function approveUser(username){
+  if(!confirm('อนุมัติ/เปิดใช้งาน '+username+' ? (ผู้ใช้จะเข้าระบบได้)'))return;
+  apiPost({action:'auth_update_user',token:window._snToken,targetUsername:username,active:true},function(d){
+    if(d.success){showToast(username+' เปิดใช้งานแล้ว');loadUsers();}
+    else showToast(d.error||'Failed','error');
+  });
+}
 function deleteUser(username){
   if(!confirm('ปิดการใช้งาน '+username+' ? (ผู้ใช้จะเข้าระบบไม่ได้)'))return;
   // backend has no hard-delete; disabling (active:false) blocks login
