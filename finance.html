@@ -1017,7 +1017,7 @@ async function loadCashflow(force) {
   var grid = document.getElementById("cfGrid");
   // Instant paint from cache (SWR); fall back to spinner only on first-ever load.
   if(!snPaint("cfSummary", "sn_h_cfsum_v47")){["cfIncome","cfExpense","cfProfit","cfUnpaid"].forEach(function(id){document.getElementById(id).textContent="—";});}
-  if (!snPaint("cfGrid", "sn_h_cfgrid")) grid.innerHTML = '<div class="loading">กำลังโหลด...</div>';
+  if (!snPaint("cfGrid", "sn_h_cfgrid")) grid.innerHTML = '<div class="loading">กำลังโหลด...</div>'; else if(window.snMetrics)snMetrics.markTTF('finance','local');
   var ratePromise=loadExchangeRate();
 
   try {
@@ -1149,6 +1149,7 @@ async function loadCashflow(force) {
       grid.appendChild(card);
     });
     snSave("cfSummary", "sn_h_cfsum_v47"); snSave("cfGrid", "sn_h_cfgrid");
+    if(window.snMetrics)snMetrics.markTTF('finance','network');
 
   } catch (err) {
     if(requestVersion!==snCashflowVersion)return;

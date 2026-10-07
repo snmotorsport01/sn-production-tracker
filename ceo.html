@@ -132,7 +132,7 @@ async function loadCeo(force){
   // 1) Instant render from the persistent snapshot (survives tab close / new session).
   var snap=null; try{ snap = window.snStore ? await snStore.get('ceo') : null; }catch(e){}
   if(requestVersion!==snCeoVersion)return;
-  if(snap && snap.data && !force){ RAW = snap.data; buildYears(); renderAll(); ceoStamp(snap.savedAt,true); }
+  if(snap && snap.data && !force){ RAW = snap.data; buildYears(); renderAll(); ceoStamp(snap.savedAt,true); if(window.snMetrics)snMetrics.markTTF('ceo','local'); }
 
   // 2) Only hit the (slow) bundle when CEO's data domain (finance) actually changed.
   var needFetch = force || !snap || !snap.data;
@@ -152,7 +152,7 @@ async function loadCeo(force){
     RAW = { payments: pay, invoices: inv };
     var eps = bundle.epochReliable ? bundle.epochs : null;
     try{ if(window.snStore) await snStore.put('ceo', RAW, eps); }catch(e){}
-    buildYears(); renderAll(); ceoStamp(Date.now(),false);
+    buildYears(); renderAll(); ceoStamp(Date.now(),false); if(window.snMetrics)snMetrics.markTTF('ceo','network');
   }catch(err){
     if(requestVersion!==snCeoVersion)return;
     document.getElementById("ceoStamp").textContent="อัปเดตไม่ได้ แสดงข้อมูลที่โหลดไว้ก่อนหน้า";

@@ -25,7 +25,13 @@ window.snMetrics={
   },
   table:function(h){try{console.table(window.snMetrics.summary(h));}catch(e){console.log(JSON.stringify(window.snMetrics.summary(h),null,1));}return 'ok';},
   raw:function(){return snMRead();},
-  clear:function(){try{localStorage.removeItem(SN_MBUF);}catch(e){}window.snApiMetrics=[];return 'cleared';}
+  clear:function(){try{localStorage.removeItem(SN_MBUF);}catch(e){}window.snApiMetrics=[];return 'cleared';},
+  // Perceived speed: time (ms since page load) to first LOCAL (cache) paint vs
+  // first NETWORK data. Recorded as endpoint "TTF:<page>" where coldP95=local,
+  // warmP95=network. Once per kind per page-load.
+  markTTF:function(page,kind){try{var k='__ttf_'+page+'_'+kind;if(window[k])return;window[k]=1;var b=snMRead();b.push({a:'TTF:'+page,m:Math.round(performance.now()),o:'ok',c:kind==='local'?1:0,n:0,t:Date.now()});snMWrite(b);}catch(e){}},
+  // Perceived-speed view: per page, p50/p95 of local (cache) paint vs network paint.
+  ttf:function(sinceHours){var since=sinceHours?Date.now()-sinceHours*3600000:0,by={};snMRead().forEach(function(s){if(s.t<since||s.a.indexOf('TTF:')!==0)return;var p=s.a.slice(4),g=by[p]||(by[p]={local:[],network:[]});(s.c?g.local:g.network).push(s.m);});var out={};Object.keys(by).forEach(function(p){var g=by[p];out[p]={loads:g.local.length,localP50:snPct(g.local,50),localP95:snPct(g.local,95),networkP50:snPct(g.network,50),networkP95:snPct(g.network,95)};});try{console.table(out);}catch(e){}return out;}
 };
 window.snFetch=function(input,options){
   options=options||{};

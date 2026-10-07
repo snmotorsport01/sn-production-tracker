@@ -237,7 +237,7 @@ function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catc
   var products=null;
   try{var c=JSON.parse(sessionStorage.getItem('sn_cache_getProducts')||'null');if(c&&c.d&&c.d.success===true&&Date.now()-c.t<1800000)products=c.d;}catch(e){}
   var snap=null; try{ snap=window.snStore?await snStore.get('hub'):null; }catch(e){}
-  if(snap&&snap.data){ paintSections(snap.data); }
+  if(snap&&snap.data){ paintSections(snap.data); if(window.snMetrics)snMetrics.markTTF('hub','local'); }
   else { Object.keys(renders).forEach(function(api){try{var d=JSON.parse(sessionStorage.getItem('sn_hub_'+api)||'null');if(d&&d.success!==false)renders[api](d);}catch(e){}}); if(products)renderProducts(products); }
   var needFetch = !snap || !snap.data;
   if(!needFetch && window.snSync){ try{ needFetch = await snSync.isStaleAny(snap,['finance','production','inventory','cost']); }catch(e){ needFetch=true; } }
@@ -246,6 +246,7 @@ function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catc
     if(!d||d.success!==true||!d.sections)throw new Error('Bundle unavailable');
     Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else if(!(d.errors&&d.errors[api]))fallback(api);}); // skip fallback for sections the server withheld (forbidden)
     try{ if(window.snStore) snStore.put('hub', d.sections, d.epochReliable?d.epochs:null); }catch(e){}
+    if(window.snMetrics)snMetrics.markTTF('hub','network');
   }).catch(function(){Object.keys(renders).concat(products?[]:['getProducts']).forEach(fallback);});
 })();
 })();
