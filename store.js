@@ -53,19 +53,20 @@ window.snSync={
       .finally(function(){syncP=null;});
     return syncP;
   },
-  // Decide if a cached snapshot for `domain` is stale. Uses epochs when reliable,
-  // else TTL (reconcileAfterMs) so direct-sheet edits still reconcile over time.
-  isStale:function(snap, domain){
-    if(!snap||!snap.data)return true;
+  // Stale if ANY of `domains` changed. Uses epochs when reliable, else TTL
+  // (reconcileAfterMs) so direct-sheet edits still reconcile over time.
+  isStaleAny:function(snap, domains){
+    if(!snap||!snap.data)return Promise.resolve(true);
     return window.snSync.epochs().then(function(sy){
       if(sy&&sy.epochs){
-        if(!snap.epochs||!(domain in snap.epochs))return true;      // no stored epoch -> refetch once
-        if(snap.epochs[domain]!==sy.epochs[domain])return true;     // changed -> refetch
+        if(!snap.epochs)return true;                                // no stored epochs -> refetch once
+        for(var i=0;i<domains.length;i++){var d=domains[i];if(!(d in snap.epochs)||snap.epochs[d]!==sy.epochs[d])return true;}
         var ttl=sy.reconcileAfterMs||60000;
         return (Date.now()-(snap.savedAt||0))>Math.max(ttl,300000); // periodic safety refresh for off-router sheet edits
       }
       return (Date.now()-(snap.savedAt||0))>60000;                  // sync unavailable -> TTL fallback
     });
-  }
+  },
+  isStale:function(snap, domain){ return window.snSync.isStaleAny(snap,[domain]); }
 };
 })();

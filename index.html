@@ -3,6 +3,7 @@
 <head>
 <!-- Shared transport and one throttled auth refresh -->
 <script src="api.js"></script>
+<script src="store.js"></script>
 
 <!--sn-perm-->
 <script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}var allow=P[u.role];document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.bottom-nav a,.bnav a').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop();if(h&&/\.html$/.test(h)&&h!=='index.html'&&h!=='hub.html'&&allow.indexOf(h)===-1)a.style.display='none';});});}}catch(e){}})();</script>
@@ -205,20 +206,29 @@ function kfmt(n){n=Math.round(n||0);var a=Math.abs(n);return '฿'+(a>=1000?(Mat
 var setk=function(id,v){var e=document.getElementById(id);if(e)e.textContent=kfmt(v);};
 setk('h-in',data.totalIncome);setk('h-out',data.totalExpense);setk('h-net',net);
 }
-/* Paint the existing snapshots immediately, then refresh in one request. */
+/* Local-first: paint the persistent IndexedDB snapshot instantly, then refresh
+   via hubBundle ONLY when a hub data domain changed (cheap ?api=sync gate). */
 (function loadHub(){
 var renders={listBatches:renderProd,listInventory:renderInv,listCashflow:renderCash};
-Object.keys(renders).forEach(function(api){try{var d=JSON.parse(sessionStorage.getItem('sn_hub_'+api)||'null');if(d&&d.success!==false)renders[api](d);}catch(e){}});
-var products=null;
-try{var c=JSON.parse(sessionStorage.getItem('sn_cache_getProducts')||'null');if(c&&c.d&&c.d.success===true&&Date.now()-c.t<1800000)products=c.d;}catch(e){}
 function renderProducts(d){if(d&&d.success===true)setTile('t-cost',(d.products||[]).length);}
-if(products)renderProducts(products);
+function paintSections(sections){if(!sections)return;Object.keys(renders).forEach(function(api){if(sections[api]&&sections[api].success!==false)renders[api](sections[api]);});if(sections.getProducts)renderProducts(sections.getProducts);}
 function accept(api,d){if(!d||d.success===false)return;if(api==='getProducts'){try{sessionStorage.setItem('sn_cache_getProducts',JSON.stringify({t:Date.now(),d:d}));}catch(e){}renderProducts(d);}else{try{sessionStorage.setItem('sn_hub_'+api,JSON.stringify(d));}catch(e){}renders[api](d);}}
 function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catch(function(){});}
-callAPI({api:'hubBundle',products:products?'0':'1'}).then(function(d){
-if(!d||d.success!==true||!d.sections)throw new Error('Bundle unavailable');
-Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else fallback(api);});
-}).catch(function(){Object.keys(renders).concat(products?[]:['getProducts']).forEach(fallback);});
+(async function(){
+  var products=null;
+  try{var c=JSON.parse(sessionStorage.getItem('sn_cache_getProducts')||'null');if(c&&c.d&&c.d.success===true&&Date.now()-c.t<1800000)products=c.d;}catch(e){}
+  var snap=null; try{ snap=window.snStore?await snStore.get('hub'):null; }catch(e){}
+  if(snap&&snap.data){ paintSections(snap.data); }
+  else { Object.keys(renders).forEach(function(api){try{var d=JSON.parse(sessionStorage.getItem('sn_hub_'+api)||'null');if(d&&d.success!==false)renders[api](d);}catch(e){}}); if(products)renderProducts(products); }
+  var needFetch = !snap || !snap.data;
+  if(!needFetch && window.snSync){ try{ needFetch = await snSync.isStaleAny(snap,['finance','production','inventory','cost']); }catch(e){ needFetch=true; } }
+  if(!needFetch) return;
+  callAPI({api:'hubBundle',products:products?'0':'1'}).then(function(d){
+    if(!d||d.success!==true||!d.sections)throw new Error('Bundle unavailable');
+    Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else fallback(api);});
+    try{ if(window.snStore) snStore.put('hub', d.sections, d.epochReliable?d.epochs:null); }catch(e){}
+  }).catch(function(){Object.keys(renders).concat(products?[]:['getProducts']).forEach(fallback);});
+})();
 })();
 
 /* Admin FAB */

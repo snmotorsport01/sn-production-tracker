@@ -71,6 +71,7 @@ select.select-box{background:#1a1a1a;color:#e0e0e0;border:1px solid #333;border-
 <script>if('serviceWorker'in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 <link rel="stylesheet" href="axis.css">
 <link rel="stylesheet" href="lounge.css">
+<script src="store.js"></script>
 <script src="axis.js" defer></script>
 </head>
 <body>
@@ -271,14 +272,10 @@ return json.table ? json.table.rows : [];
 
 function loadDynamic() { loadFromAPI(); }
 
-function loadFromAPI() {
-snApiGet('costBundle',{token:sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token')||''}).then(function(bundle){
-var data=bundle.sections&&bundle.sections.getProducts,details=bundle.sections&&bundle.sections.getCostData;
-if(!data)throw new Error('Products unavailable');
-if(details&&details.success)COST_DATA=details.data;
-if(!data.success || !data.products || data.products.length===0) throw new Error('API failed');
+function applyCostPayload(products, costData){
+if(costData)COST_DATA=costData;
 VARIANTS = [];
-data.products.forEach(function(p){
+products.forEach(function(p){
 var armW = p.arm_weight || p.arm || 0;
 var sp = p.sell_price || p.sellPrice || SELL;
 var pName = p.product_name || p.name || '';
@@ -291,10 +288,26 @@ dataSource = 'api';
 document.querySelector('.subtitle').textContent = 'API — ราคาขาย ฿'+fmtShort(SELL)+' ทุก Variant';
 render();
 rebuildWithCostData();
-}).catch(function(e){
-console.warn('API failed, using fallback', e);
-useFallback();
-});
+}
+// Local-first: paint the persistent snapshot instantly for perceived speed, then
+// ALWAYS refetch (cost must stay live from the 1RLo sheet, whose direct edits do
+// not bump an epoch) and persist the new snapshot.
+function loadFromAPI() {
+(async function(){
+  var snap=null; try{ snap=window.snStore?await snStore.get('cost'):null; }catch(e){}
+  if(snap&&snap.data&&snap.data.products){ try{ applyCostPayload(snap.data.products, snap.data.costData); }catch(e){} }
+  snApiGet('costBundle',{token:sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token')||''}).then(function(bundle){
+    var data=bundle.sections&&bundle.sections.getProducts,details=bundle.sections&&bundle.sections.getCostData;
+    if(!data)throw new Error('Products unavailable');
+    if(!data.success || !data.products || data.products.length===0) throw new Error('API failed');
+    var costData=(details&&details.success)?details.data:null;
+    applyCostPayload(data.products, costData);
+    try{ if(window.snStore) snStore.put('cost', {products:data.products, costData:costData}, bundle.epochReliable?bundle.epochs:null); }catch(e){}
+  }).catch(function(e){
+    console.warn('API failed, using fallback', e);
+    if(!snap||!snap.data||!snap.data.products) useFallback();
+  });
+})();
 }
 
 function useFallback() {
