@@ -5,12 +5,12 @@
    - Apps Script API (script.google.com): bypass service worker; shared transport handles timeouts and safe read retries.
    Only GET requests are cached; POST (auth, uploads, mutations) always hits the network.
    Bump VERSION to force a refresh of all cached assets. */
-var VERSION = 'v55';
+var VERSION = 'v56';
 var SHELL   = 'sn-shell-' + VERSION;
 var RUNTIME = 'sn-runtime-' + VERSION;
 
 var SHELL_ASSETS = [
-  './', 'api.js', 'sn-monogram.png', 'axis.css', 'lounge.css', 'axis.js', 'batch-media.js', 'batch-media.css', 'fonts/psionic.otf',
+  './', 'api.js', 'store.js', 'sn-monogram.png', 'axis.css', 'lounge.css', 'axis.js', 'batch-media.js', 'batch-media.css', 'fonts/psionic.otf',
   'index.html', 'hub.html', 'production.html', 'inventory.html',
   'finance.html', 'cost.html', 'ceo.html', 'qr.html', 'report.html',
   'admin.html', 'login.html',

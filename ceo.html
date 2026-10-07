@@ -3,6 +3,7 @@
 <head>
 <!-- Shared transport and one throttled auth refresh -->
 <script src="api.js"></script>
+<script src="store.js"></script>
 
 <!--sn-perm-->
 <script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}}}catch(e){}})();</script>
@@ -124,26 +125,34 @@ function cacheSet(k,v){try{sessionStorage.setItem(k,JSON.stringify(v));}catch(e)
 
 var RAW = { payments:[], invoices:[] };
 
+function ceoStamp(ts,cached){try{var t=new Date(ts||Date.now()).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});document.getElementById("ceoStamp").textContent=(cached?"แคช ":"อัปเดต ")+t;}catch(e){}}
 var snCeoVersion=0;
 async function loadCeo(force){
   var requestVersion=++snCeoVersion;
-  // SWR: paint from cache instantly, then refresh
-  var cached = cacheGet("sn_ceo_raw");
-  if(cached && !force){ RAW = cached; buildYears(); renderAll(); }
+  // 1) Instant render from the persistent snapshot (survives tab close / new session).
+  var snap=null; try{ snap = window.snStore ? await snStore.get('ceo') : null; }catch(e){}
+  if(requestVersion!==snCeoVersion)return;
+  if(snap && snap.data && !force){ RAW = snap.data; buildYears(); renderAll(); ceoStamp(snap.savedAt,true); }
+
+  // 2) Only hit the (slow) bundle when CEO's data domain (finance) actually changed.
+  var needFetch = force || !snap || !snap.data;
+  if(!needFetch && window.snSync){ try{ needFetch = await snSync.isStale(snap,'finance'); }catch(e){ needFetch=true; } if(requestVersion!==snCeoVersion)return; }
   var ratePromise=rateLoaded?Promise.resolve():loadExchangeRate();
+  if(!needFetch){ try{ await ratePromise; }catch(e){} if(requestVersion===snCeoVersion) renderAll(); return; }
+
+  // 3) Refetch bundle, persist snapshot + its epoch.
   try{
     var tok = sessionStorage.getItem("sn_token") || "";
     var results=await Promise.all([snApiGet('ceoBundle',{token:tok,fresh:force?'1':undefined}),ratePromise]);
-    var sections=results[0].sections||{};
+    var bundle=results[0], sections=bundle.sections||{};
     if(!sections.listPayments||!sections.listInvoices)throw new Error('โหลดข้อมูลไม่ครบ กรุณาลองอีกครั้ง');
     if(requestVersion!==snCeoVersion)return;
-    var R=[sections.listPayments,sections.listInvoices];
-    var pay = Array.isArray(R[0]) ? R[0] : (R[0].payments || []);
-    var inv = (R[1] && R[1].invoices) ? R[1].invoices : [];
+    var pay = Array.isArray(sections.listPayments) ? sections.listPayments : (sections.listPayments.payments || []);
+    var inv = (sections.listInvoices && sections.listInvoices.invoices) ? sections.listInvoices.invoices : [];
     RAW = { payments: pay, invoices: inv };
-    cacheSet("sn_ceo_raw", RAW);
-    buildYears(); renderAll();
-    var now=new Date();document.getElementById("ceoStamp").textContent="อัปเดต "+now.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
+    var eps = bundle.epochReliable ? bundle.epochs : null;
+    try{ if(window.snStore) await snStore.put('ceo', RAW, eps); }catch(e){}
+    buildYears(); renderAll(); ceoStamp(Date.now(),false);
   }catch(err){
     if(requestVersion!==snCeoVersion)return;
     document.getElementById("ceoStamp").textContent="อัปเดตไม่ได้ แสดงข้อมูลที่โหลดไว้ก่อนหน้า";
@@ -250,8 +259,9 @@ function el(id){return document.getElementById(id);}
 function set(id,v){var e=el(id);if(e)e.textContent=v;}
 
 loadCeo();
-setInterval(function(){ if(!document.hidden) loadCeo(true); }, 300000);
-document.addEventListener("visibilitychange", function(){ if(!document.hidden) loadCeo(true); });
+// Background reconcile: epoch-gated (cheap ?api=sync; fetches the bundle only when finance changed). Manual ↻ button forces a full refresh.
+setInterval(function(){ if(!document.hidden) loadCeo(); }, 300000);
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) loadCeo(); });
 </script>
 </body>
 </html>
