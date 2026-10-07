@@ -204,6 +204,7 @@ el('wDetail').addEventListener('click',function(e){ if(e.target===el('wDetail'))
 async function loadClaims(id){
   try{
     var r = await (window.snApiGet ? snApiGet('getWarranty',{token:tok(),id:id}) : fetch(API+'?api=getWarranty&token='+encodeURIComponent(tok())+'&id='+encodeURIComponent(id)).then(function(x){return x.json();}));
+    if(r && r.success===false) throw new Error(r.error||'โหลดไม่สำเร็จ');  // distinguish failure from genuinely empty
     var claims = (r && r.claims) ? r.claims : [];
     var cl = el('claimList'); if(!cl)return;
     if(!claims.length){ cl.innerHTML='<div class="empty" style="padding:12px 0">ยังไม่มีประวัติเคลม</div>'; return; }
