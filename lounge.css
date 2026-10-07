@@ -47,3 +47,24 @@
 #sn-axis-demo .sn-badge.gold:before,#sn-axis-demo .sn-badge.warn:before{background:#cba96b!important}
 #sn-axis-demo .sn-badge.grey,#sn-axis-demo .b-created,#sn-axis-demo .b-out{color:#9a9a9a!important;background:rgba(189,189,189,.08)!important;border-color:rgba(189,189,189,.18)!important}
 #sn-axis-demo .sn-badge.grey:before{background:#9a9a9a!important}
+
+/* ── Motion: app-like page transitions + tactile press feedback ───────────────
+   Subtle/premium to match Operations Lounge. All guarded by reduced-motion. ── */
+/* Cross-document View Transitions: soft crossfade between pages instead of a
+   white reload flash. No-op on browsers without support (normal navigation). */
+@view-transition{ navigation: auto; }
+::view-transition-old(root){ animation: sn-vt-out .18s ease both; }
+::view-transition-new(root){ animation: sn-vt-in .26s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes sn-vt-out{ to{ opacity:0 } }
+@keyframes sn-vt-in{ from{ opacity:0; transform:translateY(8px) } to{ opacity:1; transform:none } }
+
+/* Tactile press/tap feedback — the UI reacts the instant you touch it. */
+#sn-axis-demo .sn-nav,#sn-axis-demo .sn-action,#sn-axis-demo .sn-shortcuts button,#sn-axis-demo .tab,#sn-axis-demo .sn-kpi,#sn-axis-demo .ceo-refresh,.login-container .btn-primary,.login-container .tab-bar button{transition:transform .12s ease,background-color .15s ease,border-color .15s ease,filter .15s ease,box-shadow .2s ease}
+@media(prefers-reduced-motion:no-preference){
+  #sn-axis-demo .sn-nav:active,#sn-axis-demo .sn-action:active,#sn-axis-demo .sn-shortcuts button:active,#sn-axis-demo .tab:active,#sn-axis-demo .ceo-refresh:active,.login-container .btn-primary:active,.login-container .tab-bar button:active{transform:scale(.96)}
+  #sn-axis-demo .sn-kpi:active,#sn-axis-demo .sn-glass:active{transform:scale(.993)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+}
