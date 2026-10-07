@@ -136,7 +136,12 @@ var API = 'https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_
   var page=location.pathname.split('/').pop()||'index.html';
   if(perms[page]&&perms[page].indexOf(u.role)<0){window.location.href='index.html';return;}
   var bar=document.createElement('div');bar.className='auth-bar';
-  bar.innerHTML='<img src="logo.svg" style="height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px"><strong>'+u.name+'</strong><span class="role-badge role-'+u.role+'">'+u.role+'</span><span class="spacer"></span><button class="logout-btn" onclick="snLogout()">Logout</button>';
+  var _lg=document.createElement('img');_lg.src='logo.svg';_lg.style.cssText='height:clamp(14px,3.5vw,22px);vertical-align:middle;margin-right:6px';
+  var _st=document.createElement('strong');_st.textContent=String(u.name||'');
+  var _rb=document.createElement('span');_rb.className='role-badge role-'+String(u.role||'').replace(/[^a-z0-9_-]/gi,'');_rb.textContent=String(u.role||'');
+  var _sp=document.createElement('span');_sp.className='spacer';
+  var _lo=document.createElement('button');_lo.className='logout-btn';_lo.textContent='Logout';_lo.addEventListener('click',snLogout);
+  bar.appendChild(_lg);bar.appendChild(_st);bar.appendChild(_rb);bar.appendChild(_sp);bar.appendChild(_lo);
   document.body.prepend(bar);
   window._snUser=u; window._snToken=t;
 })();
@@ -195,12 +200,14 @@ function loadUsers(){
   });
 }
 
-// role dropdown options — admin + 3 departments (+ keep any legacy role visible)
-function roleOpts(cur){
+// role dropdown options — built via DOM (value/text set as data, never parsed as markup)
+function roleOptsEl(sel, cur){
   var roles=[['admin','Admin'],['production','Production'],['finance','Finance'],['marketing','Marketing']];
   if(cur && !roles.some(function(r){return r[0]===cur;})) roles.push([cur, cur]);
-  return roles.map(function(r){return '<option value="'+r[0]+'"'+(cur===r[0]?' selected':'')+'>'+r[1]+'</option>';}).join('');
+  roles.forEach(function(r){var o=document.createElement('option');o.value=r[0];o.textContent=r[1];if(cur===r[0])o.selected=true;sel.appendChild(o);});
 }
+// button with a bound click handler (no inline onclick → raw username can't inject)
+function mkBtn(text, cls, fn){var b=document.createElement('button');b.className='btn-sm '+cls;b.textContent=text;b.addEventListener('click',fn);return b;}
 
 function renderStats(users){
   function c(role){return users.filter(function(u){return u.role===role;}).length;}
@@ -212,25 +219,34 @@ function renderStats(users){
 }
 
 function renderUsers(users){
-  var html = '';
+  var list = document.getElementById('userList');
+  list.textContent = '';
+  if(!users.length){ list.innerHTML = '<div class="empty-state">No users found</div>'; return; }
+  // Built entirely via DOM: every backend field (name/username/created/role) is set
+  // as textContent / element value, never concatenated into HTML — stored XSS safe.
   users.forEach(function(u){
-    var isSelf = u.username === window._snUser.username;
+    var uname = String(u.username||'');
+    var isSelf = uname === window._snUser.username;
     var isActive = (u.active===true || String(u.active).toLowerCase()==='true');
-    html += '<div class="user-card" id="user-'+u.username+'">'
-      + '<div class="user-info">'
-      + '<div class="user-name">'+u.name+(isSelf?' (you)':'')+(isActive?'':' <span style="color:#cba96b;font-size:.72rem">● รออนุมัติ/ปิดใช้งาน</span>')+'</div>'
-      + '<div class="user-id">@'+u.username+' | created: '+(u.created||'N/A')+'</div>'
-      + '</div>'
-      + '<div class="user-actions">'
-      + '<select class="role-select" id="role-'+u.username+'" '+(isSelf?'disabled':'')+' data-original="'+u.role+'">'
-      + roleOpts(u.role)
-      + '</select>'
-      + (isSelf?'':'<button class="btn-sm btn-save" onclick="changeRole(\''+u.username+'\')">Save</button>')
-      + (isSelf?'':'<button class="btn-sm btn-reset" onclick="resetPin(\''+u.username+'\')">Reset PIN</button>')
-      + (isSelf?'':(isActive?'<button class="btn-sm btn-delete" onclick="deleteUser(\''+u.username+'\')">ปิดใช้งาน</button>':'<button class="btn-sm btn-save" onclick="approveUser(\''+u.username+'\')">✓ อนุมัติ/เปิดใช้งาน</button>'))
-      + '</div></div>';
+    var card = document.createElement('div'); card.className='user-card'; card.id='user-'+uname;
+    var info = document.createElement('div'); info.className='user-info';
+    var nm = document.createElement('div'); nm.className='user-name'; nm.textContent = String(u.name||'') + (isSelf?' (you)':'');
+    if(!isActive){ var bdg=document.createElement('span'); bdg.style.cssText='color:#cba96b;font-size:.72rem;margin-left:6px'; bdg.textContent='● รออนุมัติ/ปิดใช้งาน'; nm.appendChild(bdg); }
+    var idd = document.createElement('div'); idd.className='user-id'; idd.textContent='@'+uname+' | created: '+String(u.created||'N/A');
+    info.appendChild(nm); info.appendChild(idd);
+    var acts = document.createElement('div'); acts.className='user-actions';
+    var sel = document.createElement('select'); sel.className='role-select'; sel.id='role-'+uname; if(isSelf)sel.disabled=true; sel.setAttribute('data-original', String(u.role||''));
+    roleOptsEl(sel, u.role);
+    acts.appendChild(sel);
+    if(!isSelf){
+      acts.appendChild(mkBtn('Save','btn-save',function(){changeRole(uname);}));
+      acts.appendChild(mkBtn('Reset PIN','btn-reset',function(){resetPin(uname);}));
+      acts.appendChild(isActive ? mkBtn('ปิดใช้งาน','btn-delete',function(){deleteUser(uname);}) : mkBtn('✓ อนุมัติ/เปิดใช้งาน','btn-save',function(){approveUser(uname);}));
+    }
+    card.appendChild(info); card.appendChild(acts);
+    list.appendChild(card);
   });
-  document.getElementById('userList').innerHTML = html || '<div class="empty-state">No users found</div>';
+  return;
 }
 
 // ===== Actions =====
