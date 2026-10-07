@@ -213,16 +213,16 @@ function renderAll(){
   var mktPct = revenue>0 ? marketing/revenue*100 : 0;
 
   // ---- KPI paint ----
-  set("kRevenue", money(revenue));
-  set("kProfit", money(profit)); el("kProfit").className = "val "+(profit>=0?"green":"red");
+  num("kRevenue", revenue, money);
+  num("kProfit", profit, money); el("kProfit").className = "val "+(profit>=0?"green":"red");
   set("kMargin", "อัตรากำไรสุทธิ "+pct(margin));
-  set("kRoi", expense>0?pct(roi):"—"); el("kRoi").className="val "+(roi>=0?"green":"red");
-  set("kRoas", roas!==null?roas.toFixed(2)+"×":"—");
+  if(expense>0) num("kRoi", roi, pct); else set("kRoi","—"); el("kRoi").className="val "+(roi>=0?"green":"red");
+  if(roas!==null) num("kRoas", roas, function(n){return n.toFixed(2)+"×";}); else set("kRoas","—");
   set("kRoasSub", roas!==null?("ทุก ฿1 ค่าตลาด → "+money(roas)+" รายรับ"):"ยังไม่มีค่าการตลาด");
-  set("kExpense", money(expense));
-  set("kMkt", money(marketing)); set("kMktSub", mktPct>0?("= "+pct(mktPct)+" ของรายรับ"):" ");
-  set("kAr", money(unpaid));
-  set("kCollected", money(collected)); set("kCollectedSub", revenue>0?("เก็บได้ "+pct(collectRate)):" ");
+  num("kExpense", expense, money);
+  num("kMkt", marketing, money); set("kMktSub", mktPct>0?("= "+pct(mktPct)+" ของรายรับ"):" ");
+  num("kAr", unpaid, money);
+  num("kCollected", collected, money); set("kCollectedSub", revenue>0?("เก็บได้ "+pct(collectRate)):" ");
 
   // ---- monthly chart ----
   var mk = Object.keys(months).sort();
@@ -257,6 +257,7 @@ function renderAll(){
 
 function el(id){return document.getElementById(id);}
 function set(id,v){var e=el(id);if(e)e.textContent=v;}
+function num(id,v,fmt){var e=el(id);if(!e)return;if(window.snCountUp)snCountUp(e,v,fmt);else e.textContent=fmt(v);}
 
 loadCeo();
 // Background reconcile: epoch-gated (cheap ?api=sync; fetches the bundle only when finance changed). Manual ↻ button forces a full refresh.

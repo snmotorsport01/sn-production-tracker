@@ -69,4 +69,25 @@ window.snSync={
   },
   isStale:function(snap, domain){ return window.snSync.isStaleAny(snap,[domain]); }
 };
+
+// Animated number count-up. Animates only when the value CHANGES (first appearance
+// counts up from 0); same value on a background refresh = instant, so it never
+// distracts. fmt(n)->string keeps currency/%/× formatting on every frame.
+window.snCountUp=function(el,target,fmt){
+  if(!el)return;
+  fmt=fmt||function(n){return String(Math.round(n));};
+  target=Number(target)||0;
+  var from=(typeof el._snv==='number')?el._snv:0;
+  el._snv=target;
+  if(from===target){ el.textContent=fmt(target); return; }
+  try{ if(matchMedia('(prefers-reduced-motion: reduce)').matches){ el.textContent=fmt(target); return; } }catch(e){}
+  if(document.hidden){ el.textContent=fmt(target); return; }  // rAF is paused while hidden — set final value, no empty/stuck
+  if(el._snraf)cancelAnimationFrame(el._snraf);
+  el.textContent=fmt(from);                                   // clean synchronous start (no empty flash)
+  var dur=550,t0=null;
+  function step(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=fmt(from+(target-from)*e);
+    if(p<1){el._snraf=requestAnimationFrame(step);} else {el.textContent=fmt(target);el._snraf=null;} }
+  el._snraf=requestAnimationFrame(step);
+};
 })();
