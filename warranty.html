@@ -187,7 +187,6 @@ async function openDetail(id){
     +'ลงทะเบียน: <b>'+fmtDate(it.registerDate)+'</b><br>'
     +'หมดประกัน: <b>'+fmtDate(s.expiry)+'</b> ('+(s.days==null?'—':s.days<0?('หมดแล้ว '+Math.abs(s.days)+' วัน'):('เหลือ '+s.days+' วัน'))+')<br>'
     +(it.purchaseDate?('วันที่ซื้อ: '+fmtDate(it.purchaseDate)+'<br>'):'')
-    +(it.dealer?('ร้าน: '+esc(it.dealer)+'<br>'):'')
     +(it.receiptUrl?('<a href="'+esc(it.receiptUrl)+'" target="_blank" style="color:#cea24a">ดูรูปใบเสร็จ/สินค้า</a>'):'')
     +'</div>'
     +'<div id="claimList"><div class="loading">กำลังโหลดประวัติเคลม...</div></div>'
