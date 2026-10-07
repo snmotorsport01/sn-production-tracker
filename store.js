@@ -31,6 +31,7 @@ function idbClearPrefix(prefix){return openDB().then(function(db){if(!db)return;
 window.snStore={
   get:function(name){return idbGet(keyFor(name));},
   put:function(name,data,epochs){return idbPut(keyFor(name),{data:data,epochs:epochs||null,savedAt:Date.now()});},
+  del:function(name){return openDB().then(function(db){if(!db)return;return new Promise(function(res){try{var r=db.transaction(STORE,'readwrite').objectStore(STORE).delete(keyFor(name));r.onsuccess=function(){res();};r.onerror=function(){res();};}catch(e){res();}});});},
   clearAccount:function(u){return idbClearPrefix((u||account())+'::');}
 };
 

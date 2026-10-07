@@ -5,8 +5,24 @@ var nativeFetch=window.fetch.bind(window),pending=new Map();
 var reads=new Set(['hubBundle','financeBundle','ceoBundle','costBundle','listBatches','getBatch','getStats','listInventory','listBOM','listPODrafts','listPayments','getCashFlow','listCashflow','listInvoices','getInvoice','cashflowSummary','getProducts','getCostData','getPermissions','authMe','authVerify','authListUsers','batchHistory','listWarranties','getWarranty','sync','n8nHealth','n8nGetAll','n8nGetChanges','n8nSyncStatus']);
 window.snApiMetrics=[];
 window.snFetch=function(input,options){
-  options=options||{};var url=new URL(typeof input==='string'?input:input.url,location.href),method=(options.method||'GET').toUpperCase(),api=url.searchParams.get('api')||'';
-  var backend=url.hostname==='script.google.com',read=backend&&method==='GET'&&reads.has(api),key=method+' '+url.href;
+  options=options||{};
+  var isStr=(typeof input==='string');
+  var url=new URL(isStr?input:input.url,location.href),method=(options.method||(isStr?'GET':(input.method||'GET'))).toUpperCase(),api=url.searchParams.get('api')||'';
+  var backend=url.hostname==='script.google.com';
+  // Auto-attach the session token to OUR Apps Script exec only (never third parties),
+  // so pages never rely on each call remembering it. GET -> query, POST JSON -> body.
+  // login/register stay anonymous; existing explicit tokens are left untouched.
+  if(backend && url.pathname.indexOf('/macros/s/')===0){
+    var _tk=null;try{_tk=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');}catch(e){}
+    if(_tk){
+      if(method==='GET'){
+        if(!url.searchParams.get('token')){url.searchParams.set('token',_tk);input=isStr?url.href:new Request(url.href,input);}
+      }else if(typeof options.body==='string' && /^\s*\{/.test(options.body)){
+        try{var _b=JSON.parse(options.body);if(_b&&typeof _b==='object'&&_b.token===undefined&&_b.action!=='auth_login'&&_b.action!=='auth_register'){_b.token=_tk;options=Object.assign({},options,{body:JSON.stringify(_b)});}}catch(e){}
+      }
+    }
+  }
+  var read=backend&&method==='GET'&&reads.has(api),key=method+' '+url.href;
   if(read&&pending.has(key))return pending.get(key).then(function(r){return r.clone();});
   var started=performance.now(),attempts=0;
   async function request(){

@@ -200,6 +200,22 @@ alerts.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
 var el=document.getElementById('hubAlerts');if(el)el.innerHTML=alerts.length?alerts.slice(0,4).map(function(x){return '<div class="sn-row"><div>'+esc(x.item)+'<small>'+esc(x.cat)+'</small></div>'+invChip(x.lvl)+'</div>';}).join(''):'<div class="sn-row" style="justify-content:center;color:var(--live)">สต็อกปกติทั้งหมด ✓</div>';
 }
 function canFinance(){try{var u=snMe();if(!u)return false;if(u.role==='admin')return true;var P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');if(!P||!P[u.role])return false;return P[u.role].indexOf('finance.html')>=0;}catch(e){return false;}}
+function canCost(){try{var u=snMe();if(!u)return false;if(u.role==='admin')return true;var P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');if(!P||!P[u.role])return false;return P[u.role].indexOf('cost.html')>=0;}catch(e){return false;}}
+/* Purge cached financial / product-cost snapshots for users who lack the right.
+   Guards against stale sensitive data cached before a permission/backend change. */
+async function purgeSensitiveCache(){
+  try{
+    if(!canFinance()){
+      ['sn_ceo_raw','sn_hub_listCashflow','sn_h_cfsum_v47','sn_h_cfgrid','sn_h_inv','sn_h_pay'].forEach(function(k){try{sessionStorage.removeItem(k);}catch(e){}});
+      if(window.snStore&&snStore.del){try{snStore.del('ceo');['sn_h_cfsum_v47','sn_h_cfgrid','sn_h_inv','sn_h_pay'].forEach(function(k){snStore.del('finhtml_'+k);});}catch(e){}}
+      try{if(window.snStore){var h=await snStore.get('hub');if(h&&h.data&&h.data.listCashflow){delete h.data.listCashflow;await snStore.put('hub',h.data,h.epochs);}}}catch(e){}
+    }
+    if(!canCost()){
+      try{sessionStorage.removeItem('sn_cache_getProducts');}catch(e){}
+      if(window.snStore&&snStore.del){try{snStore.del('cost');}catch(e){}}
+    }
+  }catch(e){}
+}
 function renderCash(data){
 if(!data)return;
 if(!canFinance())return;   // fail-closed: never paint company cashflow for users without finance access
@@ -217,6 +233,7 @@ function paintSections(sections){if(!sections)return;Object.keys(renders).forEac
 function accept(api,d){if(!d||d.success===false)return;if(api==='getProducts'){try{sessionStorage.setItem('sn_cache_getProducts',JSON.stringify({t:Date.now(),d:d}));}catch(e){}renderProducts(d);}else{try{sessionStorage.setItem('sn_hub_'+api,JSON.stringify(d));}catch(e){}renders[api](d);}}
 function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catch(function(){});}
 (async function(){
+  await purgeSensitiveCache();   // drop any finance/cost snapshots this user may not see, before painting
   var products=null;
   try{var c=JSON.parse(sessionStorage.getItem('sn_cache_getProducts')||'null');if(c&&c.d&&c.d.success===true&&Date.now()-c.t<1800000)products=c.d;}catch(e){}
   var snap=null; try{ snap=window.snStore?await snStore.get('hub'):null; }catch(e){}
@@ -227,7 +244,7 @@ function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catc
   if(!needFetch) return;
   callAPI({api:'hubBundle',products:products?'0':'1'}).then(function(d){
     if(!d||d.success!==true||!d.sections)throw new Error('Bundle unavailable');
-    Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else fallback(api);});
+    Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else if(!(d.errors&&d.errors[api]))fallback(api);}); // skip fallback for sections the server withheld (forbidden)
     try{ if(window.snStore) snStore.put('hub', d.sections, d.epochReliable?d.epochs:null); }catch(e){}
   }).catch(function(){Object.keys(renders).concat(products?[]:['getProducts']).forEach(fallback);});
 })();
