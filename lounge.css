@@ -68,3 +68,17 @@
 @media(prefers-reduced-motion:reduce){
   ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
 }
+
+/* Tab / panel crossfade. Finance panels re-run this on every display toggle;
+   other views re-trigger it via the .sn-anim-in class. */
+@keyframes sn-tab-in{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+#sn-axis-demo #tab-cashflow,#sn-axis-demo #tab-payments,#sn-axis-demo #tab-invoices,#sn-axis-demo #tab-import,.sn-anim-in{ animation:sn-tab-in .24s ease both }
+
+/* Skeleton shimmer for first-load placeholders (rare with local-first, but polished). */
+#sn-axis-demo .loading{position:relative;color:transparent!important;min-height:46px;border-radius:12px;overflow:hidden;background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(255,255,255,.08),rgba(255,255,255,.03));background-size:200% 100%;animation:sn-shimmer 1.3s linear infinite}
+@keyframes sn-shimmer{ to{ background-position:-200% 0 } }
+
+@media(prefers-reduced-motion:reduce){
+  #sn-axis-demo #tab-cashflow,#sn-axis-demo #tab-payments,#sn-axis-demo #tab-invoices,#sn-axis-demo #tab-import,.sn-anim-in{animation:none!important}
+  #sn-axis-demo .loading{animation:none}
+}

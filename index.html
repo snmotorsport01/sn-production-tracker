@@ -176,7 +176,7 @@ function fmt(n){if(n===undefined||n===null||isNaN(n))return'—';return Number(n
 
 /* ── Command Deck hub helpers ── */
 function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':s);return d.innerHTML;}
-function setTile(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===undefined||v===null||isNaN(v))?'—':v;}
+function setTile(id,v){var e=document.getElementById(id);if(!e)return;if(v===undefined||v===null||isNaN(v)){e.textContent='—';return;}if(window.snCountUp)snCountUp(e,v,function(n){return String(Math.round(n));});else e.textContent=v;}
 function invChip(lvl){var m={crit:['crit','วิกฤต'],low:['warn','ต่ำ']};var c=m[lvl];return '<span class="sn-badge '+c[0]+'">'+c[1]+'</span>';}
 function stChip(s){var m={'Start Producing':['red','ผลิต'],'Print Finish':['blue','พิมพ์เสร็จ'],'Outsource':['purple','ส่งนอก'],'QC Pass':['ok','QC'],'Shipped':['green','ส่งแล้ว'],'Created':['grey','รอ']};var c=m[s||'']||['gold',(s||'-')];return '<span class="sn-badge '+c[0]+'">'+c[1]+'</span>';}
 
@@ -203,7 +203,7 @@ function renderCash(data){
 if(!data)return;
 var net=(data.totalIncome||0)-(data.totalExpense||0);
 function kfmt(n){n=Math.round(n||0);var a=Math.abs(n);return '฿'+(a>=1000?(Math.round(n/100)/10)+'k':n);}
-var setk=function(id,v){var e=document.getElementById(id);if(e)e.textContent=kfmt(v);};
+var setk=function(id,v){var e=document.getElementById(id);if(e){if(window.snCountUp)snCountUp(e,v,kfmt);else e.textContent=kfmt(v);}};
 setk('h-in',data.totalIncome);setk('h-out',data.totalExpense);setk('h-net',net);
 }
 /* Local-first: paint the persistent IndexedDB snapshot instantly, then refresh

@@ -335,6 +335,7 @@ document.getElementById('tab'+f.charAt(0).toUpperCase()+f.slice(1)).classList.ad
 selectedVariant = null;
 document.getElementById('detailSection').style.display='none';
 render();
+var vl=document.getElementById('variantList'); if(vl){ vl.classList.remove('sn-anim-in'); void vl.offsetWidth; vl.classList.add('sn-anim-in'); } // crossfade cards on filter change
 }
 
 function render(){
@@ -352,11 +353,19 @@ var avg = list.reduce(function(s,v){return s+v.total;},0)/list.length;
 var avgP = list.reduce(function(s,v){return s+v.profit;},0)/list.length;
 var mn = Math.min.apply(null,list.map(function(v){return v.total;}));
 var mx = Math.max.apply(null,list.map(function(v){return v.total;}));
-document.getElementById('sumCost').textContent = '฿'+fmtShort(avg);
+var bht=function(n){return '฿'+fmtShort(n);};
+if(window.snCountUp){
+snCountUp(document.getElementById('sumCost'), avg, bht);
+snCountUp(document.getElementById('sumProfit'), avgP, function(n){return n.toFixed(1)+'%';});
+snCountUp(document.getElementById('sumMin'), mn, bht);
+snCountUp(document.getElementById('sumMax'), mx, bht);
+}else{
+document.getElementById('sumCost').textContent = bht(avg);
 document.getElementById('sumProfit').textContent = avgP.toFixed(1)+'%';
+document.getElementById('sumMin').textContent = bht(mn);
+document.getElementById('sumMax').textContent = bht(mx);
+}
 (function(){var arc=document.getElementById('sumProfitArc');if(arc){var C=201,p=Math.max(0,Math.min(100,avgP||0));arc.style.strokeDashoffset=String(C*(1-p/100));}})();
-document.getElementById('sumMin').textContent = '฿'+fmtShort(mn);
-document.getElementById('sumMax').textContent = '฿'+fmtShort(mx);
 }
 
 function drawBarChart(){

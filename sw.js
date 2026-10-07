@@ -5,7 +5,7 @@
    - Apps Script API (script.google.com): bypass service worker; shared transport handles timeouts and safe read retries.
    Only GET requests are cached; POST (auth, uploads, mutations) always hits the network.
    Bump VERSION to force a refresh of all cached assets. */
-var VERSION = 'v60';
+var VERSION = 'v61';
 var SHELL   = 'sn-shell-' + VERSION;
 var RUNTIME = 'sn-runtime-' + VERSION;
 
