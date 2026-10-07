@@ -178,7 +178,7 @@ async function doRegister(e){
   if(!/^[a-zA-Z0-9_]+$/.test(u)){showError('ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษ ตัวเลข หรือ _');return;}
   if(!n){showError('กรุณาระบุชื่อแสดง');return;}if(!/^\d{4}$/.test(p)){showError('กรุณาระบุ PIN ตัวเลข 4 หลัก');return;}if(p!==p2){showError('PIN ไม่ตรงกัน');return;}
   registerBusy=true;authGeneration++;var btn=document.getElementById('regBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังลงทะเบียน…';
-  try{var d=await authRequest({action:'auth_register',username:u,name:n,pin:p,role:'operator'});if(d.success){showTab('login');showSuccess('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');document.getElementById('loginUser').value=u;}else showError(d.error||'ลงทะเบียนไม่สำเร็จ');}
+  try{var d=await authRequest({action:'auth_register',username:u,name:n,pin:p,role:'operator'});if(d.success){showTab('login');showSuccess('ลงทะเบียนสำเร็จ! บัญชีของคุณรอผู้ดูแลอนุมัติก่อนจึงจะเข้าใช้งานได้');document.getElementById('loginUser').value=u;}else showError(d.error||'ลงทะเบียนไม่สำเร็จ');}
   catch(err){showError(authMessage(err));}finally{registerBusy=false;btn.disabled=false;btn.textContent='ลงทะเบียน';}
 }
 // Validate remembered tokens before redirecting; expired tokens must not bounce

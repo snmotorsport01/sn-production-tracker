@@ -162,7 +162,7 @@ function addUser(){
   if(!/^\d{4}$/.test(p)){showToast('PIN ต้องเป็นตัวเลข 4 หลัก','error');return;}
   // register as operator first (backend only allows admin/manager/operator on register),
   // then promote to the chosen department role via auth_update_user
-  apiPost({action:'auth_register',username:u,name:n,pin:p,role:'operator'},function(d){
+  apiPost({action:'auth_register',username:u,name:n,pin:p,role:'operator',token:window._snToken,adminToken:window._snToken},function(d){
     if(d.success){
       if(role!=='operator'){
         apiPost({action:'auth_update_user',token:window._snToken,targetUsername:u,newRole:role},function(){loadUsers();});

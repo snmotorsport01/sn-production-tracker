@@ -19,6 +19,9 @@ window.snFetch=function(input,options){
         if(!url.searchParams.get('token')){url.searchParams.set('token',_tk);input=isStr?url.href:new Request(url.href,input);}
       }else if(typeof options.body==='string' && /^\s*\{/.test(options.body)){
         try{var _b=JSON.parse(options.body);if(_b&&typeof _b==='object'&&_b.token===undefined&&_b.action!=='auth_login'&&_b.action!=='auth_register'){_b.token=_tk;options=Object.assign({},options,{body:JSON.stringify(_b)});}}catch(e){}
+      }else if(!isStr && method==='POST' && typeof options.body!=='string'){
+        // Request-object POST: read its body async, then re-enter as string form so the branch above injects the token (no loop — string path checks token presence).
+        return input.clone().text().then(function(_bt){var _h={};try{input.headers.forEach(function(v,k){_h[k]=v;});}catch(e){}return window.snFetch(url.href,Object.assign({},options,{method:'POST',headers:_h,body:_bt}));});
       }
     }
   }
