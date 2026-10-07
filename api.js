@@ -4,6 +4,29 @@
 var nativeFetch=window.fetch.bind(window),pending=new Map();
 var reads=new Set(['hubBundle','financeBundle','ceoBundle','costBundle','listBatches','getBatch','getStats','listInventory','listBOM','listPODrafts','listPayments','getCashFlow','listCashflow','listInvoices','getInvoice','cashflowSummary','getProducts','getCostData','getPermissions','authMe','authVerify','authListUsers','batchHistory','listWarranties','getWarranty','sync','n8nHealth','n8nGetAll','n8nGetChanges','n8nSyncStatus']);
 window.snApiMetrics=[];
+/* Latency instrumentation (best-effort; must never affect a request). Persisted
+   ring buffer across page loads so p50/p95/cold-warm can be read over several
+   periods: snMetrics.table() in the console. No tokens/PINs/payloads are stored. */
+var snSeen={},SN_MBUF='sn_metrics_v1',SN_MCAP=600;
+function snMRead(){try{return JSON.parse(localStorage.getItem(SN_MBUF)||'[]');}catch(e){return[];}}
+function snMWrite(a){try{if(a.length>SN_MCAP)a=a.slice(a.length-SN_MCAP);localStorage.setItem(SN_MBUF,JSON.stringify(a));}catch(e){}}
+function snMRecord(api,method,ms,outcome,attempts){
+  var cold=!snSeen[api];snSeen[api]=true;
+  window.snApiMetrics.push({api:api,method:method,ms:ms,outcome:outcome,attempts:attempts,cold:cold});if(window.snApiMetrics.length>100)window.snApiMetrics.shift();
+  try{var b=snMRead();b.push({a:api,m:ms,o:outcome,c:cold?1:0,n:attempts,t:Date.now()});snMWrite(b);}catch(e){}
+}
+function snPct(a,p){if(!a.length)return null;var s=a.slice().sort(function(x,y){return x-y;});return s[Math.min(s.length-1,Math.floor(p/100*s.length))];}
+window.snMetrics={
+  summary:function(sinceHours){
+    var since=sinceHours?Date.now()-sinceHours*3600000:0,buf=snMRead().filter(function(s){return s.t>=since;}),by={};
+    buf.forEach(function(s){var g=by[s.a]||(by[s.a]={ok:[],cold:[],warm:[],n:0,to:0,er:0});g.n++;if(s.o==='timeout')g.to++;else if(s.o==='error')g.er++;else{g.ok.push(s.m);(s.c?g.cold:g.warm).push(s.m);}});
+    var out={};Object.keys(by).forEach(function(a){var g=by[a];out[a]={count:g.n,okP50:snPct(g.ok,50),okP95:snPct(g.ok,95),coldP95:snPct(g.cold,95),warmP95:snPct(g.warm,95),timeoutRate:+(g.to/g.n).toFixed(3),errorRate:+(g.er/g.n).toFixed(3)};});
+    return out;
+  },
+  table:function(h){try{console.table(window.snMetrics.summary(h));}catch(e){console.log(JSON.stringify(window.snMetrics.summary(h),null,1));}return 'ok';},
+  raw:function(){return snMRead();},
+  clear:function(){try{localStorage.removeItem(SN_MBUF);}catch(e){}window.snApiMetrics=[];return 'cleared';}
+};
 window.snFetch=function(input,options){
   options=options||{};
   var isStr=(typeof input==='string');
@@ -44,7 +67,7 @@ window.snFetch=function(input,options){
       }finally{clearTimeout(timer);if(options.signal)options.signal.removeEventListener('abort',abort);}
     }
   }
-  var promise=request().finally(function(){pending.delete(key);window.snApiMetrics.push({api:api||url.hostname,method:method,attempts:attempts,ms:Math.round(performance.now()-started)});if(window.snApiMetrics.length>100)window.snApiMetrics.shift();});
+  var promise=request().then(function(r){snMRecord(api||url.hostname,method,Math.round(performance.now()-started),'ok',attempts);return r;},function(e){snMRecord(api||url.hostname,method,Math.round(performance.now()-started),/timed out/i.test(e&&e.message||'')?'timeout':'error',attempts);throw e;}).finally(function(){pending.delete(key);});
   if(read)pending.set(key,promise);
   return promise.then(function(r){return r.clone();});
 };
