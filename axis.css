@@ -11,9 +11,9 @@
 
 :root{
   --ground:#08090b; --panel:#141519; --panel2:#181b21; --panelhi:#1e222a;
-  --hair:rgba(238,240,244,.08); --hair2:rgba(238,240,244,.15);
+  --hair:rgba(238,240,244,.12); --hair2:rgba(238,240,244,.22);
   --gold:#cea24a; --goldhi:#e4c77a; --golddim:#7a6128; --goldglow:rgba(206,162,74,.16); --goldline:rgba(206,162,74,.22);
-  --ink:#ecebe5; --ink2:#8d8b83; --ink3:#63656d;
+  --ink:#ecebe5; --ink2:#a4a299; --ink3:#868a94;   /* ink3 raised from #63656d (~3.3:1) to ≥4.5:1 AA on the dark panels */
   --live:#68b09b; --amber:#e8a13c; --red:#e5555a;
   --disp:'Chakra Petch',system-ui,sans-serif;
   --body:'IBM Plex Sans Thai',system-ui,sans-serif;

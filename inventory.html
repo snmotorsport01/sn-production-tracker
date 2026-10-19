@@ -21,7 +21,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#0a0a0a;color:#e5e5e5;
 padding:16px;max-width:600px;margin:0 auto;min-height:100vh;min-height:100dvh}
-.hdr{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.hdr{font-size:11px;color:#8b8e97;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
 .card{background:#151515;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e1e1e}
 .btn{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;
 text-align:center;cursor:pointer;border:none;margin-bottom:8px;transition:.12s;-webkit-appearance:none}
@@ -39,7 +39,7 @@ border-radius:50%;animation:spin .6s linear infinite}
 .b-ok{background:#0a2a1a;color:#8fd3bf}
 .b-low{background:#2a1a00;color:#f59e0b}
 .b-crit{background:#2d1010;color:#f87171}
-.b-out{background:#1a1a1a;color:#666}
+.b-out{background:#1a1a1a;color:#8b8e97}
 
 /* Summary grid */
 .sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
@@ -52,10 +52,10 @@ border-bottom:1px solid #1a1a1a}
 .stock-row:last-child{border-bottom:none}
 .stock-info{flex:1;min-width:0}
 .stock-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stock-meta{font-size:12px;color:#666;margin-top:2px}
+.stock-meta{font-size:12px;color:#8b8e97;margin-top:2px}
 .stock-qty{text-align:right;margin:0 12px}
 .stock-qty .n{font-size:18px;font-weight:700}
-.stock-qty .unit{font-size:11px;color:#666}
+.stock-qty .unit{font-size:11px;color:#8b8e97}
 .stock-bar{width:60px;height:6px;background:#1a1a1a;border-radius:3px;margin-top:4px}
 .stock-bar-fill{height:100%;border-radius:3px;transition:.3s}
 
@@ -75,7 +75,7 @@ border:1px solid #333;background:#0d0d0d;color:#fff;font-size:14px;-webkit-appea
 /* Tabs */
 .tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;
-white-space:nowrap;border:1px solid #333;background:transparent;color:#888;transition:.15s}
+white-space:nowrap;border:1px solid #4a4d55;background:transparent;color:#aeb0b8;transition:.15s}
 .tab.active{background:#cea24a;color:#fff;border-color:#cea24a}
 
 /* Toast */
@@ -194,7 +194,7 @@ background:#0d0d0d;color:#fff;font-size:14px;margin-bottom:10px;-webkit-appearan
     <span style="color:#888;font-size:12px">ชิ้น</span>
     <button class="btn btn-o" onclick="fillFromBOM()" style="padding:8px 10px;font-size:12px;margin:0;flex:1;white-space:nowrap">↻ ดึงวัตถุดิบตามสูตร</button>
   </div>
-  <div style="display:flex;gap:6px;font-size:11px;color:#666;margin-bottom:4px">
+  <div style="display:flex;gap:6px;font-size:11px;color:#8b8e97;margin-bottom:4px">
     <span style="flex:2">วัตถุดิบ</span><span style="width:52px;text-align:center">จำนวน</span><span style="width:78px;text-align:center">ราคา/หน่วย</span><span style="width:24px"></span>
   </div>
   <div id="mcRows"></div>
@@ -302,7 +302,7 @@ function loadInventory() {
 }
 
 function getStockStatus(stock, min) {
-  if (stock <= 0) return { label: 'Out', cls: 'b-out', color: '#666' };
+  if (stock <= 0) return { label: 'Out', cls: 'b-out', color: '#8b8e97' };
   if (stock <= min * 0.5) return { label: 'Critical', cls: 'b-crit', color: '#f87171' };
   if (stock <= min) return { label: 'Low', cls: 'b-low', color: '#f59e0b' };
   return { label: 'OK', cls: 'b-ok', color: '#8fd3bf' };
@@ -653,7 +653,7 @@ function renderPOs(pos) {
     html += ' <span class="po-status" style="color:#888">' + (po.status || 'Draft') + '</span></div>';
     html += '</div>';
     html += '<div style="font-size:13px;color:#ccc;margin-bottom:4px">' + (po.items || '-') + '</div>';
-    html += '<div style="font-size:12px;color:#666">Suppliers: ' + (po.suppliers || '-') + '</div>';
+    html += '<div style="font-size:12px;color:#8b8e97">Suppliers: ' + (po.suppliers || '-') + '</div>';
     html += '</div>';
   });
   document.getElementById('po-content').innerHTML = html;
@@ -684,13 +684,13 @@ function renderBOM(items) {
   var totalCost = 0;
   var html = '<div class="card">';
   html += '<div style="font-weight:700;margin-bottom:4px">SN Mirror — Bill of Materials</div>';
-  html += '<div style="font-size:12px;color:#666;margin-bottom:10px">Materials required per 1 unit</div>';
+  html += '<div style="font-size:12px;color:#8b8e97;margin-bottom:10px">Materials required per 1 unit</div>';
 
   items.forEach(function(it) {
     var cost = parseFloat(it.cost) || 0;
     totalCost += cost;
     html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:13px">';
-    html += '<div><span style="color:#fff">' + it.item + '</span> <span style="color:#666">x' + it.qty + ' ' + (it.unit || '') + '</span></div>';
+    html += '<div><span style="color:#fff">' + it.item + '</span> <span style="color:#8b8e97">x' + it.qty + ' ' + (it.unit || '') + '</span></div>';
     html += '<div style="color:#f59e0b;font-weight:600">฿' + cost.toLocaleString('th-TH', {minimumFractionDigits:2}) + '</div>';
     html += '</div>';
   });
