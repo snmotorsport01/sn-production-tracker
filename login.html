@@ -192,7 +192,12 @@ async function doRegister(e){
     if(generation!==authGeneration)return;
     if(d.success&&d.user){sessionStorage.setItem('sn_token',t);sessionStorage.setItem('sn_user',JSON.stringify(d.user));sessionStorage.setItem('sn_me_ts',String(Date.now()));if(localStorage.getItem('sn_token'))localStorage.setItem('sn_user',JSON.stringify(d.user));var perms=localStorage.getItem('sn_perms');if(perms&&!sessionStorage.getItem('sn_perms'))sessionStorage.setItem('sn_perms',perms);location.replace('index.html');}
     else if(d.code===401||d.code===403||d.code===404){clearAuth();showError('เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง');}
-  }catch(err){/* A network failure is not proof that the stored token is invalid. */}
+  }catch(err){
+    // Validation timed out / network hiccup — NOT proof the token is dead (a dead
+    // session returns 401 fast). Don't strand a remembered user on the login form:
+    // hand off to the Hub, which re-validates and bounces back here only if truly expired.
+    if(generation===authGeneration&&t)location.replace('index.html');
+  }
   finally{clearTimeout(timer);}
 })();
 

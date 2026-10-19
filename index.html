@@ -310,12 +310,17 @@ function applyHubPerms(){
     var u=snMe();
     if(!u||u.role==='admin'){ showAll(); return; }             // admin: everything
     var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}
-    if(!P||!P[u.role]){ showAll(); return; }                    // no matrix yet → fail-open
-    var allow=P[u.role];
+    if(!P){ showAll(); return; }                                 // perms not loaded yet → fail-open (loading window only)
+    var allow=P[u.role]||[];   // perms loaded but role absent → [] → fail-closed, matching the nav (axis.js) so menu & buttons agree
     var ok=function(pg){return !pg||pg==='index.html'||pg==='hub.html'||allow.indexOf(pg)>=0;};
     document.querySelectorAll('[data-page]').forEach(function(el){el.style.display=ok(el.getAttribute('data-page')||'')?'':'none';});
     document.querySelectorAll('.bottom-nav a').forEach(function(a){var h=(a.getAttribute('href')||'').split('/').pop();a.style.display=ok(/\.html$/.test(h)?h:'')?'':'none';});
     document.querySelectorAll('.section').forEach(function(sec){var a=sec.querySelector('a[href$=".html"]');if(!a)return;var pg=(a.getAttribute('href')||'').split('#')[0].split('?')[0].split('/').pop();sec.style.display=ok(pg)?'':'none';});
+    // Role has no granted pages → don't leave a blank hub; say so plainly.
+    var note=document.getElementById('sn-no-access');
+    if(allow.length===0){
+      if(!note){note=document.createElement('div');note.id='sn-no-access';note.className='card';note.style.cssText='margin:12px 0;text-align:center;color:#f59e0b;padding:20px;font-size:14px';note.textContent='บัญชีนี้ยังไม่ได้รับสิทธิ์เข้าถึงเมนูใด กรุณาติดต่อผู้ดูแลระบบ';var host=document.querySelector('.sn-kpis');if(host&&host.parentNode)host.parentNode.insertBefore(note,host);}
+    } else if(note){ note.remove(); }
   }catch(e){}
 }
 document.addEventListener('DOMContentLoaded',function(){
