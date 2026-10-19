@@ -232,6 +232,8 @@ function renderProducts(d){if(d&&d.success===true)setTile('t-cost',(d.products||
 function paintSections(sections){if(!sections)return;Object.keys(renders).forEach(function(api){if(sections[api]&&sections[api].success!==false)renders[api](sections[api]);});if(sections.getProducts)renderProducts(sections.getProducts);}
 function accept(api,d){if(!d||d.success===false)return;if(api==='getProducts'){try{sessionStorage.setItem('sn_cache_getProducts',JSON.stringify({t:Date.now(),d:d}));}catch(e){}renderProducts(d);}else{try{sessionStorage.setItem('sn_hub_'+api,JSON.stringify(d));}catch(e){}renders[api](d);}}
 function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catch(function(){});}
+// A hub panel whose section the server withheld (no permission) must not spin forever.
+function denyPanels(errors){var panelFor={listBatches:'hubQueue',listInventory:'hubAlerts'};Object.keys(panelFor).forEach(function(api){if(errors&&errors[api]){var el=document.getElementById(panelFor[api]);if(el&&/กำลังโหลด/.test(el.textContent))el.innerHTML='<div class="sn-row" style="justify-content:center;color:var(--ink3)">ไม่มีสิทธิ์เข้าถึง</div>';}});}
 (async function(){
   await purgeSensitiveCache();   // drop any finance/cost snapshots this user may not see, before painting
   var products=null;
@@ -245,6 +247,7 @@ function fallback(api){callAPI({api:api}).then(function(d){accept(api,d);}).catc
   callAPI({api:'hubBundle',products:products?'0':'1'}).then(function(d){
     if(!d||d.success!==true||!d.sections)throw new Error('Bundle unavailable');
     Object.keys(renders).concat(products?[]:['getProducts']).forEach(function(api){if(Object.prototype.hasOwnProperty.call(d.sections,api))accept(api,d.sections[api]);else if(!(d.errors&&d.errors[api]))fallback(api);}); // skip fallback for sections the server withheld (forbidden)
+    denyPanels(d.errors); // withheld sections: replace their "loading…" spinner with a clear no-access note
     try{ if(window.snStore) snStore.put('hub', d.sections, d.epochReliable?d.epochs:null); }catch(e){}
     if(window.snMetrics)snMetrics.markTTF('hub','network');
   }).catch(function(){Object.keys(renders).concat(products?[]:['getProducts']).forEach(fallback);});

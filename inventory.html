@@ -226,6 +226,27 @@ var allPOs = [];
 var bomData = [];
 var currentRestockItem = null;
 
+// Normalize any API response to an array of rows, or null when it is NOT a list
+// (error / forbidden / unexpected shape) — so render code never calls forEach/filter
+// on a {success:false} object and throws "x is not a function".
+function invRows(data){
+  if(Array.isArray(data))return data;
+  if(data&&Array.isArray(data.items))return data.items;
+  if(data&&Array.isArray(data.data))return data.data;
+  return null;
+}
+// Tell an auth/permission denial apart from a generic load failure.
+function invDenied(data){return !!(data&&data.success===false&&(data.code===401||data.code===403));}
+// Standard empty-state card. kind: 'denied' | 'error' | 'empty'
+function invStateCard(kind,retryFn){
+  var msg = kind==='denied' ? 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้'
+          : kind==='error'  ? 'โหลดข้อมูลไม่สำเร็จ'
+          :                   'ไม่มีข้อมูล';
+  var color = kind==='denied' ? '#f59e0b' : kind==='error' ? '#f87171' : '#555';
+  return '<div class="card" style="text-align:center;color:'+color+';padding:24px">'+msg+'</div>' +
+    (retryFn && kind==='error' ? '<button class="btn btn-o" onclick="'+retryFn+'()">ลองใหม่</button>' : '');
+}
+
 function callAPI(params) {
   var qs = Object.keys(params).map(function(k) {
     return encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
@@ -260,16 +281,23 @@ function snPaint(id, key) { try { var h = sessionStorage.getItem(key); if (h) { 
 function snSave(id, key) { try { sessionStorage.setItem(key, document.getElementById(id).innerHTML); } catch (e) {} }
 function loadInventory() {
   // instant paint from cache; also restore allInventory so cached rows are clickable
-  try { var cj = sessionStorage.getItem('sn_inv_data'); if (cj) { allInventory = JSON.parse(cj); snPaint('stock-content', 'sn_h_stock'); updateAlertBadge(allInventory); } } catch (e) {}
+  try { var cj = sessionStorage.getItem('sn_inv_data'); if (cj) { allInventory = invRows(JSON.parse(cj)) || []; snPaint('stock-content', 'sn_h_stock'); updateAlertBadge(allInventory); } } catch (e) {}
   callAPI({ api: 'listInventory' }).then(function(data) {
-    allInventory = data;
-    try { sessionStorage.setItem('sn_inv_data', JSON.stringify(data)); } catch (e) {}
-    renderStock(data);
-    updateAlertBadge(data);
+    var items = invRows(data);
+    if (!items) {   // forbidden / unauthorized / unexpected — never crash on forEach
+      allInventory = [];
+      if (!document.querySelector('#stock-content .stock-row'))
+        document.getElementById('stock-content').innerHTML = invStateCard(invDenied(data) ? 'denied' : 'error', 'loadInventory');
+      updateAlertBadge([]);
+      return;
+    }
+    allInventory = items;
+    try { sessionStorage.setItem('sn_inv_data', JSON.stringify(items)); } catch (e) {}
+    renderStock(items);
+    updateAlertBadge(items);
   }).catch(function(err) {
-    if (!document.querySelector('#stock-content .stock-row')) document.getElementById('stock-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">Error loading inventory<br><span style="font-size:13px">' + err + '</span></div>' +
-      '<button class="btn btn-o" onclick="loadInventory()">Retry</button>';
+    if (!document.querySelector('#stock-content .stock-row'))
+      document.getElementById('stock-content').innerHTML = invStateCard('error', 'loadInventory');
   });
 }
 
@@ -335,6 +363,7 @@ function filterStock(q) {
 }
 
 function updateAlertBadge(items) {
+  if (!Array.isArray(items)) return;
   var count = 0;
   items.forEach(function(it) {
     var s = getStockStatus(it.stock, it.min);
@@ -403,10 +432,18 @@ function submitRestock() {
 // ── Alerts Tab ──
 function loadAlerts() {
   var items = allInventory;
-  if (!items.length) {
+  if (!Array.isArray(items) || !items.length) {
     callAPI({ api: 'listInventory' }).then(function(data) {
-      allInventory = data;
-      renderAlerts(data);
+      var rows = invRows(data);
+      if (!rows) {
+        allInventory = [];
+        document.getElementById('alerts-content').innerHTML = invStateCard(invDenied(data) ? 'denied' : 'error', 'loadAlerts');
+        return;
+      }
+      allInventory = rows;
+      renderAlerts(rows);
+    }).catch(function() {
+      document.getElementById('alerts-content').innerHTML = invStateCard('error', 'loadAlerts');
     });
     return;
   }
@@ -414,6 +451,7 @@ function loadAlerts() {
 }
 
 function renderAlerts(items) {
+  if (!Array.isArray(items)) { document.getElementById('alerts-content').innerHTML = invStateCard('error', 'loadAlerts'); return; }
   var alerts = items.filter(function(it) {
     return getStockStatus(it.stock, it.min).label !== 'OK';
   });
@@ -586,18 +624,22 @@ function sendMaterialCost() {
 // ── PO Drafts Tab ──
 function loadPOs() {
   callAPI({ api: 'listPODrafts' }).then(function(data) {
-    allPOs = data;
-    renderPOs(data);
+    var rows = invRows(data);
+    if (!rows) {
+      allPOs = [];
+      document.getElementById('po-content').innerHTML = invStateCard(invDenied(data) ? 'denied' : 'error', 'loadPOs');
+      return;
+    }
+    allPOs = rows;
+    renderPOs(rows);
   }).catch(function(err) {
-    document.getElementById('po-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">Error loading POs</div>';
+    document.getElementById('po-content').innerHTML = invStateCard('error', 'loadPOs');
   });
 }
 
 function renderPOs(pos) {
-  if (!pos.length) {
-    document.getElementById('po-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#555;padding:24px">No PO drafts</div>';
+  if (!Array.isArray(pos) || !pos.length) {
+    document.getElementById('po-content').innerHTML = invStateCard('empty');
     return;
   }
 
@@ -620,18 +662,22 @@ function renderPOs(pos) {
 // ── BOM Tab ──
 function loadBOM() {
   callAPI({ api: 'listBOM' }).then(function(data) {
-    bomData = data;
-    renderBOM(data);
+    var rows = invRows(data);
+    if (!rows) {
+      bomData = [];
+      document.getElementById('bom-content').innerHTML = invStateCard(invDenied(data) ? 'denied' : 'error', 'loadBOM');
+      return;
+    }
+    bomData = rows;
+    renderBOM(rows);
   }).catch(function(err) {
-    document.getElementById('bom-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#f87171">Error loading BOM</div>';
+    document.getElementById('bom-content').innerHTML = invStateCard('error', 'loadBOM');
   });
 }
 
 function renderBOM(items) {
-  if (!items.length) {
-    document.getElementById('bom-content').innerHTML =
-      '<div class="card" style="text-align:center;color:#555;padding:24px">No BOM data</div>';
+  if (!Array.isArray(items) || !items.length) {
+    document.getElementById('bom-content').innerHTML = invStateCard('empty');
     return;
   }
 
