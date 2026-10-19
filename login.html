@@ -162,9 +162,10 @@ async function doLogin(e){
   if(!u){showError('กรุณาระบุชื่อผู้ใช้');return;}if(!/^\d{4}$/.test(p)){showError('กรุณาระบุ PIN ตัวเลข 4 หลัก');return;}
   loginBusy=true;authGeneration++;var btn=document.getElementById('loginBtn');btn.disabled=true;btn.innerHTML='<span class="loading-spinner"></span>กำลังเข้าสู่ระบบ…';
   try{
-    var d=await authRequest({action:'auth_login',username:u,pin:p});
+    var keep=document.getElementById('keepLogin').checked;
+    var d=await authRequest({action:'auth_login',username:u,pin:p,remember:keep}); // remember → backend issues a long-lived (30d) session; else 6h
     if(!d.success){showError(d.error||'เข้าสู่ระบบไม่สำเร็จ');return;}
-    saveLogin(d,document.getElementById('keepLogin').checked);
+    saveLogin(d,keep);
     // Updated backend supplies permissions in the same login response. Legacy
     // deployments still redirect immediately and refresh permissions on the Hub.
     window.location.replace('index.html');
