@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<!--sn-me-->
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html')return;var API='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';var tok=sessionStorage.getItem('sn_token')||localStorage.getItem('sn_token');var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!tok||!raw)return;var u;try{u=JSON.parse(raw);}catch(e){return;}try{var _mt=+(sessionStorage.getItem('sn_me_ts')||0);if(Date.now()-_mt<300000)return;sessionStorage.setItem('sn_me_ts',String(Date.now()));}catch(e){}var keep=!!localStorage.getItem('sn_token');fetch(API+'?api=authMe&token='+encodeURIComponent(tok)).then(function(r){return r.json()}).then(function(d){if(!d)return;if(d.success===false&&(d.code===401||d.code===403)){sessionStorage.clear();try{localStorage.removeItem('sn_token');localStorage.removeItem('sn_user');localStorage.removeItem('sn_perms');}catch(e){}location.replace('login.html');return;}if(d.success&&d.user&&d.user.role&&d.user.role!==u.role){sessionStorage.setItem('sn_user',JSON.stringify(d.user));if(keep)localStorage.setItem('sn_user',JSON.stringify(d.user));fetch(API+'?api=getPermissions').then(function(r){return r.json()}).then(function(pr){if(pr&&pr.permissions){var pj=JSON.stringify(pr.permissions);sessionStorage.setItem('sn_perms',pj);if(keep)localStorage.setItem('sn_perms',pj);}}).catch(function(){}).then(function(){location.reload();});}}).catch(function(){});}catch(e){}})();</script>
+<!--sn-perm-->
+<script>(function(){try{var page=(location.pathname.split('/').pop()||'index.html');if(page==='login.html'||page==='index.html'||page==='hub.html')return;var raw=sessionStorage.getItem('sn_user')||localStorage.getItem('sn_user');if(!raw)return;var u=JSON.parse(raw);if(!u||u.role==='admin')return;var P=null;try{P=JSON.parse(sessionStorage.getItem('sn_perms')||localStorage.getItem('sn_perms')||'null');}catch(e){}if(P&&P[u.role]){if(P[u.role].indexOf(page)===-1){location.replace('index.html');return;}}}catch(e){}})();</script>
+
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SN ERP — CRM</title>
+<link rel="manifest" href="manifest.json">
+<style>
+/* Customer 360 — unify warranty + sales into one profile. Local tokens mirror axis.css. */
+:root{--panel:#141519;--panel2:#1b1e25;--hair:rgba(238,240,244,.12);--hair2:rgba(238,240,244,.22);
+--ink:#ecebe5;--ink2:#a9a79e;--ink3:#878b95;--gold:#cea24a;--goldhi:#e4c77a;--golddim:#7a6128;--goldsoft:rgba(206,162,74,.14);
+--live:#68b09b;--amber:#e8a13c;--red:#e5555a;--mono:'IBM Plex Mono',ui-monospace,monospace;--disp:'Chakra Petch',system-ui,sans-serif}
+.crm-mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.crm-banner{background:rgba(232,161,60,.1);border:1px solid rgba(232,161,60,.3);color:var(--amber);border-radius:12px;padding:10px 14px;font-size:12.5px;margin-bottom:14px;display:none}
+.crm-banner.show{display:block}
+.crm-wrap{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+.crm-list{background:var(--panel);border:1px solid var(--hair);border-radius:16px;padding:12px}
+.crm-search{width:100%;background:var(--panel2);border:1px solid var(--hair2);border-radius:10px;color:var(--ink);padding:11px 13px;font-family:inherit;font-size:14px;margin-bottom:8px;min-height:44px}
+.crm-search::placeholder{color:var(--ink3)}
+.crm-rows{display:flex;flex-direction:column;gap:5px;max-height:70vh;overflow:auto}
+.crm-row{text-align:left;background:transparent;border:1px solid transparent;border-radius:11px;padding:11px 12px;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:2px;font-family:inherit}
+.crm-row:hover{background:var(--panel2)}
+.crm-row[aria-current="true"]{background:var(--goldsoft);border-color:var(--goldsoft)}
+.crm-row .rn{font-family:var(--disp);font-weight:600;font-size:14.5px}
+.crm-row .rm{font-size:11.5px;color:var(--ink3)}
+.crm-card{background:var(--panel);border:1px solid var(--hair);border-radius:16px;padding:20px;min-width:0}
+.crm-state{text-align:center;color:var(--ink3);padding:40px 16px}
+.crm-state.err{color:var(--red)} .crm-state.denied{color:var(--amber)}
+.crm-prof{display:flex;flex-direction:column;gap:16px}
+.crm-phead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.crm-av{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--golddim),#2a2410);border:1px solid var(--goldsoft);display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:20px;color:var(--goldhi)}
+.crm-pn{font-family:var(--disp);font-weight:700;font-size:20px}
+.crm-pm{color:var(--ink3);font-size:12.5px;margin-top:3px;font-family:var(--mono)}
+.crm-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.crm-pill{font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--hair);color:var(--ink2)}
+.crm-pill.gold{color:var(--gold);border-color:var(--goldsoft);background:var(--goldsoft)}
+.crm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.crm-stat{background:var(--panel2);border:1px solid var(--hair);border-radius:12px;padding:12px}
+.crm-stat .l{font-size:11px;color:var(--ink3)}
+.crm-stat .v{font-family:var(--mono);font-size:17px;font-weight:600;margin-top:4px}
+.crm-barw{height:6px;background:var(--panel2);border-radius:4px;margin-top:8px;overflow:hidden}
+.crm-bar{height:100%;border-radius:4px}
+.crm-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--ink3);text-transform:uppercase;margin-bottom:6px}
+.crm-tl{padding:0;margin:0}
+.crm-tl li{list-style:none;position:relative;padding:0 0 15px 22px;border-left:1px solid var(--hair);margin-left:5px}
+.crm-tl li:last-child{border-left-color:transparent}
+.crm-tl li::before{content:"";position:absolute;left:-5px;top:2px;width:9px;height:9px;border-radius:50%;background:var(--tc,var(--ink3));border:2px solid #0a0a0a}
+.crm-tl .d{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.crm-tl .t{font-size:13.5px;margin-top:1px}.crm-tl .t b{color:var(--ink)}
+.crm-sug{background:linear-gradient(135deg,var(--goldsoft),transparent);border:1px solid var(--goldsoft);border-radius:14px;padding:16px}
+.crm-sug h3{font-size:14px;color:var(--goldhi);margin:0 0 4px;font-family:var(--disp)}
+.crm-offer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--hair)}
+.crm-offer:first-of-type{border-top:0}
+.crm-offer .on{font-size:13.5px;font-weight:600}.crm-offer .ow{font-size:11.5px;color:var(--ink3)}
+.crm-btn{border:1px solid var(--gold);background:var(--gold);color:#161003;padding:7px 13px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.crm-btn.o{background:transparent;color:var(--gold)}
+.crm-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#23272f;border:1px solid var(--gold);color:var(--ink);padding:11px 18px;border-radius:12px;font-size:13.5px;opacity:0;pointer-events:none;transition:.22s;z-index:400}
+.crm-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:760px){.crm-wrap{grid-template-columns:1fr}.crm-rows{max-height:40vh}.crm-stats{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="crm-banner" id="crmBanner">ตัวอย่าง — ยังไม่เชื่อมข้อมูลจริง (รอ backend เฟส 0) · ปุ่มเสนอเป็นการสาธิต</div>
+
+<div class="crm-wrap">
+  <div class="crm-list">
+    <input class="crm-search" id="crmSearch" placeholder="ค้นชื่อ / เบอร์…" aria-label="ค้นหาลูกค้า">
+    <div class="crm-rows" id="crmRows"><div class="crm-state">กำลังโหลด…</div></div>
+  </div>
+  <div class="crm-card"><div id="crmProf"><div class="crm-state">เลือกลูกค้าทางซ้าย</div></div></div>
+</div>
+
+<div class="crm-toast" id="crmToast"></div>
+
+<link rel="stylesheet" href="axis.css">
+<link rel="stylesheet" href="lounge.css">
+<script src="api.js"></script>
+<script src="store.js"></script>
+<script src="axis.js" defer></script>
+<script>
+var API_URL='https://script.google.com/macros/s/AKfycbzMqTc5rY4oi2jelEuuMZhybmbx-_13zaG0zDDrjvjC09Bx3sloUEa4c1V8Cv3fTtZW/exec';
+function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':s);return d.innerHTML;}
+function toast(m){var t=document.getElementById('crmToast');t.textContent=m;t.classList.add('show');clearTimeout(t._);t._=setTimeout(function(){t.classList.remove('show');},1900);}
+function callAPI(params){var qs=Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]==null?'':params[k]);}).join('&');return snFetch(API_URL+'?'+qs).then(function(r){return r.json();});}
+/* Normalize any list response to an array, or null when it is not a list (error/forbidden). */
+function asList(d){if(Array.isArray(d))return d;if(d&&Array.isArray(d.customers))return d.customers;if(d&&Array.isArray(d.data))return d.data;return null;}
+function denied(d){return !!(d&&d.success===false&&(d.code===401||d.code===403));}
+
+/* ---- sample fallback (until backend phase-0 lands) ---- */
+var SAMPLE_LIST=[
+ {phone:'08x-xxx-4821',name:'สมชาย รุ่งเรือง',products:['Aura FD2R (Stream)'],warrantyLeftDays:21},
+ {phone:'08x-xxx-1190',name:'วีระ ชัยศิริ',products:['Aura FL5 (Stream)'],warrantyLeftDays:118},
+ {phone:'08x-xxx-7730',name:'อาร์ม ศุภกร',products:['Aura T-spec (Stream)'],warrantyLeftDays:0}
+];
+var SAMPLE_360={
+ '08x-xxx-4821':{customer:{phone:'08x-xxx-4821',name:'สมชาย รุ่งเรือง',cars:'Honda Civic FD2R',since:'ก.พ. 2026',tags:['ลูกค้าใหม่']},
+   products:[{model:'Aura FD2R (Stream)',price:25900,warrantyLeftDays:21}],totalSpend:25900,
+   timeline:[{tc:'var(--gold)',d:'14 ก.พ. 2026',t:'ซื้อ <b>Aura FD2R</b> · 25,900฿'},{tc:'var(--live)',d:'15 ก.พ. 2026',t:'ลงทะเบียนประกัน 1 ปี'},{tc:'var(--ink3)',d:'02 มี.ค. 2026',t:'สอบถามวิธีติดตั้ง · ตอบแล้ว'},{tc:'var(--amber)',d:'พรุ่งนี้',t:'<b>งานตาม:</b> ชวนต่อประกัน'}],
+   suggestions:[['AXIS Gauge','เกจดิจิทัลสำหรับ FD2R'],['ที่วางแขนคันที่ 2','ถ้ามีรถอีกคัน'],['ชวนเพื่อน','รับส่วนลดทั้งคู่']]},
+ '08x-xxx-1190':{customer:{phone:'08x-xxx-1190',name:'วีระ ชัยศิริ',cars:'Honda Civic FL5',since:'ก.พ. 2026',tags:['พร้อม cross-sell']},
+   products:[{model:'Aura FL5 (Stream)',price:25900,warrantyLeftDays:118}],totalSpend:25900,
+   timeline:[{tc:'var(--gold)',d:'20 ก.พ. 2026',t:'ซื้อ <b>Aura FL5</b> · 25,900฿'},{tc:'var(--live)',d:'28 ก.พ. 2026',t:'ให้รีวิว 5 ดาว · บอกต่อ'},{tc:'var(--gold)',d:'วันนี้',t:'<b>งานตาม:</b> เสนอ AXIS Gauge'}],
+   suggestions:[['AXIS Gauge','ลูกค้ากลุ่มนี้ซื้อต่อสูง'],['แพ็กของแต่ง FL5',''],['ชวนเพื่อน','เขาบอกต่ออยู่แล้ว']]},
+ '08x-xxx-7730':{customer:{phone:'08x-xxx-7730',name:'อาร์ม ศุภกร',cars:'Toyota Supra A80',since:'มี.ค. 2025',tags:['เงียบ 7 เดือน']},
+   products:[{model:'Aura T-spec (Stream)',price:25900,warrantyLeftDays:0}],totalSpend:25900,
+   timeline:[{tc:'var(--gold)',d:'10 มี.ค. 2025',t:'ซื้อ <b>Aura T-spec</b> · 25,900฿'},{tc:'var(--ink3)',d:'มี.ค. 2026',t:'ประกันหมดอายุ'},{tc:'var(--red)',d:'วันนี้',t:'<b>งานตาม:</b> win-back'}],
+   suggestions:[['โปรลูกค้าเก่า','ดึงกลับก่อนลืมแบรนด์'],['AXIS Gauge',''],['ของแต่งรถคันใหม่','ถ้าเปลี่ยนรถ']]}
+};
+
+var LIST=[],usingSample=false,cur=null;
+
+function renderRows(filter){
+  var box=document.getElementById('crmRows');
+  var rows=LIST.filter(function(c){return !filter||(c.name||'').indexOf(filter)>=0||(c.phone||'').indexOf(filter)>=0;});
+  if(!rows.length){box.innerHTML='<div class="crm-state">ไม่พบลูกค้า</div>';return;}
+  box.innerHTML='';
+  rows.forEach(function(c){
+    var b=document.createElement('button');b.className='crm-row';b.dataset.phone=c.phone;
+    b.setAttribute('aria-current',c.phone===cur?'true':'false');
+    var wl=c.warrantyLeftDays;var wtxt=wl==null?'':(wl<=0?' · ประกันหมด':' · ประกัน '+wl+' วัน');
+    b.innerHTML='<span class="rn">'+esc(c.name)+'</span><span class="rm">'+esc((c.products&&c.products[0])||'')+esc(wtxt)+'</span>';
+    box.appendChild(b);
+  });
+}
+function renderProf(data){
+  var p=document.getElementById('crmProf');
+  if(!data){p.innerHTML='<div class="crm-state err">โหลดข้อมูลลูกค้าไม่สำเร็จ</div>';return;}
+  var c=data.customer||{},prods=data.products||[];
+  var wl=prods.length?Math.min.apply(null,prods.map(function(x){return x.warrantyLeftDays==null?99999:x.warrantyLeftDays;})):null;
+  if(wl===99999)wl=null;
+  var wc=wl==null?'var(--ink3)':(wl<=0?'var(--red)':wl<30?'var(--amber)':'var(--live)');
+  var wtxt=wl==null?'—':(wl<=0?'หมดอายุ':wl+' วัน');
+  var spend=data.totalSpend||prods.reduce(function(s,x){return s+(+x.price||0);},0);
+  p.innerHTML=
+   '<div class="crm-phead"><div class="crm-av">'+esc((c.name||'?').slice(0,1))+'</div><div style="flex:1;min-width:0">'+
+     '<div class="crm-pn">'+esc(c.name)+'</div><div class="crm-pm">'+esc(c.phone)+(c.cars?' · '+esc(c.cars):'')+'</div>'+
+     '<div class="crm-tags">'+(c.tags||[]).map(function(t){return '<span class="crm-pill gold">'+esc(t)+'</span>';}).join('')+(c.since?'<span class="crm-pill">ลูกค้าตั้งแต่ '+esc(c.since)+'</span>':'')+'</div>'+
+   '</div></div>'+
+   '<div class="crm-stats">'+
+     '<div class="crm-stat"><div class="l">สินค้าที่ซื้อ</div><div class="v">'+prods.length+' ชิ้น</div></div>'+
+     '<div class="crm-stat"><div class="l">มูลค่ารวม</div><div class="v">฿'+Number(spend).toLocaleString('th-TH')+'</div></div>'+
+     '<div class="crm-stat"><div class="l">ประกันคงเหลือ</div><div class="v" style="color:'+wc+'">'+wtxt+'</div>'+
+       (wl==null?'':'<div class="crm-barw"><div class="crm-bar" style="width:'+Math.max(4,Math.min(100,Math.round((wl/365)*100)))+'%;background:'+wc+'"></div></div>')+'</div>'+
+   '</div>'+
+   '<div><div class="crm-lbl">สินค้า</div>'+prods.map(function(x){return '<span class="crm-pill">'+esc(x.model)+'</span>';}).join(' ')+'</div>'+
+   (data.timeline&&data.timeline.length?'<div><div class="crm-lbl">ไทม์ไลน์ลูกค้า</div><ul class="crm-tl">'+data.timeline.map(function(e){return '<li style="--tc:'+(e.tc||'var(--ink3)')+'"><div class="d">'+esc(e.d)+'</div><div class="t">'+(e.t||'')+'</div></li>';}).join('')+'</ul></div>':'')+
+   (data.suggestions&&data.suggestions.length?'<div class="crm-sug"><h3>◆ ควรเสนออะไรต่อ</h3>'+data.suggestions.map(function(o){var t=o.title||o[0],w=o.why||o[1]||'';return '<div class="crm-offer"><div><div class="on">'+esc(t)+'</div>'+(w?'<div class="ow">'+esc(w)+'</div>':'')+'</div><button class="crm-btn" data-offer="'+esc(t)+'">เสนอ</button></div>';}).join('')+'</div>':'');
+}
+
+function loadProf(phone){
+  cur=phone;renderRows(document.getElementById('crmSearch').value.trim());
+  document.getElementById('crmProf').innerHTML='<div class="crm-state">กำลังโหลด…</div>';
+  if(usingSample){renderProf(SAMPLE_360[phone]||null);return;}
+  callAPI({api:'getCustomer360',phone:phone}).then(function(d){
+    if(d&&d.success===false){renderProf(null);return;}
+    renderProf(d);
+  }).catch(function(){renderProf(null);});
+}
+
+function useSample(){usingSample=true;document.getElementById('crmBanner').classList.add('show');LIST=SAMPLE_LIST;renderRows('');}
+
+function loadList(){
+  // local-first paint
+  try{var cj=sessionStorage.getItem('sn_crm_list');if(cj){var cached=asList(JSON.parse(cj));if(cached){LIST=cached;renderRows('');}}}catch(e){}
+  callAPI({api:'listCustomers'}).then(function(d){
+    var rows=asList(d);
+    if(!rows){ // not a list → forbidden / error / endpoint not built yet → fall back to sample
+      if(!LIST.length) { if(denied(d)){document.getElementById('crmRows').innerHTML='<div class="crm-state denied">คุณไม่มีสิทธิ์เข้าถึงข้อมูลลูกค้า</div>';} else { useSample(); } }
+      return;
+    }
+    usingSample=false;document.getElementById('crmBanner').classList.remove('show');
+    LIST=rows;try{sessionStorage.setItem('sn_crm_list',JSON.stringify(rows));}catch(e){}
+    renderRows(document.getElementById('crmSearch').value.trim());
+  }).catch(function(){ if(!LIST.length) useSample(); });
+}
+
+document.getElementById('crmRows').addEventListener('click',function(e){var b=e.target.closest('.crm-row');if(b)loadProf(b.dataset.phone);});
+document.getElementById('crmSearch').addEventListener('input',function(){renderRows(this.value.trim());});
+document.getElementById('crmProf').addEventListener('click',function(e){var b=e.target.closest('[data-offer]');if(b)toast('ร่างข้อความเสนอ "'+b.dataset.offer+'" แล้ว (สาธิต)');});
+loadList();
+</script>
+</body>
+</html>

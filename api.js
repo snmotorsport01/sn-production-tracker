@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 var nativeFetch=window.fetch.bind(window),pending=new Map();
-var reads=new Set(['hubBundle','financeBundle','ceoBundle','costBundle','listBatches','getBatch','getStats','listInventory','listBOM','listPODrafts','listPayments','getCashFlow','listCashflow','listInvoices','getInvoice','cashflowSummary','getProducts','getCostData','getPermissions','authMe','authVerify','authListUsers','batchHistory','listWarranties','getWarranty','sync','n8nHealth','n8nGetAll','n8nGetChanges','n8nSyncStatus']);
+var reads=new Set(['hubBundle','financeBundle','ceoBundle','costBundle','listBatches','getBatch','getStats','listInventory','listBOM','listPODrafts','listPayments','getCashFlow','listCashflow','listInvoices','getInvoice','cashflowSummary','getProducts','getCostData','getPermissions','authMe','authVerify','authListUsers','batchHistory','listWarranties','getWarranty','listCustomers','getCustomer360','sync','n8nHealth','n8nGetAll','n8nGetChanges','n8nSyncStatus']);
 window.snApiMetrics=[];
 /* Latency instrumentation (best-effort; must never affect a request). Persisted
    ring buffer across page loads so p50/p95/cold-warm can be read over several
